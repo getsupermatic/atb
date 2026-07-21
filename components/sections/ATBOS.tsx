@@ -52,6 +52,10 @@ export default function ATBOS() {
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
+    // Re-measure once the Manrope web font loads — measuring before that
+    // under-reports height (fallback font wraps to fewer lines), so the
+    // tallest statement would overflow into the progress dots.
+    document.fonts?.ready.then(measure);
     return () => ro.disconnect();
   }, []);
 

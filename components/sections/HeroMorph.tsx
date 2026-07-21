@@ -7,6 +7,14 @@ import { motion, useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+const keywords = [
+  "AI-native products",
+  "Frontline innovation",
+  "Voice-first UX",
+  "Generative commerce",
+  "Marketing intelligence",
+];
+
 /**
  * Hero header graphic. It opens full-screen (edge-to-edge, square corners) and,
  * on scroll, wraps into a rounded contained panel — the reverse of the Why-now
@@ -120,6 +128,29 @@ export default function HeroMorph() {
                     </Link>
                   </motion.div>
                 </div>
+              </div>
+            </div>
+
+            {/* Rolling keyword strip — pinned to the bottom of the hero graphic (§2.1) */}
+            <div
+              className="marquee-mask absolute inset-x-0 bottom-0 overflow-hidden border-t py-4 backdrop-blur-sm"
+              style={{
+                borderColor: "var(--border)",
+                background:
+                  "linear-gradient(0deg, rgba(245,241,232,0.85), rgba(245,241,232,0.35))",
+              }}
+              aria-hidden
+            >
+              <div className="marquee-track flex w-max gap-10 pr-10">
+                {[...keywords, ...keywords, ...keywords, ...keywords].map((k, i) => (
+                  <span
+                    key={i}
+                    className="text-sm font-medium text-[color:var(--text-muted)]"
+                    style={{ fontFamily: "var(--font-display)", whiteSpace: "nowrap" }}
+                  >
+                    {k}
+                  </span>
+                ))}
               </div>
             </div>
           </div>

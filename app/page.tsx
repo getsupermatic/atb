@@ -5,7 +5,6 @@ import NewModel from "@/components/sections/NewModel";
 import WaysToWork from "@/components/sections/WaysToWork";
 import Products from "@/components/sections/Products";
 import ATBOS from "@/components/sections/ATBOS";
-import ClosingBand from "@/components/sections/ClosingBand";
 import { products, site } from "@/lib/site";
 
 const productsJsonLd = {
@@ -39,7 +38,6 @@ export default function Home() {
       <WaysToWork />
       <Products />
       <ATBOS />
-      <ClosingBand />
     </>
   );
 }

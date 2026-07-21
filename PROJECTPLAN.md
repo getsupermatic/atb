@@ -211,3 +211,59 @@ Other pages (Who we are, What we do, product detail, How we work, Insights, Care
 - LCP warning for `orbit-planet`: left lazy (it's section 5, below the fold; the above-the-fold hero already has `priority`). The warning came from reloading while scrolled down; shrinking the image to 488 KB is the substantive fix.
 
 Verified in-browser: hero, feature-morph and grain textures render crisply at q80; no broken images, no `.png` 404s, no LCP/scroll-behavior warnings after reload.
+
+---
+
+## Review — reposition hero keyword ticker (2026-07-21)
+
+**Problem:** Below the header, the rolling keyword ticker (§2.1) and the
+"Trusted by teams at the world's biggest brands" logo strip were stacked
+together and felt awkward in that space.
+
+**Done:** Moved the keyword ticker into the hero graphic itself — pinned to the
+bottom edge of the header panel so it stays visible in the viewport. The
+trusted-by logo strip now occupies the space directly below the header on its own.
+
+- [x] `components/sections/HeroMorph.tsx` — keyword ticker added as an
+      absolutely-positioned strip pinned to the bottom of the hero graphic
+      `card` (`absolute inset-x-0 bottom-0`). Frosted-cream gradient +
+      `backdrop-blur` + top border so the words read over the photo; clipped by
+      the panel's rounding as it morphs (100vh → 88vh). Decorative
+      (`aria-hidden`); reuses `.marquee-track` / `.marquee-mask`.
+- [x] `components/sections/Hero.tsx` — removed the standalone marquee block and
+      its `keywords` array; trusted-by strip now sits directly below the header
+      (`mt-16`).
+
+**Verified:** `next build` passes; checked in-browser (1375px) — ticker reads
+cleanly over the hero image and stays pinned through the morph; trusted-by strip
+sits alone below the header.
+
+### Follow-ups (2026-07-21)
+- **Trusted-by label size:** bumped "Trusted by teams at the world's biggest
+  brands." from `text-sm` → `text-base` (`components/sections/Hero.tsx`).
+- **Closing band relocated:** removed `<ClosingBand />` from the home page
+  (`app/page.tsx`) and temporarily placed it on a new `/insights` route
+  (`app/insights/page.tsx`) until the Insights page is built out. Home page now
+  runs ATBOS → footer. `next build` passes (new static `/insights` route);
+  both pages verified in-browser.
+- **ATBOS overlap fix:** the statement copy overlapped the progress dots on the
+  tallest (third) statement. The reserved height (`copyH`) was measured before
+  the Manrope web font loaded (fallback font wraps to fewer lines → height
+  under-reported), and the `ResizeObserver` never re-fired because the measuring
+  paragraphs are absolutely positioned. Added a `document.fonts.ready` re-measure
+  in `components/sections/ATBOS.tsx`. Verified in-browser — third statement now
+  clears the dots.
+- **Trusted-by strip centring + logo weights (`components/sections/Hero.tsx`):**
+  - Top margin `mt-16` → `mt-32` so the strip sits centrally in the band between
+    the hero panel and the feature panel (was sitting high / crowding the top).
+  - Resting opacities raised for Burger King & John Lewis (0.5 → 0.85) so they
+    read at a similar weight to Diageo; PepsiCo set to 0.7 (slightly lighter).
+  - Nestlé (pale line-art, opacity can't darken it) gets a `brightness-[0.4]`
+    resting filter, and a custom rollover (`hover:brightness-[0.3]
+    hover:contrast-[1.5]`, staying monochrome) so it goes crisp/high-contrast on
+    hover instead of revealing its faint colour version. Added optional `dim`
+    and `hover` fields per logo to support this.
+  - Follow-up tuning: John Lewis height 60 → 63 (very slightly larger) and its
+    rollover now tints the black mark **gold** (a `brightness(0)…invert…sepia…`
+    filter chain). Nestlé lightened (`brightness-[0.4]` → `[0.5]`) and height
+    36 → 34 (fractionally smaller). Verified in-browser incl. both rollovers.
