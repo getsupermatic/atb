@@ -59,7 +59,7 @@ export default function FeatureMorph() {
         <div ref={pad} className="w-full" style={{ paddingInline: "clamp(1.25rem, 5vw, 3rem)" }}>
           <div
             ref={card}
-            className="relative w-full overflow-hidden h-[88vh] sm:h-[62vh]"
+            className="relative w-full overflow-hidden h-[62vh]"
             style={{ borderRadius: "1.75rem" }}
           >
             <Image
@@ -80,8 +80,7 @@ export default function FeatureMorph() {
             <div className="absolute inset-0 flex items-end">
               <div className="shell pb-[6vh] sm:pb-[8vh]">
                 <h2
-                  className="max-w-[18ch] text-[color:var(--color-cream)]"
-                  style={{ fontSize: "var(--text-5xl)" }}
+                  className="max-w-[18ch] text-[color:var(--color-cream)] [font-size:2.35rem] sm:[font-size:var(--text-5xl)]"
                 >
                   Capability now advances by the month.{" "}
                   <span style={{ color: "var(--color-lime)" }}>
@@ -90,8 +89,8 @@ export default function FeatureMorph() {
                 </h2>
                 <p
                   ref={sub}
-                  className="mt-6 max-w-[42ch] text-[color:var(--color-cream)]"
-                  style={{ fontSize: "var(--text-xl)", opacity: 0.92 }}
+                  className="mt-5 max-w-[42ch] text-[color:var(--color-cream)] [font-size:1.05rem] sm:[font-size:var(--text-xl)]"
+                  style={{ opacity: 0.92 }}
                 >
                   We exist to close the gap between what AI can do and what actually
                   reaches your business.
