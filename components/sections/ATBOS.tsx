@@ -14,6 +14,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  * nothing is hidden behind motion.
  */
 const headlines = [
+  "The AI-native operating system we've built the whole company on, and the reason we deliver faster, at lower cost, and smarter.",
   "One intelligent system runs the entire business — every pipeline, project, decision and delivery, in a single always-current view.",
   "An agentic engine sits at its core — scoping, building, shipping and improving every product we make.",
   "We build smarter, sharper and more consistently than ever — more creative, more innovative, and more informed with every decision.",
@@ -80,7 +81,12 @@ export default function ATBOS() {
           scrub: 0.6,
           onUpdate: (self) => {
             const p = self.progress;
-            const next = p < 0.09 ? -1 : p < 0.41 ? 0 : p < 0.74 ? 1 : 2;
+            // Timeline: a 0.5 beat of logo alone, then each line spans 3 units
+            // (fade-in, hold, fade-out); the last has no fade-out.
+            const n = els.length;
+            const total = 3 * n - 0.5;
+            let next = -1;
+            for (let i = 0; i < n; i++) if (p >= (0.5 + 3 * i) / total) next = i;
             setIndex((prev) => (prev === next ? prev : next));
           },
         },
@@ -101,7 +107,8 @@ export default function ATBOS() {
   return (
     <section
       ref={section}
-      className={reduce ? "relative" : "relative h-[320vh]"}
+      className="relative"
+      style={reduce ? undefined : { height: `${Math.round(100 + (3 * headlines.length - 0.5) * 26)}vh` }}
       aria-label="ATBOS — our operating system"
     >
       <div className="sticky top-0 flex min-h-screen items-center overflow-hidden">

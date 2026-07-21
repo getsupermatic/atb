@@ -15,6 +15,7 @@ export default function FeatureMorph() {
   const section = useRef<HTMLDivElement>(null);
   const pad = useRef<HTMLDivElement>(null);
   const card = useRef<HTMLDivElement>(null);
+  const sub = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -32,14 +33,21 @@ export default function FeatureMorph() {
       tl.fromTo(
         pad.current,
         { paddingInline: "clamp(1.25rem, 5vw, 3rem)" },
-        { paddingInline: 0, ease: "none" },
+        { paddingInline: 0, ease: "none", duration: 1 },
         0,
-      ).fromTo(
-        card.current,
-        { borderRadius: "1.75rem", height: "62vh" },
-        { borderRadius: "0rem", height: "100vh", ease: "none" },
-        0,
-      );
+      )
+        .fromTo(
+          card.current,
+          { borderRadius: "1.75rem", height: "62vh" },
+          { borderRadius: "0rem", height: "100vh", ease: "none", duration: 1 },
+          0,
+        )
+        .fromTo(
+          sub.current,
+          { autoAlpha: 0, y: 28 },
+          { autoAlpha: 1, y: 0, ease: "none", duration: 0.4 },
+          0.6,
+        );
     }, section);
 
     return () => ctx.revert();
@@ -80,6 +88,14 @@ export default function FeatureMorph() {
                     Most frontline tools still change by the year.
                   </span>
                 </h2>
+                <p
+                  ref={sub}
+                  className="mt-6 max-w-[42ch] text-[color:var(--color-cream)]"
+                  style={{ fontSize: "var(--text-xl)", opacity: 0.92 }}
+                >
+                  We exist to close the gap between what AI can do and what actually
+                  reaches your business.
+                </p>
               </div>
             </div>
           </div>

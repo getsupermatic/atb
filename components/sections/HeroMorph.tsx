@@ -105,9 +105,9 @@ export default function HeroMorph() {
                     An AI-native product company
                   </motion.p>
                   <motion.h1 className="mt-5" style={{ fontSize: "var(--text-5xl)" }} {...stagger(1)}>
-                    AI-native products.
+                    Frontier AI,
                     <br />
-                    <span style={{ color: "var(--text-muted)" }}>For the customer</span> frontline.
+                    <span style={{ color: "var(--text-muted)" }}>built for</span> the real world.
                   </motion.h1>
                   <motion.p
                     className="mt-5 max-w-[56ch] text-[color:var(--text-muted)]"
@@ -117,7 +117,7 @@ export default function HeroMorph() {
                     We imagine, build and forward-deploy AI-native products — underpinned by our
                     AI-native delivery — for everywhere your business meets the customer: the shop
                     floor, the drive-through, the field, the contact centre, the app and the online
-                    store. Strategy you can deploy, live from day one.
+                    store. Strategy that gets deployed.
                   </motion.p>
                   <motion.div className="mt-7 flex flex-wrap items-center gap-3" {...stagger(3)}>
                     <Link href="/contact" className="btn btn-primary">

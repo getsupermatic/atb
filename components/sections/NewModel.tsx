@@ -31,7 +31,7 @@ export default function NewModel() {
       <div className="shell">
         <Reveal>
           <h2 className="max-w-[16ch]" style={{ fontSize: "var(--text-4xl)" }}>
-            A new model for AI where it counts.
+            A new model for a changed world.
           </h2>
         </Reveal>
         <div className="mt-12 grid gap-4 sm:grid-cols-2">
