@@ -1,0 +1,324 @@
+@import "tailwindcss";
+
+/* ============================================================
+   ATB. — design tokens
+   Brand palette (§2.2). Lime is accent-only; never body text.
+   ============================================================ */
+@theme {
+  /* Raw brand palette */
+  --color-teal: #295f66;
+  --color-cream: #f5f1e8;
+  --color-petrol: #163f45;
+  --color-aqua: #a9cfca;
+  --color-powder: #9cb9cc;
+  --color-sage: #b7c5ae;
+  --color-lime: #c6d64d;
+
+  /* Derived tints/shades */
+  --color-cream-soft: #fbf9f4;
+  --color-teal-deep: #1f4c52;
+  --color-petrol-deep: #0f2e33;
+
+  /* Typefaces (wired to next/font vars in layout.tsx) */
+  --font-display: var(--font-manrope), "Manrope", system-ui, sans-serif;
+  --font-body: var(--font-serif), "Source Serif 4", Georgia, serif;
+  --font-mono: var(--font-mono-ibm), "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Fluid type scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+  --text-3xl: clamp(1.9rem, 1.5rem + 1.6vw, 2.75rem);
+  --text-4xl: clamp(2.3rem, 1.7rem + 2.6vw, 3.75rem);
+  --text-5xl: clamp(2.8rem, 1.9rem + 4vw, 5rem);
+  --text-6xl: clamp(3.4rem, 2rem + 6vw, 6.5rem);
+
+  /* Motion (§5.6) */
+  --dur-fast: 150ms;
+  --dur-base: 300ms;
+  --dur-slow: 600ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ------------------------------------------------------------
+   Semantic aliases — remapped by .theme-dark for dark sections
+   ------------------------------------------------------------ */
+:root {
+  --bg: var(--color-cream);
+  --bg-elevated: var(--color-cream-soft);
+  --text: #163f45;
+  --text-muted: #47686c;
+  --heading: var(--color-teal);
+  --accent: var(--color-lime);
+  --border: rgba(41, 95, 102, 0.16);
+  --glass-tint: rgba(255, 255, 255, 0.55);
+  --glass-edge: rgba(255, 255, 255, 0.7);
+}
+
+.theme-dark {
+  --bg: var(--color-petrol);
+  --bg-elevated: var(--color-teal-deep);
+  --text: var(--color-cream);
+  --text-muted: var(--color-aqua);
+  --heading: var(--color-cream);
+  --accent: var(--color-lime);
+  --border: rgba(245, 241, 232, 0.16);
+  --glass-tint: rgba(41, 95, 102, 0.35);
+  --glass-edge: rgba(169, 207, 202, 0.25);
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* ============================================================
+   Base — in @layer base so Tailwind utilities can override
+   (e.g. text-[color:…] on a heading in a dark section).
+   ============================================================ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-petrol);
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    color: var(--heading);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+
+  :where(a, button, input, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-lime);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* ============================================================
+   Components
+   ============================================================ */
+@layer components {
+  /* Section kicker — sentence-case label */
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Glassy navigation — frosted enough to stay legible over dark sections,
+     still translucent + heavily blurred for a glassy feel */
+  .glass-nav {
+    background: linear-gradient(135deg, rgba(251, 249, 244, 0.72), rgba(245, 241, 232, 0.62));
+    backdrop-filter: blur(22px) saturate(1.4);
+    -webkit-backdrop-filter: blur(22px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.5) inset,
+      0 16px 40px -30px rgba(22, 63, 69, 0.45);
+  }
+
+  /* Layout container */
+  .shell {
+    width: 100%;
+    max-width: 78rem; /* ~1248px */
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 5vw, 3rem);
+  }
+
+  /* Iridescent glass — soft luminous frosted surface */
+  .material-glass {
+    background:
+      linear-gradient(135deg, var(--glass-tint), rgba(169, 207, 202, 0.14) 45%, rgba(156, 185, 204, 0.18)),
+      var(--bg-elevated);
+    backdrop-filter: blur(14px) saturate(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.1);
+    border: 1px solid var(--glass-edge);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.4) inset,
+      0 20px 50px -30px rgba(22, 63, 69, 0.5);
+  }
+
+  /* Smoked glass — dark translucent for dark sections */
+  .material-smoked {
+    background: linear-gradient(155deg, rgba(31, 76, 82, 0.6), rgba(15, 46, 51, 0.75));
+    backdrop-filter: blur(16px) saturate(1.05);
+    -webkit-backdrop-filter: blur(16px) saturate(1.05);
+    border: 1px solid rgba(169, 207, 202, 0.18);
+  }
+
+  /* Print grain — tactile texture over cream fields (§5.4) */
+  .grain-overlay {
+    position: fixed;
+    inset: -10% 0 0 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("/images/background-cream.webp");
+    background-size: cover;
+    background-position: center top;
+    opacity: 0.75;
+    mix-blend-mode: normal;
+    will-change: transform;
+  }
+
+  /* Halftone dot veil — printed-dot atmosphere over hero imagery */
+  .halftone::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(22, 63, 69, 0.5) 1px, transparent 1.4px);
+    background-size: 5px 5px;
+    mix-blend-mode: soft-light;
+    opacity: 0.5;
+  }
+
+  /* Image frame — rounded, layered edge for editorial imagery */
+  .img-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 30px 70px -45px rgba(22, 63, 69, 0.65);
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    letter-spacing: 0.01em;
+    padding: 0.85rem 1.4rem;
+    border-radius: 999px;
+    transition: transform var(--dur-base) var(--ease-standard),
+      background-color var(--dur-base) var(--ease-standard),
+      box-shadow var(--dur-base) var(--ease-standard),
+      border-color var(--dur-base) var(--ease-standard);
+    cursor: pointer;
+    line-height: 1;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  .btn-primary {
+    background: var(--color-lime);
+    color: var(--color-petrol);
+    box-shadow: 0 12px 30px -14px rgba(198, 214, 77, 0.9);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 18px 36px -14px rgba(198, 214, 77, 1);
+  }
+  .btn-outline {
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: transparent;
+  }
+  .btn-outline:hover {
+    border-color: var(--heading);
+    background: var(--bg-elevated);
+  }
+
+  /* The lime node dot used on the Contact pill / links */
+  .node-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--color-lime);
+    flex: none;
+  }
+
+  /* Section vertical rhythm */
+  .section {
+    position: relative;
+    z-index: 1;
+    padding-block: clamp(4.5rem, 9vw, 9rem);
+  }
+
+  /* Hero morph scroll runway (full-screen → contained panel) */
+  .hero-morph-section {
+    height: 175vh;
+  }
+}
+
+/* ============================================================
+   Keyframes / animation utilities
+   ============================================================ */
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.orbit-spin {
+  animation: orbit-spin 9s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee 32s linear infinite;
+}
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .grain-overlay {
+    display: none;
+  }
+  .orbit-spin,
+  .marquee-track {
+    animation: none !important;
+  }
+  /* No scroll morph — render the hero as a single full-screen panel */
+  .hero-morph-section {
+    height: 100vh;
+  }
+}
