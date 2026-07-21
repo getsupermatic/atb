@@ -11,7 +11,7 @@ export const site = {
   email: "info@atbeyond.com",
   tagline: "AI-native products for the customer frontline.",
   description:
-    "ATB. (At The Beyond) is an AI-native product and consulting company built for the customer frontline. We imagine, build and forward-deploy AI products for everywhere your business meets the customer — operations, commerce and marketing.",
+    "At The Beyond is an AI-native product and consulting company built for the customer frontline. We imagine, build and forward-deploy AI products for everywhere your business meets the customer — operations, commerce and marketing.",
   social: {
     linkedin: "https://www.linkedin.com/company/at-the-beyond",
     x: "https://x.com/atbeyond",

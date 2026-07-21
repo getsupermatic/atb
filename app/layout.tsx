@@ -27,7 +27,7 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(site.domain),
   title: {
-    default: "ATB. — AI-native products for the customer frontline",
+    default: "ATB. AI-native products for the customer frontline",
     template: "%s · ATB.",
   },
   description: site.description,
@@ -47,12 +47,12 @@ export const metadata: Metadata = {
     type: "website",
     url: site.domain,
     siteName: site.name,
-    title: "ATB. — AI-native products for the customer frontline",
+    title: "ATB. AI-native products for the customer frontline",
     description: site.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: "ATB. — AI-native products for the customer frontline",
+    title: "ATB. AI-native products for the customer frontline",
     description: site.description,
   },
   robots: { index: true, follow: true },
