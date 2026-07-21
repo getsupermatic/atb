@@ -38,7 +38,7 @@ export default function FeatureMorph() {
       )
         .fromTo(
           card.current,
-          { borderRadius: "1.75rem", height: "62vh" },
+          { borderRadius: "1.75rem" },
           { borderRadius: "0rem", height: "100vh", ease: "none", duration: 1 },
           0,
         )
@@ -59,8 +59,8 @@ export default function FeatureMorph() {
         <div ref={pad} className="w-full" style={{ paddingInline: "clamp(1.25rem, 5vw, 3rem)" }}>
           <div
             ref={card}
-            className="relative w-full overflow-hidden"
-            style={{ height: "62vh", borderRadius: "1.75rem" }}
+            className="relative w-full overflow-hidden h-[88vh] sm:h-[62vh]"
+            style={{ borderRadius: "1.75rem" }}
           >
             <Image
               src="/images/teal-tunnel.webp"
@@ -78,7 +78,7 @@ export default function FeatureMorph() {
               }}
             />
             <div className="absolute inset-0 flex items-end">
-              <div className="shell pb-[8vh]">
+              <div className="shell pb-[6vh] sm:pb-[8vh]">
                 <h2
                   className="max-w-[18ch] text-[color:var(--color-cream)]"
                   style={{ fontSize: "var(--text-5xl)" }}
