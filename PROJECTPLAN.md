@@ -267,3 +267,42 @@ sits alone below the header.
     rollover now tints the black mark **gold** (a `brightness(0)…invert…sepia…`
     filter chain). Nestlé lightened (`brightness-[0.4]` → `[0.5]`) and height
     36 → 34 (fractionally smaller). Verified in-browser incl. both rollovers.
+
+---
+
+## ATB V2 — separate creative-direction project (2026-07-25)
+
+This folder (`/Users/robhollands/Cursor/atb-v2`) is a **fork of the ATB project
+for exploring an alternate creative direction**. The original project at
+`/Users/robhollands/Cursor/atb` has been returned to its last committed state
+(`f9250ac`) and is untouched by this work.
+
+### How the split is set up
+- **Same GitHub repo** (`getsupermatic/atb.git`), full history preserved — so
+  changes can be cherry-picked in either direction.
+- **This folder is on branch `v2`**; the original folder stays on `main`. A push
+  from here can never overwrite `main`.
+- `.vercel/` was **removed here** — V2 is deliberately not linked to the live
+  `atb` production project. Run `vercel link` before deploying V2.
+- A dormant `v2` branch also exists in the original `atb` folder as a backup of
+  this work; it can be deleted once V2 is established.
+
+### What V2 currently changes (commit `9866776`)
+| Area | Change |
+| --- | --- |
+| Hero | Dark navy prism background (`hero-bg-test.png`) replacing the light `hero-hand.webp`; overlay gradients and bottom band inverted to navy; heading and muted text set light-on-dark |
+| Accent colour | Lime `#c6d64d` → terracotta `#cc8a55`, carried through buttons, shadows and the footer logo glow |
+| Logo | New dotless modern **`atb`** monogram variant added to `components/brand/Logo.tsx`, used in the nav |
+| Nav | Links pinned to dark ink `#1B2836` with accent hover; glass nav slightly more translucent and more blurred |
+
+### Known loose ends in V2
+- Hero background is still named `hero-bg-test.png` — placeholder artwork,
+  needs replacing with final licensed/approved imagery.
+- `hero-hand-v2.webp` is committed but currently unused.
+- Nav colours are **hardcoded hex** (`#1B2836`, `#f7f1e6`) rather than routed
+  through CSS custom properties — should be tokenised in `globals.css` before
+  this direction goes any further.
+- The terracotta accent is applied by overwriting `--color-lime` rather than
+  renaming the token; the variable name is now misleading.
+- Only the hero and nav were re-themed — the rest of the page is still built for
+  the light/lime direction, so the two halves don't yet cohere.
