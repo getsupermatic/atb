@@ -69,11 +69,11 @@ export default function FooterLogo({ height = 26 }: { height?: number }) {
           x: inView && armed ? 0 : parked,
           boxShadow: inView
             ? [
-                "0 0 0px 0px rgba(198, 214, 77, 0)",
-                "0 0 14px 3px rgba(198, 214, 77, 0.65)",
-                "0 0 0px 0px rgba(198, 214, 77, 0)",
+                "0 0 0px 0px rgba(204, 138, 85, 0)",
+                "0 0 14px 3px rgba(204, 138, 85, 0.65)",
+                "0 0 0px 0px rgba(204, 138, 85, 0)",
               ]
-            : "0 0 0px 0px rgba(198, 214, 77, 0)",
+            : "0 0 0px 0px rgba(204, 138, 85, 0)",
         }}
         transition={{
           x: { duration: 1.5, ease: [0.16, 1, 0.3, 1] },
@@ -91,7 +91,7 @@ export default function FooterLogo({ height = 26 }: { height?: number }) {
             width: diameter * 9,
             transformOrigin: "left center",
             background:
-              "linear-gradient(90deg, rgba(198, 214, 77, 0.55), rgba(198, 214, 77, 0))",
+              "linear-gradient(90deg, rgba(204, 138, 85, 0.55), rgba(204, 138, 85, 0))",
           }}
           animate={{ opacity: inView ? [0, 0.9, 0] : 0, scaleX: inView ? [0.2, 1, 0.2] : 0.2 }}
           transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}

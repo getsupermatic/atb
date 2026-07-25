@@ -6,7 +6,7 @@
  * `variant="full"` — the "at the beyond." lockup.
  */
 type Props = {
-  variant?: "mono" | "full";
+  variant?: "mono" | "full" | "atb";
   className?: string;
   style?: React.CSSProperties;
   /** Omit the full stop — used when the dot is animated separately (footer). */
@@ -21,6 +21,31 @@ const svgBase: React.CSSProperties = {
 };
 
 export default function Logo({ variant = "mono", className, style, hideDot }: Props) {
+  if (variant === "atb") {
+    // Dotless modern ATB monogram (test artwork). Inherits `currentColor` so it
+    // themes like the other marks; white background from the source file dropped.
+    return (
+      <svg
+        viewBox="362 558 775 270"
+        fill="currentColor"
+        role="img"
+        aria-label="ATB"
+        className={className}
+        style={{ ...svgBase, ...style }}
+      >
+        <g transform="translate(365.397657, 812.551902)">
+          <path d="M 60 -240 L 204 -240 C 212.800781 -240 220.847656 -237.847656 228.140625 -233.546875 C 235.441406 -229.242188 241.242188 -223.441406 245.546875 -216.140625 C 249.847656 -208.847656 252 -200.800781 252 -192 L 252 0 L 204 0 L 204 -96 L 60 -96 L 60 0 L 12 0 L 12 -192 C 12 -200.800781 14.148438 -208.847656 18.453125 -216.140625 C 22.753906 -223.441406 28.550781 -229.242188 35.84375 -233.546875 C 43.144531 -237.847656 51.195312 -240 60 -240 Z M 60 -192 L 60 -144 L 204 -144 L 204 -192 Z M 60 -192 " />
+        </g>
+        <g transform="translate(617.99717, 812.551902)">
+          <path d="M 252 -240 L 252 -192 L 156 -192 L 156 0 L 108 0 L 108 -192 L 12 -192 L 12 -240 Z M 252 -240 " />
+        </g>
+        <g transform="translate(870.596684, 812.551902)">
+          <path d="M 252 -192 L 252 -144 C 252 -137.394531 249.648438 -131.742188 244.953125 -127.046875 C 240.253906 -122.347656 234.601562 -120 228 -120 C 234.601562 -120 240.253906 -117.648438 244.953125 -112.953125 C 249.648438 -108.253906 252 -102.601562 252 -96 L 252 -48 C 252 -39.394531 249.847656 -31.441406 245.546875 -24.140625 C 241.242188 -16.847656 235.492188 -11 228.296875 -6.59375 C 221.097656 -2.195312 213 0 204 0 L 12 0 L 12 -240 L 204 -240 C 213 -240 221.097656 -237.796875 228.296875 -233.390625 C 235.492188 -228.992188 241.242188 -223.195312 245.546875 -216 C 249.847656 -208.800781 252 -200.800781 252 -192 Z M 204 -192 L 60 -192 L 60 -144 L 204 -144 Z M 60 -48 L 204 -48 L 204 -96 L 60 -96 Z M 60 -48 " />
+        </g>
+      </svg>
+    );
+  }
+
   if (variant === "full") {
     return (
       <svg

@@ -72,12 +72,12 @@ export default function HeroMorph() {
         <div ref={pad} className="w-full">
           <div
             ref={card}
-            className="relative w-full overflow-hidden"
-            style={{ height: "100vh", borderRadius: 0 }}
+            className="theme-dark relative w-full overflow-hidden"
+            style={{ height: "100vh", borderRadius: 0, ["--text-muted" as string]: "#cac6bb" } as React.CSSProperties}
           >
             <Image
-              src="/images/hero-hand.webp"
-              alt="A hand reaching along an orbital curve toward a lime node — intelligence just beyond reach."
+              src="/images/hero-bg-test.png"
+              alt="Light refracting through a prism against deep navy — spectral flares scattered across darkness."
               fill
               priority
               sizes="100vw"
@@ -89,13 +89,13 @@ export default function HeroMorph() {
               className="absolute inset-0"
               style={{
                 background:
-                  "linear-gradient(100deg, var(--color-cream) 6%, rgba(245,241,232,0.82) 32%, rgba(245,241,232,0.32) 54%, rgba(245,241,232,0) 76%)",
+                  "linear-gradient(100deg, rgba(11,26,46,0.92) 0%, rgba(11,26,46,0.7) 30%, rgba(11,26,46,0.3) 55%, rgba(11,26,46,0) 80%)",
               }}
             />
             <div
               aria-hidden
               className="absolute inset-x-0 top-0 h-32"
-              style={{ background: "linear-gradient(180deg, rgba(245,241,232,0.6), transparent)" }}
+              style={{ background: "linear-gradient(180deg, rgba(11,26,46,0.65), transparent)" }}
             />
 
             <div className="absolute inset-0 flex items-center">
@@ -104,7 +104,7 @@ export default function HeroMorph() {
                   <motion.p className="eyebrow" {...stagger(0)}>
                     An AI-native product company
                   </motion.p>
-                  <motion.h1 className="mt-5" style={{ fontSize: "var(--text-5xl)" }} {...stagger(1)}>
+                  <motion.h1 className="mt-5" style={{ fontSize: "var(--text-5xl)", color: "#f7f1e6" }} {...stagger(1)}>
                     Frontier AI,
                     <br />
                     <span style={{ color: "var(--text-muted)" }}>built for</span> the real world.
@@ -137,7 +137,7 @@ export default function HeroMorph() {
               style={{
                 borderColor: "var(--border)",
                 background:
-                  "linear-gradient(0deg, rgba(245,241,232,0.85), rgba(245,241,232,0.35))",
+                  "linear-gradient(0deg, rgba(11,26,46,0.92), rgba(11,26,46,0.45))",
               }}
               aria-hidden
             >

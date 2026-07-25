@@ -86,15 +86,15 @@ export default function Nav() {
           <Link
             href="/"
             className="relative flex items-center py-1"
-            aria-label="ATB. — home"
+            aria-label="ATB — home"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             onFocus={() => setHovered(true)}
             onBlur={() => setHovered(false)}
           >
             <Logo
-              variant="mono"
-              style={{ height: 26, opacity: showFull ? 0 : 1, transition: "opacity 0.35s ease" }}
+              variant="atb"
+              style={{ height: 26, color: "#1b2836", opacity: showFull ? 0 : 1, transition: "opacity 0.35s ease" }}
             />
             <AnimatePresence>
               {showFull && (
@@ -107,7 +107,7 @@ export default function Nav() {
                   exit={{ opacity: 0, filter: "blur(4px)", transition: { duration: 0.3 } }}
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <Logo variant="full" style={{ height: 26 }} />
+                  <Logo variant="full" style={{ height: 26, color: "#1b2836" }} />
                 </motion.span>
               )}
             </AnimatePresence>
@@ -118,7 +118,7 @@ export default function Nav() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="text-[0.9rem] font-medium text-[color:var(--text-muted)] transition-colors hover:text-[color:var(--heading)]"
+                  className="text-[0.9rem] font-medium text-[#1B2836] transition-colors hover:text-[color:var(--accent)]"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {item.label}
@@ -169,7 +169,7 @@ export default function Nav() {
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="flex min-h-[44px] items-center text-lg font-medium text-[color:var(--heading)]"
+                    className="flex min-h-[44px] items-center text-lg font-medium text-[#1B2836]"
                     style={{ fontFamily: "var(--font-display)" }}
                   >
                     {item.label}
