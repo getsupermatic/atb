@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Source_Serif_4, IBM_Plex_Mono } from "next/font/google";
+import { Newsreader, Inter } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 import Nav from "@/components/Nav";
@@ -7,20 +7,20 @@ import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 import GrainBackground from "@/components/motion/GrainBackground";
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+// Headline typeface. Variable, with the optical-size axis loaded so large
+// display settings get the tighter, higher-contrast cut (font-optical-sizing
+// is set on headings in globals.css).
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
+  axes: ["opsz"],
   display: "swap",
 });
-const serif = Source_Serif_4({
-  variable: "--font-serif",
+
+// Body + all UI copy (buttons, nav, eyebrows, labels).
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  display: "swap",
-});
-const mono = IBM_Plex_Mono({
-  variable: "--font-mono-ibm",
-  subsets: ["latin"],
-  weight: ["400", "500"],
   display: "swap",
 });
 
@@ -87,7 +87,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${manrope.variable} ${serif.variable} ${mono.variable}`}
+      className={`${newsreader.variable} ${inter.variable}`}
     >
       <body>
         <script
@@ -102,7 +102,7 @@ export default function RootLayout({
         <GrainBackground />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-full focus:bg-[color:var(--color-lime)] focus:px-5 focus:py-2 focus:text-[color:var(--color-petrol)]"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-full focus:bg-[color:var(--color-amber)] focus:px-5 focus:py-2 focus:text-[color:var(--color-ink)]"
         >
           Skip to content
         </a>

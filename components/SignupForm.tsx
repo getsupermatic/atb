@@ -24,7 +24,7 @@ export default function SignupForm() {
 
   if (status === "success") {
     return (
-      <p role="status" className="text-[color:var(--color-aqua)]">
+      <p role="status" className="text-[color:var(--text-muted)]">
         Thanks — you&rsquo;re on the list. We&rsquo;ll be in touch with the thinking, no noise.
       </p>
     );
@@ -56,18 +56,14 @@ export default function SignupForm() {
             if (status === "error") setStatus("idle");
           }}
           aria-invalid={status === "error"}
-          className="min-h-[48px] flex-1 rounded-full border px-5 text-[color:var(--color-cream)] placeholder:text-[color:var(--color-aqua)]/70"
-          style={{
-            background: "rgba(15,46,51,0.5)",
-            borderColor: status === "error" ? "var(--color-lime)" : "var(--border)",
-          }}
+          className="field flex-1"
         />
         <button type="submit" className="btn btn-primary justify-center">
           Subscribe
         </button>
       </div>
       {status === "error" && (
-        <p role="alert" className="mt-2 text-sm text-[color:var(--color-aqua)]">
+        <p role="alert" className="mt-2 text-sm text-[color:var(--text-muted)]">
           Enter a valid email address so we can reach you.
         </p>
       )}

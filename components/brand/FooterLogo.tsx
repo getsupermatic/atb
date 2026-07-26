@@ -67,6 +67,10 @@ export default function FooterLogo({ height = 26 }: { height?: number }) {
         initial={false}
         animate={{
           x: inView && armed ? 0 : parked,
+          // Literal Clay Amber (--color-amber, #CC8A55) rather than the token:
+          // Framer Motion has to parse and interpolate the colour inside the
+          // box-shadow keyframes, and it cannot resolve var() to do that.
+          // Keep in step with --color-amber in globals.css.
           boxShadow: inView
             ? [
                 "0 0 0px 0px rgba(204, 138, 85, 0)",
@@ -91,7 +95,7 @@ export default function FooterLogo({ height = 26 }: { height?: number }) {
             width: diameter * 9,
             transformOrigin: "left center",
             background:
-              "linear-gradient(90deg, rgba(204, 138, 85, 0.55), rgba(204, 138, 85, 0))",
+              "linear-gradient(90deg, rgb(var(--amber-rgb) / 0.55), rgb(var(--amber-rgb) / 0))",
           }}
           animate={{ opacity: inView ? [0, 0.9, 0] : 0, scaleX: inView ? [0.2, 1, 0.2] : 0.2 }}
           transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}

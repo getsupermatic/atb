@@ -30,9 +30,7 @@ export default function NewModel() {
     <section className="section" aria-label="A new model">
       <div className="shell">
         <Reveal>
-          <h2 className="max-w-[16ch]" style={{ fontSize: "var(--text-4xl)" }}>
-            A new model for a changed world.
-          </h2>
+          <h2 className="max-w-[16ch] text-4xl">A new model for a changed world.</h2>
         </Reveal>
         <div className="mt-12 grid gap-4 sm:grid-cols-2">
           {pillars.map((pillar, i) => (
@@ -42,10 +40,11 @@ export default function NewModel() {
               from={i % 2 === 0 ? "left" : "right"}
               className="relative flex min-h-[16rem] flex-col justify-end overflow-hidden rounded-3xl p-8"
             >
-              {/* Distinct crop of the shared iridescent background */}
+              {/* Distinct crop of the shared iridescent background. The crop
+                  is per-pillar, so position stays inline. */}
               <span
                 aria-hidden
-                className="absolute inset-0"
+                className="plate-legacy absolute inset-0"
                 style={{
                   backgroundImage: "url('/images/card-modern.webp')",
                   backgroundSize: "260%",
@@ -53,19 +52,10 @@ export default function NewModel() {
                 }}
               />
               {/* Legibility scrim */}
-              <span
-                aria-hidden
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(15,46,51,0.05) 0%, rgba(15,46,51,0.15) 35%, rgba(15,46,51,0.6) 70%, rgba(15,46,51,0.92) 100%)",
-                }}
-              />
+              <span aria-hidden className="scrim-card absolute inset-0" />
               <div className="relative z-10">
-                <h3 className="text-[color:var(--color-cream)]" style={{ fontSize: "var(--text-xl)" }}>
-                  {pillar.title}
-                </h3>
-                <p className="mt-2 text-[color:var(--color-aqua)]">{pillar.body}</p>
+                <h3 className="text-xl text-[color:var(--color-chalk)]">{pillar.title}</h3>
+                <p className="mt-2 text-[color:var(--color-stone)]">{pillar.body}</p>
               </div>
             </Reveal>
           ))}

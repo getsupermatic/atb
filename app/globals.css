@@ -2,27 +2,27 @@
 
 /* ============================================================
    ATB. — design tokens
-   Brand palette (§2.2). Lime is accent-only; never body text.
+   Brand palette (§2.2). Clay Amber is accent-only; it must never
+   be text on a light field (2.6:1 — use --accent-text there).
    ============================================================ */
 @theme {
-  /* Raw brand palette */
-  --color-teal: #295f66;
-  --color-cream: #f5f1e8;
-  --color-petrol: #163f45;
-  --color-aqua: #a9cfca;
-  --color-powder: #9cb9cc;
-  --color-sage: #b7c5ae;
-  --color-lime: #cc8a55;
+  /* Raw brand palette — named after the palette board */
+  --color-chalk: #f7f1e6; /* Warm Chalk  — page canvas */
+  --color-oat: #e5dccb; /* Oat Greige  — elevated surfaces on light */
+  --color-stone: #cac6bb; /* Warm Stone  — muted text on dark, soft fills */
+  --color-sage: #99a08e; /* Sage Stone  — soft support, diagram fills */
+  --color-slate: #5e6576; /* Warm Slate  — muted text on light */
+  --color-ink: #1b2836; /* Deep Ink    — headings, dark base, scrims */
+  --color-amber: #cc8a55; /* Clay Amber  — CTAs, nodes, the logo dot */
 
-  /* Derived tints/shades */
-  --color-cream-soft: #fbf9f4;
-  --color-teal-deep: #1f4c52;
-  --color-petrol-deep: #0f2e33;
+  /* Derived shades — tints/shades of the above, not new brand colours */
+  --color-ink-soft: #26333f; /* Deep Ink lifted toward Warm Slate */
+  --color-ink-deep: #121c26; /* Deep Ink deepened — deepest scrims */
+  --color-amber-deep: #8f5a2c; /* Clay Amber darkened for text on light */
 
   /* Typefaces (wired to next/font vars in layout.tsx) */
-  --font-display: var(--font-manrope), "Manrope", system-ui, sans-serif;
-  --font-body: var(--font-serif), "Source Serif 4", Georgia, serif;
-  --font-mono: var(--font-mono-ibm), "IBM Plex Mono", ui-monospace, monospace;
+  --font-display: var(--font-newsreader), "Newsreader", Georgia, serif;
+  --font-body: var(--font-inter), "Inter", system-ui, sans-serif;
 
   /* Fluid type scale */
   --text-xs: 0.75rem;
@@ -49,27 +49,39 @@
    Semantic aliases — remapped by .theme-dark for dark sections
    ------------------------------------------------------------ */
 :root {
-  --bg: var(--color-cream);
-  --bg-elevated: var(--color-cream-soft);
-  --text: #163f45;
-  --text-muted: #47686c;
-  --heading: var(--color-teal);
-  --accent: var(--color-lime);
-  --border: rgba(41, 95, 102, 0.16);
-  --glass-tint: rgba(255, 255, 255, 0.55);
-  --glass-edge: rgba(255, 255, 255, 0.7);
+  /* Channel triplets so scrims can be authored as rgb(… / alpha)
+     without hardcoding the palette hex in every gradient. */
+  --ink-rgb: 27 40 54;
+  --chalk-rgb: 247 241 230;
+  --amber-rgb: 204 138 85;
+
+  --bg: var(--color-chalk);
+  --bg-elevated: var(--color-oat);
+  --text: var(--color-ink);
+  --text-muted: var(--color-slate);
+  --heading: var(--color-ink);
+  --accent: var(--color-amber);
+  /* Amber fails AA as text on chalk — light fields use the darkened shade */
+  --accent-text: var(--color-amber-deep);
+  --border: rgb(var(--ink-rgb) / 0.14);
+  --field-bg: rgb(var(--chalk-rgb) / 0.55);
+  --glass-tint: rgb(var(--chalk-rgb) / 0.62);
+  --glass-edge: rgb(var(--chalk-rgb) / 0.75);
 }
 
 .theme-dark {
-  --bg: var(--color-petrol);
-  --bg-elevated: var(--color-teal-deep);
-  --text: var(--color-cream);
-  --text-muted: var(--color-aqua);
-  --heading: var(--color-cream);
-  --accent: var(--color-lime);
-  --border: rgba(245, 241, 232, 0.16);
-  --glass-tint: rgba(41, 95, 102, 0.35);
-  --glass-edge: rgba(169, 207, 202, 0.25);
+  --bg: var(--color-ink);
+  --bg-elevated: var(--color-ink-soft);
+  --text: var(--color-chalk);
+  --text-muted: var(--color-stone);
+  --heading: var(--color-chalk);
+  --accent: var(--color-amber);
+  /* On Deep Ink, Clay Amber clears AA (5.2:1) — no substitute needed */
+  --accent-text: var(--color-amber);
+  --border: rgb(var(--chalk-rgb) / 0.16);
+  --field-bg: rgb(var(--ink-rgb) / 0.5);
+  --glass-tint: rgb(var(--ink-rgb) / 0.45);
+  --glass-edge: rgb(var(--chalk-rgb) / 0.14);
   background-color: var(--bg);
   color: var(--text);
 }
@@ -90,28 +102,37 @@
     color: var(--text);
     font-family: var(--font-body);
     font-size: var(--text-base);
-    line-height: 1.65;
+    line-height: 1.6;
+    letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: clip;
   }
 
   ::selection {
-    background: var(--color-lime);
-    color: var(--color-petrol);
+    background: var(--color-amber);
+    color: var(--color-ink);
   }
 
+  /* Newsreader is a serif with an optical-size axis — it wants near-neutral
+     tracking, a touch more leading and a lighter weight than the grotesque
+     it replaced, or large sizes read clotted. */
   h1, h2, h3, h4, h5 {
     font-family: var(--font-display);
     color: var(--heading);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.04;
+    font-weight: 400;
+    font-optical-sizing: auto;
+    letter-spacing: -0.01em;
+    line-height: 1.08;
     text-wrap: balance;
   }
 
+  h3, h4, h5 {
+    font-weight: 500;
+  }
+
   :where(a, button, input, textarea, [tabindex]):focus-visible {
-    outline: 2px solid var(--color-lime);
+    outline: 2px solid var(--accent-text);
     outline-offset: 3px;
     border-radius: 4px;
   }
@@ -123,7 +144,7 @@
 @layer components {
   /* Section kicker — sentence-case label */
   .eyebrow {
-    font-family: var(--font-display);
+    font-family: var(--font-body);
     font-size: var(--text-sm);
     font-weight: 500;
     letter-spacing: 0.01em;
@@ -132,17 +153,101 @@
     align-items: center;
   }
 
-  /* Glassy navigation — frosted enough to stay legible over dark sections,
-     still translucent + heavily blurred for a glassy feel */
-  .glass-nav {
-    background: linear-gradient(135deg, rgba(251, 249, 244, 0.70), rgba(245, 241, 232, 0.55));
-    backdrop-filter: blur(24px) saturate(1.5);
-    -webkit-backdrop-filter: blur(24px) saturate(1.5);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.75) inset,
-      0 -1px 0 rgba(255, 255, 255, 0.12) inset,
-      0 18px 44px -30px rgba(22, 63, 69, 0.5);
+  /* Large display statement — the pull-quote / manifesto voice. Size is set
+     per usage with a type-scale utility. */
+  .statement {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-optical-sizing: auto;
+    letter-spacing: -0.01em;
+    line-height: 1.14;
+    color: var(--heading);
+    text-wrap: balance;
+  }
+
+  /* Big stat numerals — tabular so the count-up doesn't jitter in width */
+  .stat-figure {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--heading);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  /* Navigation (§4.1, behaviour target: Valliance) -----------------------
+     At the top of the page there is no container at all — the logo, links and
+     CTA sit bare over the hero. Scrolling back up brings in a full-width
+     smoked-glass bar behind them.
+
+     The bar is Deep Ink, not Warm Chalk, so the foreground stays Warm Chalk in
+     both states — there is no colour flip to cross-fade, and therefore no
+     window where the labels are the wrong colour for what is behind them.
+
+     Foreground colour lives on the header so the pane, links, logo and burger
+     all resolve from one source of truth (custom properties inherit down the
+     tree, and the pane is a sibling of the content). */
+  .nav-bar {
+    --nav-fg: var(--color-chalk);
+    /* On Deep Ink, full Clay Amber clears AA (5.2:1) */
+    --accent-text: var(--color-amber);
+  }
+
+  .nav-fg {
+    color: var(--nav-fg, var(--color-ink));
+  }
+
+  /* Bare over the hero the row sits lower, so the logo isn't crowded against
+     the top edge; docked it tightens up to keep the bar compact.
+     hidden → docked happens off-screen, but docked → top happens in full view
+     at the top of the page, so this has to be transitioned or the row snaps.
+     Matched to the pane's duration so the height and the fade move together. */
+  .nav-row {
+    padding-block: 1.5rem 1.3rem;
+    transition:
+      padding-top var(--dur-base) var(--ease-standard),
+      padding-bottom var(--dur-base) var(--ease-standard);
+  }
+  .nav-scrolled .nav-row {
+    padding-block: 1.15rem;
+  }
+
+  /* The bar itself — edge to edge and square, so it reads as a bar rather than
+     a floating pill. Kept fairly opaque: the page beneath is Deep Ink copy on
+     Warm Chalk, and a thinner tint lets that ghost through as legible text. */
+  .nav-pane {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-100%);
+    background: linear-gradient(
+      180deg,
+      rgb(var(--ink-rgb) / 0.88),
+      rgb(var(--ink-rgb) / 0.78)
+    );
+    backdrop-filter: blur(26px);
+    border-bottom: 1px solid rgb(var(--chalk-rgb) / 0.12);
+    transition:
+      opacity var(--dur-base) var(--ease-standard),
+      transform var(--dur-base) var(--ease-entrance);
+  }
+  .nav-scrolled .nav-pane {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Mobile dropdown — same smoked material, a touch more solid since it is
+     carrying a full menu rather than a single row. */
+  .nav-panel {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--ink-rgb) / 0.94),
+      rgb(var(--ink-rgb) / 0.86)
+    );
+    backdrop-filter: blur(26px);
+    border: 1px solid rgb(var(--chalk-rgb) / 0.14);
   }
 
   /* Layout container */
@@ -153,28 +258,174 @@
     padding-inline: clamp(1.25rem, 5vw, 3rem);
   }
 
-  /* Iridescent glass — soft luminous frosted surface */
+  /* Frosted glass — soft luminous surface on light fields */
   .material-glass {
     background:
-      linear-gradient(135deg, var(--glass-tint), rgba(169, 207, 202, 0.14) 45%, rgba(156, 185, 204, 0.18)),
+      linear-gradient(
+        135deg,
+        var(--glass-tint),
+        rgb(var(--chalk-rgb) / 0.4) 45%,
+        rgb(var(--chalk-rgb) / 0.5)
+      ),
       var(--bg-elevated);
     backdrop-filter: blur(14px) saturate(1.1);
-    -webkit-backdrop-filter: blur(14px) saturate(1.1);
     border: 1px solid var(--glass-edge);
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.4) inset,
-      0 20px 50px -30px rgba(22, 63, 69, 0.5);
+      0 1px 0 rgb(var(--chalk-rgb) / 0.4) inset,
+      0 20px 50px -30px rgb(var(--ink-rgb) / 0.5);
   }
 
   /* Smoked glass — dark translucent for dark sections */
   .material-smoked {
-    background: linear-gradient(155deg, rgba(31, 76, 82, 0.6), rgba(15, 46, 51, 0.75));
+    background: linear-gradient(
+      155deg,
+      rgb(var(--ink-rgb) / 0.55),
+      rgb(var(--ink-rgb) / 0.78)
+    );
     backdrop-filter: blur(16px) saturate(1.05);
-    -webkit-backdrop-filter: blur(16px) saturate(1.05);
-    border: 1px solid rgba(169, 207, 202, 0.18);
+    border: 1px solid rgb(var(--chalk-rgb) / 0.14);
   }
 
-  /* Print grain — tactile texture over cream fields (§5.4) */
+  /* Frosted cell — stat cells sitting on a textured light field */
+  .material-frost {
+    background: rgb(var(--chalk-rgb) / 0.62);
+    backdrop-filter: blur(12px);
+  }
+
+  /* ----------------------------------------------------------
+     Scrims & veils — legibility washes over imagery. Authored
+     from the palette channels, never raw hex.
+     ---------------------------------------------------------- */
+
+  /* Vertical Deep Ink wash — dark statement bands (footer, closing band) */
+  .scrim-deep {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--ink-rgb) / 0.62),
+      rgb(var(--ink-rgb) / 0.82)
+    );
+  }
+
+  /* Bottom-weighted — copy anchored to the foot of a panel */
+  .scrim-panel {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--ink-rgb) / 0.2),
+      rgb(var(--ink-rgb) / 0.42) 55%,
+      rgb(var(--ink-rgb) / 0.78)
+    );
+  }
+
+  /* Steeper bottom weight — small cards where text sits at the base.
+     Carries a warm amber note through the midtones so the desaturated
+     legacy plates underneath read clay rather than flat grey. */
+  /* Measured: the copy in these cards starts at ~39% of the card height, so the
+     ink is at full strength by 40% and the warm luminous band is kept to the
+     top third. Reads as a smoked card over the plate rather than a wash. */
+  .scrim-card {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--ink-rgb) / 0.35) 0%,
+      rgb(var(--amber-rgb) / 0.28) 18%,
+      rgb(var(--ink-rgb) / 0.88) 40%,
+      rgb(var(--ink-rgb) / 0.97) 100%
+    );
+  }
+
+  /* Horizontal — copy on the left, imagery breathing to the right */
+  .scrim-side {
+    background: linear-gradient(
+      90deg,
+      rgb(var(--ink-rgb) / 0.94) 0%,
+      rgb(var(--ink-rgb) / 0.8) 42%,
+      rgb(var(--ink-rgb) / 0.58) 100%
+    );
+  }
+
+  /* Hero — angled, clears the right side for the artwork */
+  .scrim-hero {
+    background: linear-gradient(
+      100deg,
+      rgb(var(--ink-rgb) / 0.94) 0%,
+      rgb(var(--ink-rgb) / 0.74) 30%,
+      rgb(var(--ink-rgb) / 0.34) 55%,
+      rgb(var(--ink-rgb) / 0) 80%
+    );
+  }
+
+  /* Top fade — keeps the glass nav legible over imagery */
+  .scrim-top {
+    background: linear-gradient(180deg, rgb(var(--ink-rgb) / 0.7), transparent);
+  }
+
+  /* Bottom band — the rolling keyword strip */
+  .scrim-band {
+    background: linear-gradient(
+      0deg,
+      rgb(var(--ink-rgb) / 0.94),
+      rgb(var(--ink-rgb) / 0.5)
+    );
+  }
+
+  /* Warm Chalk veils — lift light sections off their imagery */
+  .veil-chalk {
+    background: rgb(var(--chalk-rgb) / 0.62);
+  }
+
+  .veil-chalk-radial {
+    background: radial-gradient(
+      120% 90% at 50% 40%,
+      rgb(var(--chalk-rgb) / 0.82) 0%,
+      rgb(var(--chalk-rgb) / 0.58) 55%,
+      rgb(var(--chalk-rgb) / 0.38) 100%
+    );
+  }
+
+  /* ----------------------------------------------------------
+     Duotone — INTERIM. The photographic set was produced for the
+     retired teal/lime palette. This strips the original hue and
+     remaps each image into a Deep Ink ↔ Warm Chalk duotone so the
+     imagery sits inside the new palette. Delete this class (and
+     its usages) once re-treated artwork lands.
+     Wrap only the image — never a node with text inside, or the
+     blend will pick up the copy.
+     ---------------------------------------------------------- */
+  .duotone {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  /* grayscale() first wipes the retired teal and the acid-lime nodes out
+     completely; sepia() then re-tints the flat grey warm, landing it in Warm
+     Stone / Clay Amber territory rather than cold neutral. */
+  .duotone :where(img) {
+    filter: grayscale(1) sepia(0.5) saturate(1.5) contrast(1.04) brightness(1.02);
+  }
+  /* A little depth back into the plate — light at the top, ink at the foot. */
+  .duotone::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgb(var(--chalk-rgb) / 0.18),
+      rgb(var(--ink-rgb) / 0.22)
+    );
+    mix-blend-mode: soft-light;
+  }
+
+  /* INTERIM, sibling of .duotone — for legacy plates painted as a CSS
+     background-image rather than an <img>, where the blend-mode approach
+     can't reach. Strips the retired teal/lime hue; the warm note comes from
+     whichever scrim sits over it. Delete alongside .duotone. */
+  .plate-legacy {
+    /* Slightly deepened — these plates are pale, and the card copy sits over
+       them, so the scrim needs something to bite against. */
+    filter: grayscale(1) sepia(0.5) saturate(1.5) contrast(1.06) brightness(0.92);
+  }
+
+  /* Print grain — tactile texture over chalk fields (§5.4) */
   .grain-overlay {
     position: fixed;
     inset: -10% 0 0 0;
@@ -183,8 +434,11 @@
     background-image: url("/images/background-cream.webp");
     background-size: cover;
     background-position: center top;
-    opacity: 0.75;
-    mix-blend-mode: normal;
+    /* Legacy cream/teal grain plate. Desaturated then warmed so it reads as
+       texture rather than colour; kept faint because greying it made the
+       plate's large wave forms read as a watermark over Warm Chalk. */
+    filter: grayscale(1) sepia(0.55) brightness(1.04);
+    opacity: 0.22;
     will-change: transform;
   }
 
@@ -194,7 +448,10 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background-image: radial-gradient(rgba(22, 63, 69, 0.5) 1px, transparent 1.4px);
+    background-image: radial-gradient(
+      rgb(var(--ink-rgb) / 0.5) 1px,
+      transparent 1.4px
+    );
     background-size: 5px 5px;
     mix-blend-mode: soft-light;
     opacity: 0.5;
@@ -206,7 +463,7 @@
     overflow: hidden;
     border-radius: 1.25rem;
     border: 1px solid var(--border);
-    box-shadow: 0 30px 70px -45px rgba(22, 63, 69, 0.65);
+    box-shadow: 0 30px 70px -45px rgb(var(--ink-rgb) / 0.65);
   }
 
   /* Buttons */
@@ -214,13 +471,14 @@
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
-    font-family: var(--font-display);
+    font-family: var(--font-body);
     font-weight: 600;
     font-size: var(--text-sm);
     letter-spacing: 0.01em;
     padding: 0.85rem 1.4rem;
     border-radius: 999px;
-    transition: transform var(--dur-base) var(--ease-standard),
+    transition:
+      transform var(--dur-base) var(--ease-standard),
       background-color var(--dur-base) var(--ease-standard),
       box-shadow var(--dur-base) var(--ease-standard),
       border-color var(--dur-base) var(--ease-standard);
@@ -230,14 +488,14 @@
   .btn:hover {
     transform: translateY(-2px);
   }
+  /* Flat Oat Greige fill, Deep Ink label — 11:1. No border, no shadow. */
   .btn-primary {
-    background: var(--color-lime);
-    color: var(--color-petrol);
-    box-shadow: 0 12px 30px -14px rgba(204, 138, 85, 0.9);
+    background: var(--color-oat);
+    color: var(--color-ink);
   }
-  .btn-primary:hover {
-    box-shadow: 0 18px 36px -14px rgba(204, 138, 85, 1);
-  }
+
+  /* No nav-specific override needed: the bar is Deep Ink, so the flat Oat fill
+     reads as a solid shape against it exactly as it does over the hero. */
   .btn-outline {
     border: 1px solid var(--border);
     color: var(--text);
@@ -248,12 +506,39 @@
     background: var(--bg-elevated);
   }
 
-  /* The lime node dot used on the Contact pill / links */
+  /* Inline text link — accent-safe in both themes */
+  .link-accent {
+    color: var(--accent-text);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color var(--dur-base) var(--ease-standard);
+  }
+
+  /* Pill field — the insights sign-up input */
+  .field {
+    min-height: 48px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--field-bg);
+    padding-inline: 1.25rem;
+    color: var(--text);
+    font-family: var(--font-body);
+  }
+  .field::placeholder {
+    color: var(--text-muted);
+    opacity: 0.8;
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--accent);
+  }
+
+  /* The amber node dot used on the Contact pill / links */
   .node-dot {
     width: 7px;
     height: 7px;
     border-radius: 999px;
-    background: var(--color-lime);
+    background: var(--color-amber);
     flex: none;
   }
 

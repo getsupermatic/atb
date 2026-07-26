@@ -1,7 +1,7 @@
 /**
- * ATB. logo (final artwork, inlined as `currentColor` so it themes teal on
- * cream / cream on dark). The full stop is part of the mark and renders in the
- * same colour as the logo.
+ * ATB. logo (final artwork, inlined as `currentColor` so it themes Deep Ink on
+ * Warm Chalk / Warm Chalk on dark). The full stop is part of the mark and
+ * renders in the same colour as the logo.
  * `variant="mono"` — the ATB monogram.
  * `variant="full"` — the "at the beyond." lockup.
  */
@@ -13,11 +13,13 @@ type Props = {
   hideDot?: boolean;
 };
 
+// Colour is inherited rather than pinned, so the caller's context decides it
+// (the nav flips it as the pane changes; the footer picks up its own --text).
 const svgBase: React.CSSProperties = {
   height: "1.5em",
   width: "auto",
   display: "block",
-  color: "var(--heading)",
+  color: "inherit",
 };
 
 export default function Logo({ variant = "mono", className, style, hideDot }: Props) {

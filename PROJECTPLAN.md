@@ -306,3 +306,250 @@ for exploring an alternate creative direction**. The original project at
   renaming the token; the variable name is now misleading.
 - Only the hero and nav were re-themed — the rest of the page is still built for
   the light/lime direction, so the two halves don't yet cohere.
+
+---
+
+## V2 Rebrand — palette + typography implementation (2026-07-25)
+
+Closes the "known loose ends" above. Two inputs: the **Colour Palette** board
+(7 named swatches) and the typeface pair **Newsreader** (headlines) / **Inter**
+(body). Goal is to retire the teal/lime system and the inline hex patches, and
+land one tokenised system that every component reads from.
+
+### A. Colour system
+
+Raw tokens renamed to the palette's own names — the current `--color-lime`
+already *holds* `#cc8a55`, so the old names now actively mislead.
+
+| New token | Hex | Palette name | Replaces | Role |
+|---|---|---|---|---|
+| `--color-chalk` | `#F7F1E6` | Warm Chalk | `--color-cream` | Page canvas |
+| `--color-oat` | `#E5DCCB` | Oat Greige | `--color-cream-soft` | Elevated / glass surfaces on light |
+| `--color-stone` | `#CAC6BB` | Warm Stone | `--color-aqua` | Muted text on dark, soft fills |
+| `--color-sage` | `#99A08E` | Sage Stone | `--color-sage` (revalued) | Soft support, diagram fills |
+| `--color-slate` | `#5E6576` | Warm Slate | `--color-powder` | Muted text on light |
+| `--color-ink` | `#1B2836` | Deep Ink | `--color-teal` + `--color-petrol` | Headings, dark base, scrims |
+| `--color-amber` | `#CC8A55` | Clay Amber | `--color-lime` | Accent: CTAs, nodes, logo dot |
+
+Derived shades (tints/shades of the above — **not** new brand colours, named so
+that stays obvious):
+
+- `--color-ink-soft: #26333F` — Deep Ink lifted toward Warm Slate; dark elevated surfaces.
+- `--color-ink-deep: #121C26` — Deep Ink deepened; deepest scrims.
+- `--color-amber-deep: #8F5A2C` — Clay Amber darkened for **amber-as-text on light** (see contrast note).
+
+Semantic aliases (components should read these, not raw tokens):
+
+| Alias | Light (`:root`) | Dark (`.theme-dark`) |
+|---|---|---|
+| `--bg` | chalk | ink |
+| `--bg-elevated` | oat | ink-soft |
+| `--text` | ink | chalk |
+| `--text-muted` | slate | stone |
+| `--heading` | ink | chalk |
+| `--accent` | amber | amber |
+| `--accent-text` | amber-deep | amber |
+| `--border` | `ink / 14%` | `chalk / 16%` |
+
+**Contrast (WCAG AA, verified by calculation):**
+- Warm Slate on Warm Chalk — **5.1:1** ✅ body text
+- Deep Ink on Warm Chalk — **13.3:1** ✅
+- Warm Stone on Deep Ink — **8.8:1** ✅
+- Deep Ink on Clay Amber (primary button) — **5.2:1** ✅
+- Clay Amber on Deep Ink (links on dark) — **5.2:1** ✅
+- ⚠️ **Clay Amber on Warm Chalk — 2.6:1 ✗ fails.** Amber must not be text on
+  light fields. This is a live regression: `Nav.tsx` hovers links to `--accent`
+  on the light glass nav. Fixed by `--accent-text` (amber-deep, 5.1:1) for
+  light-mode text; amber stays for fills, dots, focus rings and dark-mode text.
+
+### B. Typography
+
+Flips the pairing from sans-display/serif-body to **serif-display/sans-body**.
+
+- `--font-display` → **Newsreader** (h1–h5, statement copy, large stat numerals)
+- `--font-body` → **Inter** (body copy **and all UI**: buttons, nav, eyebrows, marquee, labels)
+- **Remove IBM Plex Mono** — `--font-mono` is declared and downloaded but
+  referenced by zero components. Dead weight on every page load.
+
+Serif display needs its heading treatment retuned — the current values are
+grotesque-sans habits and will look clotted on Newsreader:
+
+| Property | Now (Manrope) | New (Newsreader) |
+|---|---|---|
+| `font-weight` | 600 | 400 (h1/h2), 500 (h3–h5) |
+| `letter-spacing` | −0.02em | −0.01em |
+| `line-height` | 1.04 | 1.08 |
+| — | — | `font-optical-sizing: auto` (Newsreader has an `opsz` axis) |
+
+The repeated `font-[600]` + inline `fontFamily`/`fontSize`/`letterSpacing`/
+`lineHeight` blobs on statement paragraphs (Footer, Problem pull-quote, ATBOS
+lines, CountUp) collapse into one `.statement` component class.
+
+### C. Inline styles to retire
+
+| File | What comes out |
+|---|---|
+| `Nav.tsx` | `color:"#1b2836"` ×2 (Logo already defaults to `--heading`); `text-[#1B2836]` ×2; `fontFamily:var(--font-display)` on links; amber hover → `--accent-text` |
+| `HeroMorph.tsx` | `--text-muted:"#cac6bb"` override (now in `.theme-dark`); `color:"#f7f1e6"` on h1; 4 × `rgba(11,26,46,…)`; marquee `fontFamily` |
+| `Footer.tsx`, `ClosingBand.tsx`, `NewModel.tsx`, `WaysToWork.tsx`, `FeatureMorph.tsx`, `SignupForm.tsx` | 11 × `rgba(15,46,51,…)` teal scrims → ink-based `.scrim-*` classes |
+| `Problem.tsx` | `rgba(245,241,232,0.55)` veil, `bg-[rgba(251,249,244,0.6)]` cells |
+| `ATBOS.tsx` | radial cream veil, `rgba(41,95,102,0.28)` progress dot |
+| `FooterLogo.tsx` | 6 × `rgba(204,138,85,…)` glow/trail → amber token |
+| `OrbitMark.tsx` | teal strokes → ink / sage |
+| `app/icon.svg` | `#163f45` / `#f5f1e8` → Deep Ink / Warm Chalk |
+
+### D. Imagery — the one thing code can't fix
+
+The photographic set is **teal + acid-lime** and was made for the retiring
+palette. Verified by inspection: `teal-tunnel.webp` is flat deep teal;
+`orbit-planet.webp` and `atbos-bg.webp` carry literal `#C6D64D`-ish lime nodes
+that fight Clay Amber directly. Affected: `teal-tunnel`, `atbos-bg`,
+`orbit-planet`, `iridescent`, `glass-planes`, `glass-planes-footer`,
+`card-modern`, `background-cream` (the grain layer), `product-*.webp`.
+
+`hero-bg-test.png` is the exception — navy with warm flares, already consistent
+with Deep Ink + Clay Amber.
+
+Retokenising the CSS scrims without addressing this means ink/chalk scrims
+sitting over teal photography. Needs a decision (see Open questions).
+
+### To-do
+
+- [x] 1. `globals.css` — new raw tokens, derived shades, semantic aliases, `.theme-dark` remap
+- [x] 2. `layout.tsx` — Newsreader + Inter via `next/font/google`; drop IBM Plex Mono
+- [x] 3. `globals.css` base — heading weight/tracking/leading for serif; `.statement`; `.eyebrow` + `.btn` to Inter
+- [x] 4. `globals.css` components — `.scrim-*` classes; `--accent-text`; glass materials to chalk/oat/ink
+- [x] 5. Sweep all raw `--color-*` references to the new names (~70 sites, 14 files)
+- [x] 6. Strip the inline styles in §C, file by file
+- [x] 7. `app/icon.svg` + `OrbitMark.tsx` to new palette
+- [x] 8. Imagery treatment per decision in §D
+- [x] 9. Update brief §2.2 / §2.5 so the source of truth matches the build
+- [x] 10. `npm run build`; check home + `/insights`, light + dark sections, mobile, reduced-motion, focus states
+
+### Open questions (blocking 8, shaping 1 & 5)
+
+1. **Legacy imagery** — interim CSS duotone treatment to pull the teal assets
+   into the new palette, or ship code-correct and accept the clash until new
+   artwork exists?
+2. **Token renaming** — rename to palette names (recommended, kills the
+   `--color-lime`-holds-terracotta trap), or keep old names with new values?
+
+
+### Review — what was built (2026-07-25)
+
+**Colour.** Palette tokens renamed to the board's own names
+(`--color-chalk` / `oat` / `stone` / `sage` / `slate` / `ink` / `amber`) with
+three derived shades (`ink-soft`, `ink-deep`, `amber-deep`). Semantic aliases
+(`--bg`, `--text`, `--text-muted`, `--heading`, `--accent`, `--accent-text`,
+`--border`, `--field-bg`) remap under `.theme-dark`. Every component reads
+tokens — the only literals left are `app/icon.svg` (a standalone file that
+can't read custom properties) and one documented Framer Motion case.
+
+**Typography.** Newsreader (display, `opsz` axis loaded) + Inter (body and all
+UI). IBM Plex Mono removed — it was downloaded on every page and referenced by
+nothing. Heading treatment retuned for a serif: weight 400/500, tracking
+−0.01em, leading 1.08, `font-optical-sizing: auto`. Repeated inline type blobs
+collapsed into `.statement` and `.stat-figure`.
+
+**Inline styles.** All 11 teal `rgba(15,46,51,…)` scrims, the 4 navy
+`rgba(11,26,46,…)` hero scrims, both chalk veils and the WIP hex patches are
+gone, replaced by `.scrim-*` / `.veil-*` component classes authored from
+`--ink-rgb` / `--chalk-rgb` / `--amber-rgb` channel triplets. Every
+`style={{fontSize: "var(--text-Nxl)"}}` became a type-scale utility.
+
+**Accessibility.** Contrast verified by calculation: Warm Slate on Warm Chalk
+5.1:1, Deep Ink on Warm Chalk 13.3:1, Warm Stone on Deep Ink 8.8:1, Deep Ink on
+Oat (buttons) 11:1. Clay Amber on Warm Chalk is only **2.6:1**, so `--accent-text`
+(Clay Amber darkened, 5.1:1) carries amber-as-text on light fields; this fixed a
+live regression where nav links hovered to full amber on the light glass.
+
+**Bug found and fixed: `backdrop-filter` was dead site-wide.** `globals.css`
+declared `backdrop-filter` immediately followed by `-webkit-backdrop-filter`.
+Lightning CSS (Tailwind v4) dedupes the pair and keeps the last one, and Chrome
+supports the standard property but *not* the `-webkit-` alias — so the glass nav
+and all three glass materials had no blur at all and rendered as flat slabs.
+Removing the hand-written prefixed lines restored it; the build's own prefixing
+handles targets. Verified in the emitted CSS and via `getComputedStyle`.
+
+### Client direction taken during the session
+
+- **Nav** — went through several rounds; see "Nav — final behaviour" below for
+  the version that landed. (Interim states — always-on glass pill, then an
+  adaptive light/dark pill — were both replaced.)
+- **CTA buttons** — Clay Amber → Warm Chalk → **Oat Greige**, Deep Ink label.
+- **Hero** — "built for" set in Clay Amber. `sm:max-w-[10ch]` on the h1 holds
+  the break at "built for the / real world."; `ch` not `rem` so the constraint
+  tracks the clamped display size, and unconstrained below `sm:` where a narrow
+  measure would split "Frontier AI,". Intro paragraph settled at `text-lg` /
+  `max-w-[48ch]`.
+- **Stat band** — now a square-edged, full-bleed strip with ruled dividers,
+  moved outside `.shell`; the boxed rounded card is gone.
+- **New hero artwork** — supplied PNG (1.9 MB, 1672×941) converted to
+  `hero-prism.webp` at q88/m6/sharp_yuv: **57 KB**, PSNR 42.7 dB. Matches the
+  dimensions of the other full-bleed plates. Placeholder `hero-bg-test.png`
+  deleted.
+
+### Interim: legacy imagery
+
+`.duotone` (for `<img>`) and `.plate-legacy` (for CSS background plates) strip
+the retired teal and acid-lime with `grayscale(1)` then re-tint warm with
+`sepia(0.5) saturate(1.5)`, landing the plates in Warm Stone / Clay Amber
+territory. Applied to `teal-tunnel`, `iridescent`, `orbit-planet`, `atbos-bg`,
+`glass-planes`, `glass-planes-footer`, `card-modern` and the `product-*` shots.
+The grain plate was also desaturated, warmed and dropped to 0.22 opacity —
+greying it had turned its large wave forms into a visible watermark.
+
+**Both classes are temporary.** Delete them (and their usages) when re-treated
+artwork lands. `hero-prism.webp` needs neither.
+
+### Still open
+
+- **Re-treat the photographic set** in the new palette so `.duotone` /
+  `.plate-legacy` can be removed. This is an asset job, not a code one.
+- `hero-hand.webp` and `hero-hand-v2.webp` are now unreferenced — safe to
+  delete once the hero direction is signed off.
+- Other sections of the brief still reference the retired system in passing
+  (§2.3 material families name aqua/powder/sage; §2.4 photography direction
+  specifies "restrained teal-and-cream with small lime accents"). §2.2 and §2.5
+  have been rewritten to match the build; these two want a pass once the new
+  artwork direction is settled.
+- The NewModel card scrim was strengthened last (`.scrim-card`, ink at full
+  strength by 40% since the copy starts at ~39% of the card). The browser
+  connection dropped before this final value could be eyeballed — worth a look.
+
+### Nav — final behaviour (2026-07-25)
+
+The contained glass pill is gone entirely. `Nav.tsx` now runs three states off
+scroll position and direction:
+
+| State | Trigger | Appearance |
+|---|---|---|
+| `top` | `scrollY <= 8` | **No container at all** — logo, links and CTA bare over the hero |
+| `hidden` | scrolling **down** | Whole header slides up `-100%` and stays away |
+| `docked` | scrolling **up** | Returns as a **full-width** smoked-glass bar |
+
+Detail worth keeping in mind:
+
+- **The bar is Deep Ink, not Warm Chalk.** That means the foreground stays Warm
+  Chalk in *both* states, so there is no colour flip to cross-fade and no window
+  where the labels are the wrong colour for what sits behind them. An earlier
+  light-bar version needed an `--nav-fg` flip and had exactly that problem.
+- Pane tint is `ink 0.88 → 0.78`. Thinner than that and the page's Deep-Ink-on-
+  Warm-Chalk body copy ghosts through the bar as legible text.
+- Direction detection ignores deltas under 4px, or the bar flickers on jitter.
+- A mount effect docks immediately if the page loads already scrolled — a reload
+  restoring a mid-page position would otherwise show the bare Warm Chalk
+  treatment over light content until the first scroll event.
+- `prefers-reduced-motion` skips the slide-away entirely and simply stays docked.
+- **`.btn-primary` is now flat** — no border, no shadow, no gradient. Because the
+  bar is dark, the Oat Greige fill reads as a solid shape both over the hero and
+  in the bar, so no per-state override is needed. (A light bar *did* need one:
+  Oat on Warm Chalk is ~1.1:1 and the button lost its shape.)
+- Removed classes: `.glass-nav`, `.nav-root`, `.is-solid`. New: `.nav-bar`,
+  `.nav-pane`, `.nav-panel`, `.nav-fg`.
+
+**Not visually verified.** The Chrome extension disconnected partway through
+this round, so the three scroll states were confirmed by type-check, production
+build, and inspection of the emitted CSS and server-rendered markup — but not
+seen rendering. Worth scrolling through before sign-off. The one thing to watch
+is whether `docked` reappearing on any upward scroll feels too eager mid-page.

@@ -23,33 +23,26 @@ function XIcon() {
 /**
  * Deep super-footer (§7.10): a closing statement paired with the Insights
  * sign-up, grouped navigation, and a base row carrying the logo, social links
- * and copyright — petrol / smoked-glass material.
+ * and copyright — Deep Ink / smoked-glass material.
  */
 export default function Footer() {
   return (
     <footer className="theme-dark relative overflow-hidden">
-      <Image
-        src="/images/glass-planes-footer.webp"
-        alt=""
-        fill
-        sizes="100vw"
-        className="object-cover object-right"
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(15,46,51,0.55), rgba(15,46,51,0.75))",
-        }}
-      />
+      <div aria-hidden className="duotone absolute inset-0">
+        <Image
+          src="/images/glass-planes-footer.webp"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-right"
+        />
+      </div>
+      <div aria-hidden className="scrim-deep absolute inset-0" />
       <div className="shell relative z-10 py-20 lg:py-28">
         {/* Statement + supporting paragraph */}
         <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch lg:gap-20">
           <div>
-            <p
-              className="max-w-[15ch] font-[600] text-[color:var(--color-cream)]"
-              style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-5xl)", lineHeight: 1.05, letterSpacing: "-0.02em" }}
-            >
+            <p className="statement max-w-[15ch] text-5xl">
               AI-native products for the customer frontline. Operations. Commerce. Marketing.
             </p>
             <Link href="/contact" className="btn btn-primary mt-8">
@@ -59,10 +52,8 @@ export default function Footer() {
 
           <div className="flex flex-col">
             <div className="mt-8 lg:mt-auto lg:pt-8">
-              <h2 className="text-[color:var(--color-cream)]" style={{ fontSize: "var(--text-2xl)" }}>
-                Insights
-              </h2>
-              <p className="mb-5 mt-2 max-w-[52ch] text-[color:var(--color-aqua)]">
+              <h2 className="text-2xl">Insights</h2>
+              <p className="mb-5 mt-2 max-w-[52ch] text-[color:var(--text-muted)]">
                 No noise, just the thinking on frontier AI.
               </p>
               <SignupForm />
@@ -78,15 +69,13 @@ export default function Footer() {
         >
           {Object.entries(footerNav).map(([group, links]) => (
             <div key={group}>
-              <h3 className="eyebrow mb-4" style={{ color: "var(--color-aqua)" }}>
-                {group}
-              </h3>
+              <h3 className="eyebrow mb-4">{group}</h3>
               <ul className="flex flex-col gap-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-[0.95rem] text-[color:var(--color-cream)]/85 transition-colors hover:text-[color:var(--color-lime)]"
+                      className="text-[0.95rem] text-[color:var(--color-chalk)]/85 transition-colors hover:text-[color:var(--color-amber)]"
                     >
                       {link.label}
                     </Link>
@@ -94,12 +83,12 @@ export default function Footer() {
                 ))}
               </ul>
               {group === "More" && (
-                <div className="mt-5 flex items-center gap-4 text-[color:var(--color-cream)]/85">
+                <div className="mt-5 flex items-center gap-4 text-[color:var(--color-chalk)]/85">
                   <a
                     href={site.social.linkedin}
                     aria-label="ATB. on LinkedIn"
                     rel="me noopener"
-                    className="transition-colors hover:text-[color:var(--color-lime)]"
+                    className="transition-colors hover:text-[color:var(--color-amber)]"
                   >
                     <LinkedInIcon />
                   </a>
@@ -107,7 +96,7 @@ export default function Footer() {
                     href={site.social.x}
                     aria-label="ATB. on X"
                     rel="me noopener"
-                    className="transition-colors hover:text-[color:var(--color-lime)]"
+                    className="transition-colors hover:text-[color:var(--color-amber)]"
                   >
                     <XIcon />
                   </a>
@@ -123,7 +112,7 @@ export default function Footer() {
           style={{ borderColor: "var(--border)" }}
         >
           <FooterLogo height={26} />
-          <p className="text-xs text-[color:var(--color-aqua)]/80">
+          <p className="text-xs text-[color:var(--text-muted)]/80">
             Copyright © 2026 {site.legalName}. All rights reserved.
           </p>
         </div>

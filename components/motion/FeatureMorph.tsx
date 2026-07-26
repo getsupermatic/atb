@@ -62,35 +62,30 @@ export default function FeatureMorph() {
             className="relative w-full overflow-hidden h-[62vh]"
             style={{ borderRadius: "1.75rem" }}
           >
-            <Image
-              src="/images/teal-tunnel.webp"
-              alt="A curved corridor of layered light — the far side of a horizon."
-              fill
-              sizes="100vw"
-              className="object-cover"
-              priority
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgba(15,46,51,0.15), rgba(15,46,51,0.35) 55%, rgba(15,46,51,0.72))",
-              }}
-            />
+            {/* .duotone is interim — remaps the legacy teal plate into the
+                Deep Ink / Warm Chalk palette. See globals.css. */}
+            <div className="duotone absolute inset-0">
+              <Image
+                src="/images/teal-tunnel.webp"
+                alt="A curved corridor of layered light — the far side of a horizon."
+                fill
+                sizes="100vw"
+                className="object-cover"
+                priority
+              />
+            </div>
+            <div aria-hidden className="scrim-panel absolute inset-0" />
             <div className="absolute inset-0 flex items-end">
               <div className="shell pb-[6vh] sm:pb-[8vh]">
-                <h2
-                  className="max-w-[18ch] text-[color:var(--color-cream)] [font-size:2.35rem] sm:[font-size:var(--text-5xl)]"
-                >
+                <h2 className="max-w-[18ch] text-[2.35rem] text-[color:var(--color-chalk)] sm:text-5xl">
                   Capability now advances by the month.{" "}
-                  <span style={{ color: "var(--color-lime)" }}>
+                  <span className="text-[color:var(--color-amber)]">
                     Most frontline tools still change by the year.
                   </span>
                 </h2>
                 <p
                   ref={sub}
-                  className="mt-5 max-w-[42ch] text-[color:var(--color-cream)] [font-size:1.05rem] sm:[font-size:var(--text-xl)]"
-                  style={{ opacity: 0.92 }}
+                  className="mt-5 max-w-[42ch] text-[1.05rem] text-[color:var(--color-stone)] sm:text-xl"
                 >
                   We exist to close the gap between what AI can do and what actually
                   reaches your business.

@@ -3,11 +3,11 @@ import Link from "next/link";
 import Reveal from "@/components/motion/Reveal";
 
 /**
- * Icons built from the brand's orbit + lime-node motif — one per engagement
- * model. Cream shapes on the dark section, with the lime node as the accent.
+ * Icons built from the brand's orbit + node motif — one per engagement model.
+ * Warm Chalk shapes on the dark section, with the Clay Amber node as the accent.
  */
-const stroke = { fill: "none", stroke: "var(--color-cream)", strokeWidth: 4, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-const node = { fill: "var(--color-lime)" };
+const stroke = { fill: "none", stroke: "var(--color-chalk)", strokeWidth: 4, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+const node = { fill: "var(--color-amber)" };
 
 // Subscribe & Deploy — a node in orbit: plug into the system that's already running.
 function DeployIcon() {
@@ -64,23 +64,14 @@ const ways = [
 export default function WaysToWork() {
   return (
     <section className="theme-dark section relative overflow-hidden" aria-label="Three ways to work with us">
-      <div aria-hidden className="absolute inset-0">
+      <div aria-hidden className="duotone absolute inset-0">
         <Image src="/images/orbit-planet.webp" alt="" fill sizes="100vw" className="object-cover" />
       </div>
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(15,46,51,0.92) 0%, rgba(15,46,51,0.78) 42%, rgba(15,46,51,0.55) 100%)",
-        }}
-      />
+      <div aria-hidden className="scrim-side absolute inset-0" />
       <div className="shell relative z-10">
         <Reveal>
-          <h2 className="max-w-[18ch]" style={{ fontSize: "var(--text-4xl)" }}>
-            Three ways to work with us.
-          </h2>
-          <p className="mt-5 max-w-[56ch] text-[color:var(--color-aqua)]" style={{ fontSize: "var(--text-lg)" }}>
+          <h2 className="max-w-[18ch] text-4xl">Three ways to work with us.</h2>
+          <p className="mt-5 max-w-[56ch] text-lg text-[color:var(--text-muted)]">
             Subscribe to a ready-made Blueprint, customise one to your exact needs, or co-create
             something entirely new at the frontier.
           </p>
@@ -90,21 +81,15 @@ export default function WaysToWork() {
           {ways.map((way, i) => (
             <Reveal as="li" key={way.name} delay={i * 0.14} distance={56} className="material-smoked flex flex-col rounded-3xl p-8">
               <way.Icon />
-              <p className="mt-6 text-sm text-[color:var(--color-aqua)]">{way.kicker}</p>
-              <h3 className="mt-1 text-[color:var(--color-cream)]" style={{ fontSize: "var(--text-2xl)" }}>
-                {way.name}
-              </h3>
-              <p className="mt-3 flex-1 text-[color:var(--color-aqua)]">{way.body}</p>
+              <p className="mt-6 text-sm text-[color:var(--text-muted)]">{way.kicker}</p>
+              <h3 className="mt-1 text-2xl">{way.name}</h3>
+              <p className="mt-3 flex-1 text-[color:var(--text-muted)]">{way.body}</p>
             </Reveal>
           ))}
         </ol>
 
         <Reveal delay={0.1}>
-          <Link
-            href="/how-we-work"
-            className="mt-10 inline-block font-medium text-[color:var(--color-lime)] underline underline-offset-4"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
+          <Link href="/how-we-work" className="link-accent mt-10 inline-block">
             How we work
           </Link>
         </Reveal>

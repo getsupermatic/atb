@@ -73,30 +73,19 @@ export default function HeroMorph() {
           <div
             ref={card}
             className="theme-dark relative w-full overflow-hidden"
-            style={{ height: "100vh", borderRadius: 0, ["--text-muted" as string]: "#cac6bb" } as React.CSSProperties}
+            style={{ height: "100vh", borderRadius: 0 }}
           >
             <Image
-              src="/images/hero-bg-test.png"
-              alt="Light refracting through a prism against deep navy — spectral flares scattered across darkness."
+              src="/images/hero-prism.webp"
+              alt="Light refracting through a prism against near-black — warm amber flares scattered across darkness."
               fill
               priority
               sizes="100vw"
               className="object-cover"
               style={{ objectPosition: "72% center" }}
             />
-            <div
-              aria-hidden
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(100deg, rgba(11,26,46,0.92) 0%, rgba(11,26,46,0.7) 30%, rgba(11,26,46,0.3) 55%, rgba(11,26,46,0) 80%)",
-              }}
-            />
-            <div
-              aria-hidden
-              className="absolute inset-x-0 top-0 h-32"
-              style={{ background: "linear-gradient(180deg, rgba(11,26,46,0.65), transparent)" }}
-            />
+            <div aria-hidden className="scrim-hero absolute inset-0" />
+            <div aria-hidden className="scrim-top absolute inset-x-0 top-0 h-32" />
 
             <div className="absolute inset-0 flex items-center">
               <div className="shell">
@@ -104,18 +93,21 @@ export default function HeroMorph() {
                   <motion.p className="eyebrow" {...stagger(0)}>
                     An AI-native product company
                   </motion.p>
-                  <motion.h1 className="mt-5" style={{ fontSize: "var(--text-5xl)", color: "#f7f1e6" }} {...stagger(1)}>
+                  {/* 10ch holds the break at "built for the / real world." — ch
+                      rather than rem so the constraint tracks the clamped
+                      display size. Unconstrained below sm:, where the narrower
+                      measure would split "Frontier AI," instead. */}
+                  <motion.h1 className="mt-7 text-5xl sm:max-w-[10ch]" {...stagger(1)}>
                     Frontier AI,
                     <br />
-                    <span style={{ color: "var(--text-muted)" }}>built for</span> the real world.
+                    <span className="text-[color:var(--accent)]">built for</span> the real world.
                   </motion.h1>
                   <motion.p
-                    className="mt-5 max-w-[56ch] text-[color:var(--text-muted)]"
-                    style={{ fontSize: "var(--text-lg)" }}
+                    className="mt-5 max-w-[48ch] text-lg text-[color:var(--text-muted)]"
                     {...stagger(2)}
                   >
-                    We imagine, build and forward-deploy AI-native products — underpinned by our
-                    AI-native delivery — for everywhere your business meets the customer: the shop
+                    We imagine, build and forward-deploy AI-native products, underpinned by our
+                    AI-native delivery, for everywhere your business meets the customer: the shop
                     floor, the drive-through, the field, the contact centre, the app and the online
                     store. Strategy that gets deployed.
                   </motion.p>
@@ -133,20 +125,15 @@ export default function HeroMorph() {
 
             {/* Rolling keyword strip — pinned to the bottom of the hero graphic (§2.1) */}
             <div
-              className="marquee-mask absolute inset-x-0 bottom-0 overflow-hidden border-t py-4 backdrop-blur-sm"
-              style={{
-                borderColor: "var(--border)",
-                background:
-                  "linear-gradient(0deg, rgba(11,26,46,0.92), rgba(11,26,46,0.45))",
-              }}
+              className="marquee-mask scrim-band absolute inset-x-0 bottom-0 overflow-hidden border-t py-4 backdrop-blur-sm"
+              style={{ borderColor: "var(--border)" }}
               aria-hidden
             >
               <div className="marquee-track flex w-max gap-10 pr-10">
                 {[...keywords, ...keywords, ...keywords, ...keywords].map((k, i) => (
                   <span
                     key={i}
-                    className="text-sm font-medium text-[color:var(--text-muted)]"
-                    style={{ fontFamily: "var(--font-display)", whiteSpace: "nowrap" }}
+                    className="whitespace-nowrap text-sm font-medium text-[color:var(--text-muted)]"
                   >
                     {k}
                   </span>

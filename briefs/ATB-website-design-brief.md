@@ -37,17 +37,30 @@ ATB (*at the beyond.*) is an **AI-native product studio**. We build intelligent 
 
 ### 2.2 Colour system
 
-Primary palette carries the brand; secondary tones are **soft supports** for diagrams, materials, UI states and photographic treatments. Target usage ratio across the site is roughly **60% primary base (cream + teal) / 30% secondary supports / 10% lime accent**. Lime is an accent only — never a background field, never body text.
+*(Revised 2026-07-25 — supersedes the original teal/cream/lime system.)*
+
+A warm-neutral palette anchored by Deep Ink. Target usage ratio across the site
+is roughly **60% base (Warm Chalk + Deep Ink) / 30% supports / 10% Clay Amber
+accent**. Clay Amber is an accent only — never a background field, never body
+text.
 
 | Token | Hex | Name | Use |
 |---|---|---|---|
-| `--color-teal` | `#295F66` | Deep teal / primary | Primary brand, headings, dark UI base, authority |
-| `--color-cream` | `#F5F1E8` | Cream / canvas | Default page background, warm editorial base |
-| `--color-petrol` | `#163F45` | Dark petrol | Dark-mode base, super-footer, deep sections |
-| `--color-aqua` | `#A9CFCA` | Pale aqua | Soft support, diagram fills, hover tints |
-| `--color-powder` | `#9CB9CC` | Powder blue | Soft support, diagram fills, glass tints |
-| `--color-sage` | `#B7C5AE` | Soft sage | Soft support, diagram fills |
-| `--color-lime` | `#C6D64D` | Lime accent | CTAs, active states, the logo dot, orbital nodes, key stats |
+| `--color-chalk` | `#F7F1E6` | Warm Chalk | Default page background, warm editorial base |
+| `--color-oat` | `#E5DCCB` | Oat Greige | Elevated surfaces on light, primary button fill |
+| `--color-stone` | `#CAC6BB` | Warm Stone | Muted text on dark, soft fills |
+| `--color-sage` | `#99A08E` | Sage Stone | Soft support, diagram fills |
+| `--color-slate` | `#5E6576` | Warm Slate | Muted text on light |
+| `--color-ink` | `#1B2836` | Deep Ink | Headings, dark base, super-footer, scrims |
+| `--color-amber` | `#CC8A55` | Clay Amber | Accent: active states, the logo dot, orbital nodes, key stats |
+
+Derived shades (tints/shades of the above, **not** new brand colours):
+`--color-ink-soft` `#26333F`, `--color-ink-deep` `#121C26`,
+`--color-amber-deep` `#8F5A2C`.
+
+**Contrast rule.** Clay Amber on Warm Chalk is only **2.6:1** and must never be
+used as text on a light field. `--accent-text` resolves to `--color-amber-deep`
+(5.1:1) on light and full Clay Amber on dark, so accent text is safe in both.
 
 Define these as CSS custom properties / Tailwind theme tokens and derive tints/shades programmatically. Provide semantic aliases (`--bg`, `--bg-elevated`, `--text`, `--text-muted`, `--accent`, `--border`) mapped to the raw tokens so dark sections can remap cleanly.
 
@@ -73,10 +86,20 @@ Four reusable visual “materials”. Build each as a component/utility so it ca
 
 *(If a typeface is not yet locked, use this as the intent and confirm licences before build.)*
 
-- **Display / headings:** a clean, slightly condensed geometric/grotesque sans (matches the “The colour scheme” / “Material Families” headings). Tight leading, sentence case, generous size jumps.
-- **Body:** a highly legible humanist sans at comfortable measure (60–75 characters).
-- **Mono / labels:** a monospace or tracked-out uppercase sans for the small “01 IDENTITY / BRAND OVERVIEW” eyebrow labels — this tracked-uppercase micro-label is a signature device; use it for section eyebrows.
-- Establish a modular type scale as tokens (`--text-xs` … `--text-6xl`). Headings in teal on cream; cream on dark sections.
+*(Revised 2026-07-25 — typefaces are now locked; supersedes the earlier
+sans-display / serif-body intent.)*
+
+- **Display / headings — Newsreader.** A serif with an optical-size axis. Set at
+  weight 400 (500 for h3–h5), tracking −0.01em, leading 1.08, with
+  `font-optical-sizing: auto`. Sentence case, generous size jumps. It wants
+  near-neutral tracking and a lighter weight than a grotesque — the old
+  600/−0.02em settings read clotted on it.
+- **Body — Inter.** Carries body copy **and all UI**: buttons, nav, eyebrows and
+  labels. Comfortable measure (46–75 characters), leading 1.6, tracking −0.011em.
+- **Mono:** none. The previous IBM Plex Mono was loaded on every page and used by
+  nothing; section eyebrows are set in Inter.
+- Modular type scale as tokens (`--text-xs` … `--text-6xl`). Headings in Deep Ink
+  on Warm Chalk; Warm Chalk on dark sections.
 
 ---
 

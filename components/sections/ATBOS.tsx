@@ -20,12 +20,9 @@ const headlines = [
   "We build smarter, sharper and more consistently than ever — more creative, more innovative, and more informed with every decision.",
 ];
 
-const headlineStyle: React.CSSProperties = {
-  fontFamily: "var(--font-display)",
-  fontSize: "var(--text-3xl)",
-  lineHeight: 1.16,
-  letterSpacing: "-0.015em",
-};
+// Shared by the live copy and the hidden measuring stack, so both wrap
+// identically. Presentation lives in `.statement` / `text-3xl`.
+const headlineClass = "statement text-3xl";
 
 export default function ATBOS() {
   const section = useRef<HTMLElement>(null);
@@ -53,7 +50,7 @@ export default function ATBOS() {
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
-    // Re-measure once the Manrope web font loads — measuring before that
+    // Re-measure once the Newsreader web font loads — measuring before that
     // under-reports height (fallback font wraps to fewer lines), so the
     // tallest statement would overflow into the progress dots.
     document.fonts?.ready.then(measure);
@@ -112,16 +109,11 @@ export default function ATBOS() {
       aria-label="ATBOS — our operating system"
     >
       <div className="sticky top-0 flex min-h-screen items-center overflow-hidden">
-        <Image src="/images/atbos-bg.webp" alt="" fill sizes="100vw" className="object-cover" />
-        {/* Cream veil keeps the statements legible over the imagery */}
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(120% 90% at 50% 40%, rgba(245,241,232,0.78) 0%, rgba(245,241,232,0.5) 55%, rgba(245,241,232,0.3) 100%)",
-          }}
-        />
+        <div aria-hidden className="duotone absolute inset-0">
+          <Image src="/images/atbos-bg.webp" alt="" fill sizes="100vw" className="object-cover" />
+        </div>
+        {/* Warm Chalk veil keeps the statements legible over the imagery */}
+        <div aria-hidden className="veil-chalk-radial absolute inset-0" />
 
         <div className="shell relative z-10 flex w-full flex-col items-center text-center">
           <img
@@ -135,7 +127,7 @@ export default function ATBOS() {
           {reduce ? (
             <div className="mt-10 flex max-w-[44rem] flex-col gap-6">
               {headlines.map((h) => (
-                <p key={h} className="font-[600] text-[color:var(--heading)]" style={headlineStyle}>
+                <p key={h} className={headlineClass}>
                   {h}
                 </p>
               ))}
@@ -149,8 +141,8 @@ export default function ATBOS() {
                     ref={(el) => {
                       lines.current[i] = el;
                     }}
-                    className="absolute inset-x-0 top-0 font-[600] text-[color:var(--heading)]"
-                    style={{ ...headlineStyle, opacity: 0 }}
+                    className={`absolute inset-x-0 top-0 ${headlineClass}`}
+                    style={{ opacity: 0 }}
                   >
                     {h}
                   </p>
@@ -166,7 +158,8 @@ export default function ATBOS() {
                     style={{
                       height: 11,
                       width: i === index ? 30 : 11,
-                      background: i === index ? "var(--color-teal)" : "rgba(41,95,102,0.28)",
+                      background:
+                        i === index ? "var(--color-ink)" : "rgb(var(--ink-rgb) / 0.28)",
                     }}
                   />
                 ))}
@@ -182,7 +175,7 @@ export default function ATBOS() {
           className="pointer-events-none invisible absolute left-1/2 w-full max-w-[44rem] -translate-x-1/2"
         >
           {headlines.map((h) => (
-            <p key={h} data-line className="absolute inset-x-0 top-0 font-[600]" style={headlineStyle}>
+            <p key={h} data-line className={`absolute inset-x-0 top-0 ${headlineClass}`}>
               {h}
             </p>
           ))}

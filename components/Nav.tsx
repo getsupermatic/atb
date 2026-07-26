@@ -13,17 +13,25 @@ import { primaryNav } from "@/lib/site";
 import Logo from "./brand/Logo";
 
 /**
- * Contained, scroll-aware navigation (§4.1). At the very top the nav sits
- * bare over the hero; the glassy rounded panel builds in on first scroll
- * (Valliance-style). On first load the logo writes out "at the beyond." and
- * collapses to "ATB." in place, then the links fade in. Hides on scroll down,
- * reveals on scroll up. Mobile → full glassy panel.
+ * Scroll-aware navigation (§4.1, behaviour target: Valliance). Three states:
+ *
+ *   top     — at the very top: no container at all; logo, links and CTA sit
+ *             bare over the hero
+ *   hidden  — scrolling down: the nav slides up and away, and stays away for
+ *             as long as you keep going down
+ *   docked  — scrolling back up: it returns as a full-width glass bar
+ *
+ * Because the header is fully off-screen in `hidden`, the Warm Chalk → Deep Ink
+ * foreground flip happens out of sight — no contrast flash mid-transition.
+ * On first load the logo writes out "at the beyond." and collapses to "ATB." in
+ * place, then the links fade in. Mobile → the same bar plus a dropdown panel.
  */
+type Mode = "top" | "hidden" | "docked";
+
 export default function Nav() {
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
-  const [hidden, setHidden] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [mode, setMode] = useState<Mode>("top");
   const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState<"full" | "mono">("full");
   const [revealed, setRevealed] = useState(false);
@@ -47,13 +55,25 @@ export default function Nav() {
     };
   }, [reduce]);
 
+  // A reload can restore a mid-page scroll position, where the bare Warm Chalk
+  // treatment would be invisible over light content. Dock immediately in that
+  // case rather than waiting for the first scroll event.
+  useEffect(() => {
+    if (window.scrollY > 8) setMode("docked");
+  }, []);
+
   useMotionValueEvent(scrollY, "change", (y) => {
-    const prev = scrollY.getPrevious() ?? 0;
-    setScrolled(y > 24);
-    if (open) return;
-    if (y > prev && y > 160) setHidden(true);
-    else setHidden(false);
+    if (open) return; // don't move the bar out from under an open menu
+    if (y <= 8) return setMode("top"); // back at the top → bare again
+    // Under reduced motion, skip the slide-away entirely and just stay docked.
+    if (reduce) return setMode("docked");
+    const dy = y - (scrollY.getPrevious() ?? 0);
+    if (Math.abs(dy) < 4) return; // ignore jitter, or the bar flickers
+    setMode(dy < 0 ? "docked" : "hidden"); // reveal only on scrolling up
   });
+
+  // The menu can only open from the docked bar (or pin it solid at the top).
+  const docked = mode === "docked" || open;
 
   const revealStyle = {
     opacity: revealed ? 1 : 0,
@@ -64,28 +84,19 @@ export default function Nav() {
 
   return (
     <motion.header
-      className="fixed inset-x-0 top-0 z-50 flex justify-center"
-      animate={{ y: hidden && !reduce ? "-140%" : "0%" }}
-      transition={{ duration: 0.7, ease: [0.65, 0, 0.35, 1] }}
+      className={`nav-bar fixed inset-x-0 top-0 z-50 ${docked ? "nav-scrolled" : ""}`}
+      animate={{ y: mode === "hidden" ? "-100%" : "0%" }}
+      transition={{ duration: 0.45, ease: [0.65, 0, 0.35, 1] }}
     >
-      <nav
-        className="relative mt-3 w-[min(78rem,calc(100%-1.5rem))] rounded-[1.5rem]"
-        aria-label="Primary"
-      >
-        {/* Glassy panel — always visible, with a soft shadow once scrolled */}
-        <div
-          aria-hidden
-          className="glass-nav absolute inset-0 rounded-[1.5rem]"
-          style={{
-            boxShadow: scrolled ? "0 18px 45px -30px rgba(22,63,69,0.6)" : "none",
-            transition: "box-shadow 0.45s ease",
-          }}
-        />
+      {/* Full-width glass bar — absent at the top of the page, slides in when docked */}
+      <div aria-hidden className="nav-pane" />
 
-        <div className="relative flex items-center justify-between py-2.5 pl-5 pr-2.5">
+      <nav aria-label="Primary">
+        {/* .shell keeps the row aligned with the page content either side */}
+        <div className="nav-row shell relative flex items-center justify-between">
           <Link
             href="/"
-            className="relative flex items-center py-1"
+            className="nav-fg relative flex items-center py-1"
             aria-label="ATB — home"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
@@ -93,8 +104,8 @@ export default function Nav() {
             onBlur={() => setHovered(false)}
           >
             <Logo
-              variant="atb"
-              style={{ height: 26, color: "#1b2836", opacity: showFull ? 0 : 1, transition: "opacity 0.35s ease" }}
+              variant="mono"
+              style={{ height: 26, opacity: showFull ? 0 : 1, transition: "opacity 0.35s ease" }}
             />
             <AnimatePresence>
               {showFull && (
@@ -107,7 +118,7 @@ export default function Nav() {
                   exit={{ opacity: 0, filter: "blur(4px)", transition: { duration: 0.3 } }}
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <Logo variant="full" style={{ height: 26, color: "#1b2836" }} />
+                  <Logo variant="full" style={{ height: 26 }} />
                 </motion.span>
               )}
             </AnimatePresence>
@@ -118,8 +129,7 @@ export default function Nav() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="text-[0.9rem] font-medium text-[#1B2836] transition-colors hover:text-[color:var(--accent)]"
-                  style={{ fontFamily: "var(--font-display)" }}
+                  className="nav-fg text-[0.9rem] font-medium transition-colors hover:text-[color:var(--accent-text)]"
                 >
                   {item.label}
                 </Link>
@@ -140,11 +150,11 @@ export default function Nav() {
             >
               <span className="relative block h-3 w-5">
                 <span
-                  className="absolute left-0 h-0.5 w-5 rounded bg-[color:var(--heading)] transition-transform"
+                  className="absolute left-0 h-0.5 w-5 rounded bg-[color:var(--nav-fg)] transition-transform"
                   style={{ top: open ? "5px" : 0, transform: open ? "rotate(45deg)" : "none" }}
                 />
                 <span
-                  className="absolute bottom-0 left-0 h-0.5 w-5 rounded bg-[color:var(--heading)] transition-transform"
+                  className="absolute bottom-0 left-0 h-0.5 w-5 rounded bg-[color:var(--nav-fg)] transition-transform"
                   style={{ bottom: open ? "5px" : 0, transform: open ? "rotate(-45deg)" : "none" }}
                 />
               </span>
@@ -161,7 +171,7 @@ export default function Nav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="glass-nav fixed inset-x-3 top-20 rounded-[1.5rem] p-6 lg:hidden"
+            className="nav-panel fixed inset-x-3 top-[5.25rem] rounded-[1.75rem] p-6 lg:hidden"
           >
             <ul className="flex flex-col gap-1">
               {primaryNav.map((item) => (
@@ -169,8 +179,7 @@ export default function Nav() {
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="flex min-h-[44px] items-center text-lg font-medium text-[#1B2836]"
-                    style={{ fontFamily: "var(--font-display)" }}
+                    className="nav-fg flex min-h-[44px] items-center text-lg font-medium"
                   >
                     {item.label}
                   </Link>
