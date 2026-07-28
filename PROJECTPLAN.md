@@ -706,25 +706,25 @@ de-sepias. The green request cannot apply there without a second green.
 
 ### To-do
 
-- [ ] **1. De-sepia the image treatment.** Drop `sepia()`/`saturate()` from
+- [x] **1. De-sepia the image treatment.** Drop `sepia()`/`saturate()` from
       `.duotone` and `.plate-legacy`; keep `grayscale(1)` and lift contrast so
       the plates read as punchy neutral B&W like the header shot. Also neutralise
       the warm cast in `.duotone::after` (currently a chalk→ink soft-light).
-- [ ] **2. FeatureMorph** — "Capability now advances by the month." Typeface
+- [x] **2. FeatureMorph** — "Capability now advances by the month." Typeface
       unchanged, **Clay Amber accent word retained** (explicitly kept), only the
       background plate changes. Falls out of item 1.
-- [ ] **3. NewModel** — the four panels. Images retained, now neutral B&W.
+- [x] **3. NewModel** — the four panels. Images retained, now neutral B&W.
       Falls out of item 1 (`.plate-legacy`).
-- [ ] **4. WaysToWork** — background plate to the black style only (falls out
+- [x] **4. WaysToWork** — background plate to the black style only (falls out
       of item 1). Icon nodes and the "How we work" link **stay Clay Amber** per
       the resolved constraint above — the section is dark, and no second green
       is being introduced.
-- [ ] **5. Products** — CommerceOS + MarketingOS both use `/images/hero-aisle.webp`
+- [x] **5. Products** — CommerceOS + MarketingOS both use `/images/hero-aisle.webp`
       as a placeholder, and **drop `.duotone`** from those two cards (the aisle
       shot is already monochrome, same as the spotlight). "Live" badge fill
       amber → `--color-forest` with a Warm Chalk label, matching the header button.
-- [ ] **6. Footer** — image retained, de-sepia'd. Falls out of item 1.
-- [ ] **7. Build + visual check.**
+- [x] **6. Footer** — image retained, de-sepia'd. Falls out of item 1.
+- [x] **7. Build + visual check.**
 
 ### Reach beyond the named sections — APPROVED (2026-07-28)
 
@@ -739,3 +739,49 @@ The sepia lives in two shared classes, so fixing it also changes **ATBOS**,
 - Amber in the logo dot, OrbitMark, footer link hovers, nav link hover, skip link
 - Any second green shade — explicitly ruled out
 - Any section changing from light to dark, or vice versa
+
+
+### Review (2026-07-28)
+
+All seven items done. Verified against the **deployed** CSS on the v3 preview,
+not just a local build.
+
+**One change did most of the work.** The sepia was not per-section — it lived in
+two shared classes. Removing `sepia(0.5) saturate(1.5)` from `.duotone` and
+`.plate-legacy` de-sepia'd FeatureMorph, NewModel, WaysToWork, ATBOS,
+ClosingBand, the Footer and the Products card frames in one edit.
+
+| File | Change |
+|---|---|
+| `app/globals.css` | `--color-lime` → `--color-forest: #2d523d`; `.btn-primary` label to Warm Chalk; `.duotone` + `.plate-legacy` de-sepia'd; `.duotone::after` chalk → neutral white |
+| `components/sections/HeroMorph.tsx` | H1 accent span removed (now Oat Greige throughout); eyebrow → "At the Beyond" |
+| `components/sections/Products.tsx` | "Live" badge → Deep Forest fill, Chalk label; `.duotone` dropped from the two cards |
+| `lib/site.ts` | CommerceOS + MarketingOS → `hero-aisle.webp` placeholder |
+
+**Two things worth knowing:**
+
+1. **`.duotone::after` was quietly re-warming the plates.** Its top stop was
+   Warm Chalk (`#f7f1e6` — a warm cream) at `soft-light`. Removing the filter
+   sepia alone would have left a warm cast behind. Now neutral white.
+2. **`.grain-overlay` still carries `sepia(0.16)`** — left deliberately. It is
+   the page-wide print-grain texture, not a section plate, and at 0.16 it is
+   the warm note the brand palette wants rather than the brown the plates had.
+   Trivially removable if the page should read fully cold-neutral.
+
+**Not visually verified.** Confirmed by production build and by grepping the
+CSS actually served from the preview deployment — `--color-forest:#2d523d`
+present, `c7e85b` gone, `sepia(0.5)` gone, `.btn-primary` correct. But not seen
+rendering in a browser.
+
+### Deploy
+
+Branch `v3` pushed to `getsupermatic/atb`; Vercel project `tactico/atb` builds
+it automatically as a preview.
+
+**https://atb-git-v3-tactico.vercel.app** — stable alias, re-points at the
+newest v3 build on every push.
+
+Note: a literal `atbeyond.com/v3` path is not practical for this branch. The
+work is almost entirely global design tokens in `globals.css`, so one Next app
+cannot serve v2 at `/` and v3 at `/v3` without the tokens colliding. That would
+need either `basePath` or a second Vercel project plus a rewrite.
