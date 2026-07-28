@@ -785,3 +785,63 @@ Note: a literal `atbeyond.com/v3` path is not practical for this branch. The
 work is almost entirely global design tokens in `globals.css`, so one Next app
 cannot serve v2 at `/` and v3 at `/v3` without the tokens colliding. That would
 need either `basePath` or a second Vercel project plus a rewrite.
+
+---
+
+## Round 4 — New primary logo (bold squarish `atb.` mark)
+
+Three candidates were supplied in turn; the third is what shipped:
+
+| Attempt | Artwork | Outcome |
+|---|---|---|
+| 1 | `file.svg` — light geometric lowercase `atb`, arrow-apex `t` | superseded |
+| 2 | `file (2).svg` — light geometric uppercase `ATB` | superseded |
+| 3 | `file (3).svg` — bold squarish lowercase `atb` | **shipped** |
+
+### What changed
+
+- [x] **`components/brand/Logo.tsx`** — `variant="mono"` now carries the bold
+      squarish `atb` artwork. The export shipped an opaque `#FCFCFC` background
+      plus a mid-grey anti-alias ring behind each glyph; only the four core
+      shapes are kept (`#080808` / `#050505` / `#040404` ×2), so the mark fills
+      with `currentColor` and its counters read as true holes on any ground.
+- [x] **Re-added the brand full stop.** None of the three source files carried
+      one, and the `ATB.` device plus the footer's amber comet both depend on it.
+      Drawn as a `<circle>` at r 27 — a shade over the 47-unit stem — sitting on
+      the baseline one letter-gap clear of the `b`.
+- [x] **viewBox normalised, not just cropped.** `-12 -3 949 384` crops to the
+      ink (x 13–808 / y 22–346) and then re-pads it to the same ink-to-box ratio
+      as the `full` "at the beyond." lockup (103/122). That puts the monogram's
+      ascenders on the lockup's cap height, so a single `height` prop renders
+      both marks at matching optical size and the nav's mono→full crossfade
+      stays aligned. Every existing call site keeps working unchanged.
+- [x] **`components/brand/FooterLogo.tsx`** — dot geometry re-derived from the
+      new viewBox (`s = height / 384`, diameter 54·s, home 860·s / 295·s). The
+      comet still departs from the right edge of the footer rule and docks where
+      the static period sits.
+- [x] **Dropped the dead `variant="atb"`** test artwork and its `Props` union
+      member — nothing referenced it.
+- [x] **`app/icon.svg`** — favicon now uses the new `a` letterform rather than
+      the old lockup's `A`. Its 47-unit stem lands at ~2px in a 16px tile, so it
+      needs no optical thickening (the light attempts 1 and 2 did).
+
+### Size
+
+The mark renders a touch larger than the old one: `height` 26 → 31 in both the
+nav (`components/Nav.tsx`) and the footer (`components/Footer.tsx`). The `full`
+lockup stays at 26 — the two never show simultaneously, they crossfade, and a
+three-letter monogram carries more optical weight than a full lockup at equal
+height.
+
+### Verification
+
+`npx tsc --noEmit` and `npx next build` both clean. The mark, the full stop's
+placement and the favicon were checked by rasterising the composed SVG at large
+size, at nav size (31px) and at 16px. **Not checked in a running browser** — the
+user is verifying the nav, the crossfade and the footer comet animation
+themselves.
+
+### Left alone
+
+`public/images/atbos-logo.svg` (the ATBOS product mark) is untouched — it is a
+separate lockup, not the company logo.

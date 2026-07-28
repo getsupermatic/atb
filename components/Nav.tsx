@@ -103,9 +103,12 @@ export default function Nav() {
             onFocus={() => setHovered(true)}
             onBlur={() => setHovered(false)}
           >
+            {/* The monogram carries more optical size than the lockup at the
+                same height, so it runs a few px taller — the two never show at
+                once, they crossfade. */}
             <Logo
               variant="mono"
-              style={{ height: 26, opacity: showFull ? 0 : 1, transition: "opacity 0.35s ease" }}
+              style={{ height: 31, opacity: showFull ? 0 : 1, transition: "opacity 0.35s ease" }}
             />
             <AnimatePresence>
               {showFull && (

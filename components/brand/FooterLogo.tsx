@@ -12,7 +12,7 @@ import Logo from "./Logo";
  * scroll-out it resets to the right edge (off-screen) so the run replays.
  *
  * The dot's resting position is derived from the mono logo's SVG geometry
- * (viewBox 600 690 332 120, period at cx 909 / cy 789 / r 12), so it always
+ * (viewBox -12 -3 949 384, period at cx 875 / cy 319 / r 27), so it always
  * lands with the correct optical spacing regardless of the rendered height.
  */
 export default function FooterLogo({ height = 26 }: { height?: number }) {
@@ -23,10 +23,10 @@ export default function FooterLogo({ height = 26 }: { height?: number }) {
   const [armed, setArmed] = useState(false);
 
   // Geometry: map the SVG period into rendered pixels.
-  const s = height / 120;
-  const diameter = 24 * s;
-  const homeLeft = 297 * s; // (909 − 600 − 12) · s
-  const homeTop = 87 * s; //  (789 − 690 − 12) · s
+  const s = height / 384;
+  const diameter = 54 * s;
+  const homeLeft = 860 * s; // (875 − −12 − 27) · s
+  const homeTop = 295 * s; //  (319 − −3 − 27) · s
 
   // Measure how far the dot must travel to reach the right edge of the foot.
   useLayoutEffect(() => {

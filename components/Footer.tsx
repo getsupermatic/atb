@@ -111,7 +111,7 @@ export default function Footer() {
           className="footer-base mt-16 flex flex-col gap-6 border-t pt-8 sm:flex-row sm:items-center sm:justify-between"
           style={{ borderColor: "var(--border)" }}
         >
-          <FooterLogo height={26} />
+          <FooterLogo height={31} />
           <p className="text-xs text-[color:var(--text-muted)]/80">
             Copyright © 2026 {site.legalName}. All rights reserved.
           </p>
