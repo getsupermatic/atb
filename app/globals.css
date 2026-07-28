@@ -7,17 +7,19 @@
    ============================================================ */
 @theme {
   /* Raw brand palette — named after the palette board */
-  --color-chalk: #f7f1e6; /* Warm Chalk  — page canvas */
+  --color-chalk: #f7f1e6; /* Warm Chalk  — light text on dark, veils, glass */
+  --color-paper: #fbfaf6; /* Paper White — the page canvas, barely warm */
   --color-oat: #e5dccb; /* Oat Greige  — elevated surfaces on light */
   --color-stone: #cac6bb; /* Warm Stone  — muted text on dark, soft fills */
   --color-sage: #99a08e; /* Sage Stone  — soft support, diagram fills */
   --color-slate: #5e6576; /* Warm Slate  — muted text on light */
-  --color-ink: #1b2836; /* Deep Ink    — headings, dark base, scrims */
+  --color-ink: #111111; /* Ink Black   — headings, dark base, scrims */
   --color-amber: #cc8a55; /* Clay Amber  — CTAs, nodes, the logo dot */
+  --color-forest: #2d523d; /* Deep Forest — display accent + primary CTA fill (v3 test) */
 
   /* Derived shades — tints/shades of the above, not new brand colours */
-  --color-ink-soft: #26333f; /* Deep Ink lifted toward Warm Slate */
-  --color-ink-deep: #121c26; /* Deep Ink deepened — deepest scrims */
+  --color-ink-soft: #1f1f1f; /* Ink Black lifted — elevated dark surfaces */
+  --color-ink-deep: #000000; /* True black — deepest scrims */
   --color-amber-deep: #8f5a2c; /* Clay Amber darkened for text on light */
 
   /* Typefaces (wired to next/font vars in layout.tsx) */
@@ -30,11 +32,17 @@
   --text-base: 1.0625rem;
   --text-lg: 1.1875rem;
   --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
-  --text-2xl: clamp(1.5rem, 1.25rem + 1vw, 2rem);
-  --text-3xl: clamp(1.9rem, 1.5rem + 1.6vw, 2.75rem);
-  --text-4xl: clamp(2.3rem, 1.7rem + 2.6vw, 3.75rem);
-  --text-5xl: clamp(2.8rem, 1.9rem + 4vw, 5rem);
-  --text-6xl: clamp(3.4rem, 2rem + 6vw, 6.5rem);
+  /* Display steps — headings, .statement and .stat-figure only; no body copy
+     uses these. Nudged up ~4% at the floor and ~6% at the cap: Newsreader at
+     400 reads optically smaller than the grotesque it replaced, so the whole
+     display end of the scale wanted a lift. The floors are deliberately raised
+     less than the caps — they govern narrow viewports, where the previous
+     round of tuning was what fixed the mobile clipping. */
+  --text-2xl: clamp(1.5625rem, 1.3rem + 1.05vw, 2.125rem);
+  --text-3xl: clamp(1.975rem, 1.55rem + 1.7vw, 2.9rem);
+  --text-4xl: clamp(2.4rem, 1.75rem + 2.75vw, 4rem);
+  --text-5xl: clamp(2.9rem, 1.95rem + 4.2vw, 5.3rem);
+  --text-6xl: clamp(3.55rem, 2.1rem + 6.3vw, 6.9rem);
 
   /* Motion (§5.6) */
   --dur-fast: 150ms;
@@ -51,11 +59,14 @@
 :root {
   /* Channel triplets so scrims can be authored as rgb(… / alpha)
      without hardcoding the palette hex in every gradient. */
-  --ink-rgb: 27 40 54;
+  --ink-rgb: 17 17 17;
   --chalk-rgb: 247 241 230;
   --amber-rgb: 204 138 85;
 
-  --bg: var(--color-chalk);
+  /* Paper White rather than Warm Chalk — the canvas reads white, and the grain
+     plate on top of it is what supplies the warmth. Warm Chalk stays the
+     brand colour everywhere else (text on dark, veils, glass tints). */
+  --bg: var(--color-paper);
   --bg-elevated: var(--color-oat);
   --text: var(--color-ink);
   --text-muted: var(--color-slate);
@@ -63,6 +74,11 @@
   --accent: var(--color-amber);
   /* Amber fails AA as text on chalk — light fields use the darkened shade */
   --accent-text: var(--color-amber-deep);
+  /* Display accent for highlighted words in headings. Deep Forest is a dark
+     green — it reads on the paper canvas (9.0:1) but only 2.2:1 on Ink Black,
+     so the dark hero highlight is decorative, not legible. Light fields keep
+     falling back to the heading colour, as before. */
+  --accent-display: var(--heading);
   --border: rgb(var(--ink-rgb) / 0.14);
   --field-bg: rgb(var(--chalk-rgb) / 0.55);
   --glass-tint: rgb(var(--chalk-rgb) / 0.62);
@@ -76,8 +92,11 @@
   --text-muted: var(--color-stone);
   --heading: var(--color-chalk);
   --accent: var(--color-amber);
-  /* On Deep Ink, Clay Amber clears AA (5.2:1) — no substitute needed */
+  /* On Ink Black, Clay Amber clears AA comfortably (6.6:1) — no substitute */
   --accent-text: var(--color-amber);
+  /* Deep Forest on Ink Black is only 2.2:1 — see the note on --accent-display
+     in :root. Kept as the display accent by direction, not by contrast. */
+  --accent-display: var(--color-forest);
   --border: rgb(var(--chalk-rgb) / 0.16);
   --field-bg: rgb(var(--ink-rgb) / 0.5);
   --glass-tint: rgb(var(--ink-rgb) / 0.45);
@@ -181,7 +200,7 @@
      CTA sit bare over the hero. Scrolling back up brings in a full-width
      smoked-glass bar behind them.
 
-     The bar is Deep Ink, not Warm Chalk, so the foreground stays Warm Chalk in
+     The bar is Ink Black, not Warm Chalk, so the foreground stays Warm Chalk in
      both states — there is no colour flip to cross-fade, and therefore no
      window where the labels are the wrong colour for what is behind them.
 
@@ -190,7 +209,7 @@
      tree, and the pane is a sibling of the content). */
   .nav-bar {
     --nav-fg: var(--color-chalk);
-    /* On Deep Ink, full Clay Amber clears AA (5.2:1) */
+    /* On Ink Black, full Clay Amber clears AA (6.6:1) */
     --accent-text: var(--color-amber);
   }
 
@@ -214,7 +233,7 @@
   }
 
   /* The bar itself — edge to edge and square, so it reads as a bar rather than
-     a floating pill. Kept fairly opaque: the page beneath is Deep Ink copy on
+     a floating pill. Kept fairly opaque: the page beneath is Ink Black copy on
      Warm Chalk, and a thinner tint lets that ghost through as legible text. */
   .nav-pane {
     position: absolute;
@@ -286,18 +305,12 @@
     border: 1px solid rgb(var(--chalk-rgb) / 0.14);
   }
 
-  /* Frosted cell — stat cells sitting on a textured light field */
-  .material-frost {
-    background: rgb(var(--chalk-rgb) / 0.62);
-    backdrop-filter: blur(12px);
-  }
-
   /* ----------------------------------------------------------
      Scrims & veils — legibility washes over imagery. Authored
      from the palette channels, never raw hex.
      ---------------------------------------------------------- */
 
-  /* Vertical Deep Ink wash — dark statement bands (footer, closing band) */
+  /* Vertical Ink Black wash — dark statement bands (footer, closing band) */
   .scrim-deep {
     background: linear-gradient(
       180deg,
@@ -342,14 +355,19 @@
     );
   }
 
-  /* Hero — angled, clears the right side for the artwork */
+  /* Hero — angled, clears the right side for the artwork.
+     Retuned for the frontline composite. The previous 0.94 → 0.34 wash was
+     built for the prism plate, which was bright enough to read through it;
+     over an already-dark monochrome shot it crushed the left half to flat
+     black, so the picture only surfaced when a resize happened to swing a
+     light frame into the unscrimmed right edge. */
   .scrim-hero {
     background: linear-gradient(
       100deg,
-      rgb(var(--ink-rgb) / 0.94) 0%,
-      rgb(var(--ink-rgb) / 0.74) 30%,
-      rgb(var(--ink-rgb) / 0.34) 55%,
-      rgb(var(--ink-rgb) / 0) 80%
+      rgb(var(--ink-rgb) / 0.8) 0%,
+      rgb(var(--ink-rgb) / 0.56) 32%,
+      rgb(var(--ink-rgb) / 0.22) 58%,
+      rgb(var(--ink-rgb) / 0) 78%
     );
   }
 
@@ -384,7 +402,7 @@
   /* ----------------------------------------------------------
      Duotone — INTERIM. The photographic set was produced for the
      retired teal/lime palette. This strips the original hue and
-     remaps each image into a Deep Ink ↔ Warm Chalk duotone so the
+     remaps each image into a Ink Black ↔ Warm Chalk duotone so the
      imagery sits inside the new palette. Delete this class (and
      its usages) once re-treated artwork lands.
      Wrap only the image — never a node with text inside, or the
@@ -395,13 +413,18 @@
     isolation: isolate;
     overflow: hidden;
   }
-  /* grayscale() first wipes the retired teal and the acid-lime nodes out
-     completely; sepia() then re-tints the flat grey warm, landing it in Warm
-     Stone / Clay Amber territory rather than cold neutral. */
+  /* grayscale() wipes the retired teal and the acid-lime nodes out completely.
+     Nothing re-tints it: the plates stay neutral black-and-white so they match
+     the header photograph, which is a genuinely monochrome shot shown with no
+     filter at all. The old sepia(0.5) saturate(1.5) that used to sit here was
+     what made every plate read brown. Contrast is up a little to compensate —
+     removing the sepia also removed the punch it was adding. */
   .duotone :where(img) {
-    filter: grayscale(1) sepia(0.5) saturate(1.5) contrast(1.04) brightness(1.02);
+    filter: grayscale(1) contrast(1.12) brightness(0.98);
   }
-  /* A little depth back into the plate — light at the top, ink at the foot. */
+  /* A little depth back into the plate — light at the top, ink at the foot.
+     Neutral white rather than Warm Chalk: chalk is a warm cream, and at
+     soft-light it was reintroducing the warm cast the filter just removed. */
   .duotone::after {
     content: "";
     position: absolute;
@@ -409,20 +432,20 @@
     pointer-events: none;
     background: linear-gradient(
       180deg,
-      rgb(var(--chalk-rgb) / 0.18),
-      rgb(var(--ink-rgb) / 0.22)
+      rgb(255 255 255 / 0.16),
+      rgb(var(--ink-rgb) / 0.24)
     );
     mix-blend-mode: soft-light;
   }
 
   /* INTERIM, sibling of .duotone — for legacy plates painted as a CSS
      background-image rather than an <img>, where the blend-mode approach
-     can't reach. Strips the retired teal/lime hue; the warm note comes from
-     whichever scrim sits over it. Delete alongside .duotone. */
+     can't reach. Strips the retired teal/lime hue and leaves it neutral,
+     matching .duotone. Delete alongside .duotone. */
   .plate-legacy {
-    /* Slightly deepened — these plates are pale, and the card copy sits over
-       them, so the scrim needs something to bite against. */
-    filter: grayscale(1) sepia(0.5) saturate(1.5) contrast(1.06) brightness(0.92);
+    /* Deepened further than .duotone — these plates are pale, and the card copy
+       sits over them, so the scrim needs something to bite against. */
+    filter: grayscale(1) contrast(1.14) brightness(0.86);
   }
 
   /* Print grain — tactile texture over chalk fields (§5.4) */
@@ -434,11 +457,13 @@
     background-image: url("/images/background-cream.webp");
     background-size: cover;
     background-position: center top;
-    /* Legacy cream/teal grain plate. Desaturated then warmed so it reads as
-       texture rather than colour; kept faint because greying it made the
-       plate's large wave forms read as a watermark over Warm Chalk. */
-    filter: grayscale(1) sepia(0.55) brightness(1.04);
-    opacity: 0.22;
+    /* Legacy cream/teal grain plate. Desaturated, then only lightly warmed —
+       most of the sepia is gone so the texture reads white rather than cream,
+       and the opacity is up so it actually comes through. Watch the plate's
+       large wave forms at this strength: they were the reason it used to be
+       held at 0.22. */
+    filter: grayscale(1) sepia(0.16) brightness(1.06);
+    opacity: 0.38;
     will-change: transform;
   }
 
@@ -488,14 +513,19 @@
   .btn:hover {
     transform: translateY(-2px);
   }
-  /* Flat Oat Greige fill, Deep Ink label — 11:1. No border, no shadow. */
+  /* Flat Deep Forest fill, Warm Chalk label — 7.7:1. No border, no shadow.
+     The label has to be Chalk: Ink Black on this green is 2.2:1 and
+     unreadable. Every .btn-primary sits on a dark field (hero, the Ink Black
+     nav bar, and the theme-dark footer and closing band), where the fill is
+     only 2.2:1 against Ink — the button reads as a shape by its chalk label
+     rather than by fill contrast. */
   .btn-primary {
-    background: var(--color-oat);
-    color: var(--color-ink);
+    background: var(--color-forest);
+    color: var(--color-chalk);
   }
 
-  /* No nav-specific override needed: the bar is Deep Ink, so the flat Oat fill
-     reads as a solid shape against it exactly as it does over the hero. */
+  /* No nav-specific override needed: the bar is Ink Black, so the flat Deep
+     Forest fill sits on the same field it does over the hero. */
   .btn-outline {
     border: 1px solid var(--border);
     color: var(--text);

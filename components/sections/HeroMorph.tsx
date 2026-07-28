@@ -3,6 +3,10 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+// Statically imported so the emitted URL carries a content hash. The hero
+// artwork is being iterated on, and a fixed /images/… path meant every swap
+// reused the same URL and served the previous shot from browser cache.
+import heroPanels from "@/public/images/hero-panels.webp";
 import { motion, useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -76,13 +80,12 @@ export default function HeroMorph() {
             style={{ height: "100vh", borderRadius: 0 }}
           >
             <Image
-              src="/images/hero-prism.webp"
-              alt="Light refracting through a prism against near-black — warm amber flares scattered across darkness."
+              src={heroPanels}
+              alt="Five monochrome panels of frontline workers using handheld devices: a supermarket colleague in the chilled aisle, a retail assistant serving a customer, a drive-through operator on a headset, a store colleague on a headset checking a phone, and a field engineer at the back of a van."
               fill
               priority
               sizes="100vw"
               className="object-cover"
-              style={{ objectPosition: "72% center" }}
             />
             <div aria-hidden className="scrim-hero absolute inset-0" />
             <div aria-hidden className="scrim-top absolute inset-x-0 top-0 h-32" />
@@ -91,25 +94,27 @@ export default function HeroMorph() {
               <div className="shell">
                 <div className="max-w-[42rem]">
                   <motion.p className="eyebrow" {...stagger(0)}>
-                    An AI-native product company
+                    At the Beyond
                   </motion.p>
-                  {/* 10ch holds the break at "built for the / real world." — ch
-                      rather than rem so the constraint tracks the clamped
-                      display size. Unconstrained below sm:, where the narrower
-                      measure would split "Frontier AI," instead. */}
-                  <motion.h1 className="mt-7 text-5xl sm:max-w-[10ch]" {...stagger(1)}>
-                    Frontier AI,
+                  {/* Hard break holds the two-line composition; the line is
+                      short enough that no max-measure constraint is needed.
+                      Newsreader at the base h1 settings — size only here, so it
+                      matches the headings further down the page. */}
+                  <motion.h1
+                    className="mt-7 text-6xl text-[color:var(--color-oat)]"
+                    {...stagger(1)}
+                  >
+                    The future,
                     <br />
-                    <span className="text-[color:var(--accent)]">built for</span> the real world.
+                    put to work.
                   </motion.h1>
                   <motion.p
-                    className="mt-5 max-w-[48ch] text-lg text-[color:var(--text-muted)]"
+                    className="mt-5 max-w-[44ch] text-base text-[color:var(--text-muted)]"
                     {...stagger(2)}
                   >
-                    We imagine, build and forward-deploy AI-native products, underpinned by our
-                    AI-native delivery, for everywhere your business meets the customer: the shop
-                    floor, the drive-through, the field, the contact centre, the app and the online
-                    store. Strategy that gets deployed.
+                    We work at the beyond: where emerging technology meets the real world. We turn
+                    what&rsquo;s next into what&rsquo;s useful, creating intelligent products and
+                    experiences for the people at the heart of your business.
                   </motion.p>
                   <motion.div className="mt-7 flex flex-wrap items-center gap-3" {...stagger(3)}>
                     <Link href="/contact" className="btn btn-primary">

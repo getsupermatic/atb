@@ -1,5 +1,5 @@
 /**
- * ATB. logo (final artwork, inlined as `currentColor` so it themes Deep Ink on
+ * ATB. logo (final artwork, inlined as `currentColor` so it themes Ink Black on
  * Warm Chalk / Warm Chalk on dark). The full stop is part of the mark and
  * renders in the same colour as the logo.
  * `variant="mono"` — the ATB monogram.

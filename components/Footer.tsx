@@ -23,7 +23,7 @@ function XIcon() {
 /**
  * Deep super-footer (§7.10): a closing statement paired with the Insights
  * sign-up, grouped navigation, and a base row carrying the logo, social links
- * and copyright — Deep Ink / smoked-glass material.
+ * and copyright — Ink Black / smoked-glass material.
  */
 export default function Footer() {
   return (

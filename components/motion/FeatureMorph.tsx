@@ -77,7 +77,11 @@ export default function FeatureMorph() {
             <div aria-hidden className="scrim-panel absolute inset-0" />
             <div className="absolute inset-0 flex items-end">
               <div className="shell pb-[6vh] sm:pb-[8vh]">
-                <h2 className="max-w-[18ch] text-[2.35rem] text-[color:var(--color-chalk)] sm:text-5xl">
+                {/* The one hardcoded display size on the page, so it does not
+                    follow --text-*. Lifted 4% in step with the scale floors —
+                    kept to that, because this narrow-viewport value is what
+                    stopped this bottom-anchored heading clipping on mobile. */}
+                <h2 className="max-w-[18ch] text-[2.45rem] text-[color:var(--color-chalk)] sm:text-5xl">
                   Capability now advances by the month.{" "}
                   <span className="text-[color:var(--color-amber)]">
                     Most frontline tools still change by the year.

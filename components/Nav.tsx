@@ -21,7 +21,7 @@ import Logo from "./brand/Logo";
  *             as long as you keep going down
  *   docked  — scrolling back up: it returns as a full-width glass bar
  *
- * Because the header is fully off-screen in `hidden`, the Warm Chalk → Deep Ink
+ * Because the header is fully off-screen in `hidden`, the Warm Chalk → Ink Black
  * foreground flip happens out of sight — no contrast flash mid-transition.
  * On first load the logo writes out "at the beyond." and collapses to "ATB." in
  * place, then the links fade in. Mobile → the same bar plus a dropdown panel.

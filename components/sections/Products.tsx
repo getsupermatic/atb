@@ -20,10 +20,14 @@ export default function Products() {
         {/* FrontlineOS spotlight */}
         <Reveal from="left" className="mt-12">
           <article className="material-glass grid overflow-hidden rounded-[1.75rem] lg:grid-cols-2">
-            <div className="duotone relative aspect-[16/10] lg:aspect-auto">
+            {/* No .duotone here — the aisle shot is already monochrome and is
+                shown untreated, exactly as it appears in the header. The two
+                cards below keep .duotone because their plates are legacy
+                teal/lime artwork that still needs remapping. */}
+            <div className="relative aspect-[16/10] lg:aspect-auto">
               <Image
                 src={frontline.image}
-                alt="FrontlineOS — voice-first AI support on the store floor."
+                alt="FrontlineOS — a supermarket colleague in the chilled aisle before opening, checking a handheld device beside a stock cart."
                 fill
                 sizes="(max-width: 1024px) 90vw, 44vw"
                 className="object-cover"
@@ -32,8 +36,10 @@ export default function Products() {
             <div className="flex flex-col justify-center p-7 lg:p-10">
               <div className="flex items-center gap-3">
                 <h3 className="text-3xl">{frontline.name}</h3>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-amber)] px-3 py-1 text-xs font-medium text-[color:var(--color-ink)]">
-                  <span className="node-dot bg-[color:var(--color-ink)]" />
+                {/* Deep Forest fill with a Warm Chalk label, matching the header
+                    CTA. Chalk on this green is 7.7:1; Ink would be 2.2:1. */}
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--color-forest)] px-3 py-1 text-xs font-medium text-[color:var(--color-chalk)]">
+                  <span className="node-dot bg-[color:var(--color-chalk)]" />
                   {frontline.status}
                 </span>
               </div>
@@ -58,10 +64,14 @@ export default function Products() {
               delay={i * 0.08}
             >
               <article className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] border" style={{ borderColor: "var(--border)" }}>
-                <div className="img-frame duotone aspect-[16/9] rounded-none border-0">
+                {/* No .duotone — these now carry the same already-monochrome
+                    aisle shot as the spotlight and the header, so there is no
+                    legacy hue left to strip. Restore it if bespoke artwork
+                    lands that needs remapping. */}
+                <div className="img-frame aspect-[16/9] rounded-none border-0">
                   <Image
                     src={product.image}
-                    alt={`${product.name} — AI-native ${product.name === "CommerceOS" ? "commerce" : "marketing"} layer.`}
+                    alt=""
                     fill
                     sizes="(max-width: 768px) 90vw, 40vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"

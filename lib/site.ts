@@ -31,7 +31,9 @@ export const products = [
     name: "FrontlineOS",
     status: "Live",
     href: "/products/frontline-os",
-    image: "/images/product-frontline.webp",
+    // Shares the hero photograph — the aisle shot is the FrontlineOS setting,
+    // so the spotlight panel and the header now carry the same image.
+    image: "/images/hero-aisle.webp",
     summary:
       "An AI-native operating layer for frontline teams. Voice-first guidance, real-time knowledge, and a seamless line to the contact centre and back office behind them.",
     proof: "40%+ frontline productivity.",
@@ -40,7 +42,10 @@ export const products = [
     name: "CommerceOS",
     status: null,
     href: "/products/commerce-os",
-    image: "/images/product-commerce.webp",
+    // PLACEHOLDER — borrowing the FrontlineOS aisle shot until CommerceOS
+    // artwork lands. Its own plate (product-commerce.webp) is legacy teal/lime
+    // and reads wrong against the black treatment.
+    image: "/images/hero-aisle.webp",
     summary:
       "AI-native commerce that bridges frontline staff, contact-centre agents and customers. Conversational experiences that lift both service and top line.",
     proof: "15–25% revenue uplift.",
@@ -49,7 +54,8 @@ export const products = [
     name: "MarketingOS",
     status: null,
     href: "/products/marketing-os",
-    image: "/images/product-marketing.webp",
+    // PLACEHOLDER — see the CommerceOS note above.
+    image: "/images/hero-aisle.webp",
     summary:
       "A unified marketing intelligence and experience layer — AI-native strategy, campaign, creative and communications across your whole stack.",
     proof: "50%+ cost reduction. 10× faster campaigns.",

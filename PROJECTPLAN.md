@@ -1,8 +1,116 @@
 # ATB. Marketing Website — Project Plan
 
-**Scope (this phase):** Home page only, built on a foundation that the rest of the site can extend later.
-**Source of truth:** `briefs/ATB-website-design-brief.md` (design/build) + `briefs/documents/ATB-Website-Master-Copy-Deck.md` (copy).
-**Status:** Awaiting sign-off before build begins.
+**Branch:** `v3` — a creative-direction test forked from `v2` at `2637034`.
+`v2` is untouched and remains the incumbent.
+
+> **Part 0** below is the live v3 plan. Everything from Part 1 onward is the v2
+> record, kept for reference — the tokens, copy sources and quality bar it
+> documents still apply, because v3 forks the design system rather than
+> replacing it.
+
+---
+
+# Part 0 — V3 direction
+
+**Status:** Awaiting sign-off. No code written yet.
+**Trigger:** new hero copy supplied 2026-07-26 (H1 + intro).
+
+## 0.1 The new copy
+
+> **[H1]** The future, put to work.
+>
+> **[Intro]** We work at the beyond: where emerging technology meets the real
+> world. We turn what's next into what's useful, creating intelligent products
+> and experiences for the people at the heart of your business. In aisle 14 at
+> 6:42am, behind the beauty counter, at the drive-through at midnight. And
+> because we've been here before, you don't start from zero.
+
+## 0.2 What changed, and what it asks of the design
+
+| | v2 / copy deck v7 | v3 copy |
+|---|---|---|
+| H1 | "Frontier AI, built for the real world." (two lines, 6 words) | "The future, put to work." (4 words) |
+| Register | Taxonomic — names *what we are* | Declarative, verb-led — names *what we do* |
+| Place | A category list: shop floor, drive-through, field, contact centre, app, online store | Three specific moments: aisle 14 at 6:42am, behind the beauty counter, the drive-through at midnight |
+| Vocabulary | "AI-native", "forward-deploy", "frontier" | No jargon at all — and no "AI" |
+| New claim | — | "because we've been here before, you don't start from zero" |
+| "Beyond" | A horizon/orbit metaphor | A **place you work**: "we work at the beyond" |
+
+Three of these drive the design:
+
+1. **Specificity of moment is the strongest hook.** "Aisle 14 at 6:42am" is not
+   a category, it's a documentary observation with a timestamp. v2 answers
+   abstraction with abstraction — prisms, iridescent glass, orbits. This copy
+   asks for real places and real times.
+2. **A four-word H1 wants the whole screen.** v2 sets its H1 at `text-5xl`
+   inside a 42rem column, left-aligned over a photographic plate. Four words
+   don't need a column or a plate to sit on.
+3. **Plain speech wants plain composition.** No jargon in the words means the
+   layout shouldn't be doing ornamental work either.
+
+## 0.3 Proposed direction — "Field Record"
+
+Documentary and annotated, where v2 is editorial and veiled. The organising
+device is **the caption**: small tagged labels (place, time) set against very
+large plain type. A field notebook or a shift log, not a magazine spread.
+
+**Kept from v2** — per the "fork and reshape" decision, the design system does
+not change: Deep Ink / Warm Chalk / Clay Amber tokens, Newsreader + Inter,
+`lib/site.ts`, the copy deck, SEO scaffolding, the nav.
+
+**Changed:**
+
+- **Hero screen one is type only.** "The future, put to work." set very large
+  across the full shell width on bare Warm Chalk — no image, no scrim, no
+  column. The departure comes from scale and restraint, not new tokens.
+- **The three moments become the signature component.** Rather than running
+  inline in the paragraph, "aisle 14 at 6:42am" / "behind the beauty counter" /
+  "the drive-through at midnight" render as three documentary frames, each
+  tagged with its place and time in small Inter. This replaces v2's
+  card-to-full-bleed morph as the page's identifying gesture.
+- **"You don't start from zero" earns the logo bar.** The client marks stop
+  being a generic trust strip and become the evidence for that sentence —
+  placed directly beneath it, captioned as such.
+- **Motion serves "put to work."** Drop the Anthropic-derived morph. The
+  moments arrive in sequence, timestamps settling — a shift ticking over.
+  Restrained, and still fully legible under `prefers-reduced-motion`.
+
+**The alternative I did not pick:** keeping a full-bleed image behind the H1 as
+v2 does, and treating the moments as captions over it. Faster to build and
+closer to the incumbent, but it keeps the thing that most makes v3 look like v2.
+Say so if you'd rather see that.
+
+## 0.4 To do
+
+- [ ] Sign off this direction (or redirect)
+- [ ] Resolve the four open questions in §0.5
+- [ ] Build hero screen one — full-width type, bare Warm Chalk
+- [ ] Build the three tagged moment frames
+- [ ] Rework the logo bar as proof for "you don't start from zero"
+- [ ] New hero motion; remove `HeroMorph`'s scrubbed morph from the v3 hero
+- [ ] Re-check contrast, reduced-motion and 360/768/1024/1440 breakpoints
+- [ ] Review section at the end of Part 0
+
+## 0.5 Open questions
+
+1. **Rest of the page.** Is new copy coming section by section, or should the
+   remaining sections (problem / new model / three ways / products / closing)
+   keep the copy-deck wording for now? Building the hero alone is fine — it is
+   where direction gets set — but the page will read as two voices until the
+   rest follows.
+2. **Photography.** "Field Record" needs real frames: a supermarket aisle, a
+   beauty counter, a drive-through at night. The current library is abstract
+   (prisms, glass, orbits) and is still awaiting re-treatment in the warm-neutral
+   palette. Options: source new imagery, hold with type-only frames, or reuse
+   the existing plates as obvious placeholders. **Type-only is my
+   recommendation for the first pass** — it tests the layout without waiting on
+   an asset job.
+3. **"AI" is absent from the new copy.** Deliberate? It reads as a confident
+   choice, but it moves the positioning away from the copy deck's "AI-native
+   product company" and has consequences for the rest of the site and for search.
+4. **Copy deck §1.1 bans "the Beyond" in body copy**, while permitting the
+   *concept* of "the beyond" to be evoked. "We work at the beyond" sits exactly
+   on that line. Your call — flagging it, not blocking on it.
 
 ---
 
@@ -553,3 +661,81 @@ this round, so the three scroll states were confirmed by type-check, production
 build, and inspection of the emitted CSS and server-rendered markup — but not
 seen rendering. Worth scrolling through before sign-off. The one thing to watch
 is whether `docked` reappearing on any upward scroll feels too eager mid-page.
+
+---
+
+## Plan — Carry the black/green header treatment into the sections (2026-07-28)
+
+### Context
+
+The header now reads: Ink Black field, **cream (Oat Greige) H1**, **Deep Forest
+`#2d523d`** button fill with a Warm Chalk label, and an untreated *genuinely
+monochrome* photograph (`hero-panels.webp`) under ink scrims.
+
+The sections below still carry two hangovers from the retired palette:
+
+1. **Sepia imagery.** `.duotone` and `.plate-legacy` both run
+   `grayscale(1) sepia(0.5) saturate(1.5)`. The `grayscale` strips the old
+   teal/lime; the `sepia(0.5) saturate(1.5)` then re-tints it warm — that is
+   the brown look. The header image gets none of this.
+2. **Clay Amber accents** below the header.
+
+### The one real constraint — RESOLVED (2026-07-28)
+
+Deep Forest inverts across the two fields:
+
+| Field | Contrast | Verdict |
+|---|---|---|
+| Paper White (light sections) | **8.3:1** | Excellent — better than amber, which needed `--color-amber-deep` |
+| Ink Black (dark sections) | **2.2:1** | Fails — unreadable as text, near-invisible as a dot |
+
+**Decision: no new green shade.** Green is used only where it is legible — i.e.
+on **light** fields and as a **fill** behind a Warm Chalk label. Anywhere green
+would fail (accents on dark sections), **Clay Amber is retained** as the accent,
+since it already clears AA on Ink at 6.6:1.
+
+This makes the palette rule simple and worth stating once:
+
+> **Green on light, amber on dark.** Deep Forest is legal as accent *text* on
+> light fields and as a *fill* anywhere. Clay Amber remains the accent on Ink
+> Black. No second green is introduced.
+
+**Consequence for WaysToWork:** it is a dark section, so its icon nodes and
+"How we work" link **stay Clay Amber** — unchanged. Only its background plate
+de-sepias. The green request cannot apply there without a second green.
+
+### To-do
+
+- [ ] **1. De-sepia the image treatment.** Drop `sepia()`/`saturate()` from
+      `.duotone` and `.plate-legacy`; keep `grayscale(1)` and lift contrast so
+      the plates read as punchy neutral B&W like the header shot. Also neutralise
+      the warm cast in `.duotone::after` (currently a chalk→ink soft-light).
+- [ ] **2. FeatureMorph** — "Capability now advances by the month." Typeface
+      unchanged, **Clay Amber accent word retained** (explicitly kept), only the
+      background plate changes. Falls out of item 1.
+- [ ] **3. NewModel** — the four panels. Images retained, now neutral B&W.
+      Falls out of item 1 (`.plate-legacy`).
+- [ ] **4. WaysToWork** — background plate to the black style only (falls out
+      of item 1). Icon nodes and the "How we work" link **stay Clay Amber** per
+      the resolved constraint above — the section is dark, and no second green
+      is being introduced.
+- [ ] **5. Products** — CommerceOS + MarketingOS both use `/images/hero-aisle.webp`
+      as a placeholder, and **drop `.duotone`** from those two cards (the aisle
+      shot is already monochrome, same as the spotlight). "Live" badge fill
+      amber → `--color-forest` with a Warm Chalk label, matching the header button.
+- [ ] **6. Footer** — image retained, de-sepia'd. Falls out of item 1.
+- [ ] **7. Build + visual check.**
+
+### Reach beyond the named sections — APPROVED (2026-07-28)
+
+The sepia lives in two shared classes, so fixing it also changes **ATBOS**,
+**ClosingBand** and the Products card frames. Confirmed: de-sepia all sections.
+
+### Deliberately NOT in scope
+
+- Cream headings on the other dark sections (WaysToWork, ClosingBand currently
+  use Warm Chalk `#f7f1e6`, hero H1 uses Oat Greige `#e5dccb` — very close;
+  not touching unless asked)
+- Amber in the logo dot, OrbitMark, footer link hovers, nav link hover, skip link
+- Any second green shade — explicitly ruled out
+- Any section changing from light to dark, or vice versa
