@@ -2348,3 +2348,59 @@ zoom does scale the layout viewport, so there is no product implication.
 - The note on `.btn-primary` in `globals.css` still says every use sits on a dark
   field. Left as-is rather than rewritten mid-round; it wants updating next time
   that file is open.
+
+## Round: shared-link previews showed the retired logo
+
+**Reported:** a Slack unfurl of the v3 preview URL showed the old teal chevron
+mark, while the browser tab and bookmarks showed the new squarish `atb.` mark.
+
+### Cause
+
+`app/favicon.ico` had **never been updated since the initial commit** (`415d984`).
+It predated both the warm-neutral palette and the new mark, so it was still the
+retired teal chevron on a petrol field. `app/icon.svg` *was* updated with the new
+mark in `a128b14`.
+
+Both are served, and which one wins depends on the client:
+
+```
+<link rel="icon" href="/favicon.ico" sizes="64x64" type="image/x-icon">
+<link rel="icon" href="/icon.svg"    sizes="any"   type="image/svg+xml">
+```
+
+Browsers prefer the SVG — hence the correct mark in the tab and on bookmarks.
+Slack takes `/favicon.ico`, so it got the retired one. The two had simply drifted,
+and nothing pointed that out because the browser always showed the good one.
+
+The reason an *icon* appears in the unfurl at all is that the site declares **no
+`og:image` and no `twitter:image`**, so Slack falls back to the favicon. Left that
+way deliberately: a share card was considered and explicitly not wanted — the ask
+was for the unfurl to use the same mark as the browser icon, which is what a
+corrected `.ico` delivers.
+
+### Fixed
+
+- [x] `app/favicon.ico` regenerated **from `app/icon.svg`**, so the two cannot
+      drift again by hand: rendered at density 1200 to a 256px PNG32, then
+      `-define icon:auto-resize=64,48,32,16`. Same four sizes the old file
+      carried. All four frames inspected at 8× — the mark is legible at 16px.
+- Verified the dev server serves the new bytes: the content fingerprint moved
+  from `favicon.2wyj22-r32qk0.ico` to `favicon.2i_uoxm2s4sa_.ico`, and the served
+  file's sha256 matches the file in the repo.
+
+### Worth knowing
+
+- **Slack caches unfurls per URL.** The corrected icon will not appear on a link
+  already unfurled until that cache expires; re-share with a changed URL (a new
+  deployment URL, or a `?v=2` query) to see it immediately.
+- `twitter:card` is set to `summary_large_image`, which is meant to be paired with
+  an image. With none set, X degrades the card. Not touched — it is pre-existing
+  and outside this fix — but it wants either an image or `summary`.
+- Regenerating from the SVG is the repeatable step. If the mark changes again,
+  re-run that command rather than hand-editing an `.ico`, or the same drift
+  recurs:
+  `magick -background none -density 1200 app/icon.svg -resize 256x256 PNG32:- | magick - -define icon:auto-resize=64,48,32,16 app/favicon.ico`
+- `app/icon.svg` paints its field in `#1B2836` and the mark in `#F7F1E6`. Neither
+  is a palette token (Deep Pine is `#0f1613`, Warm Chalk `#f5f1e8`), so the icon
+  sits just outside the palette. Not changed — it is the mark as adopted — but
+  noted for whenever the icon is next revisited.
