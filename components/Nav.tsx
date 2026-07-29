@@ -21,12 +21,29 @@ import Logo from "./brand/Logo";
  *             as long as you keep going down
  *   docked  — scrolling back up: it returns as a full-width glass bar
  *
- * Because the header is fully off-screen in `hidden`, the Warm Chalk → Ink Black
+ * Because the header is fully off-screen in `hidden`, the Warm Chalk → Deep Pine
  * foreground flip happens out of sight — no contrast flash mid-transition.
- * On first load the logo writes out "at the beyond." and collapses to "ATB." in
- * place, then the links fade in. Mobile → the same bar plus a dropdown panel.
+ * On load the logo holds "at the beyond." written out, then collapses to "atb." —
+ * see HOLD_MS. The links and CTA are present throughout and slide left with the
+ * collapse. Mobile → the same bar plus a dropdown panel.
  */
 type Mode = "top" | "hidden" | "docked";
+
+/**
+ * How long the lockup sits fully written out before it collapses; the collapse
+ * itself then takes 520ms (Logo's own transition), and the links ride that same
+ * 520ms leftward because the logo is in flow — see the row below.
+ *
+ * This runs on every page load, not once per session. It used to be gated on an
+ * `atb-intro` sessionStorage key, but the gate is unreadable during SSR: the
+ * server always rendered the lockup expanded, so on a gated load it painted
+ * written-out and then snapped shut the moment the effect below hydrated — the
+ * hold never ran and the collapse read as an instant flash. Playing it every
+ * time is the honest version of the same gesture. Only full document loads
+ * trigger it; the header lives in the layout, so client-side route changes don't
+ * remount it.
+ */
+const HOLD_MS = 2000;
 
 export default function Nav() {
   const reduce = useReducedMotion();
@@ -34,25 +51,16 @@ export default function Nav() {
   const [mode, setMode] = useState<Mode>("top");
   const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState<"full" | "mono">("full");
-  const [revealed, setRevealed] = useState(false);
   const [hovered, setHovered] = useState(false);
   const showFull = phase === "full" || hovered;
 
   useEffect(() => {
-    if (reduce || sessionStorage.getItem("atb-intro")) {
+    if (reduce) {
       setPhase("mono");
-      setRevealed(true);
       return;
     }
-    const t1 = setTimeout(() => setPhase("mono"), 780);
-    const t2 = setTimeout(() => {
-      setRevealed(true);
-      sessionStorage.setItem("atb-intro", "1");
-    }, 1040);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    const t = setTimeout(() => setPhase("mono"), HOLD_MS);
+    return () => clearTimeout(t);
   }, [reduce]);
 
   // A reload can restore a mid-page scroll position, where the bare Warm Chalk
@@ -75,13 +83,6 @@ export default function Nav() {
   // The menu can only open from the docked bar (or pin it solid at the top).
   const docked = mode === "docked" || open;
 
-  const revealStyle = {
-    opacity: revealed ? 1 : 0,
-    transform: revealed ? "translateY(0)" : "translateY(-4px)",
-    transition: "opacity 0.5s ease, transform 0.5s ease",
-    pointerEvents: (revealed ? "auto" : "none") as "auto" | "none",
-  };
-
   return (
     <motion.header
       className={`nav-bar fixed inset-x-0 top-0 z-50 ${docked ? "nav-scrolled" : ""}`}
@@ -96,38 +97,33 @@ export default function Nav() {
         <div className="nav-row shell relative flex items-center justify-between">
           <Link
             href="/"
-            className="nav-fg relative flex items-center py-1"
+            className="nav-fg relative flex shrink-0 items-center py-1"
             aria-label="ATB — home"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             onFocus={() => setHovered(true)}
             onBlur={() => setHovered(false)}
           >
-            {/* The monogram carries more optical size than the lockup at the
-                same height, so it runs a few px taller — the two never show at
-                once, they crossfade. */}
-            <Logo
-              variant="mono"
-              style={{ height: 31, opacity: showFull ? 0 : 1, transition: "opacity 0.35s ease" }}
-            />
-            <AnimatePresence>
-              {showFull && (
-                <motion.span
-                  key="full"
-                  aria-hidden
-                  className="absolute left-0 whitespace-nowrap"
-                  initial={{ opacity: 0, filter: "blur(3px)" }}
-                  animate={{ opacity: 1, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, filter: "blur(4px)", transition: { duration: 0.3 } }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <Logo variant="full" style={{ height: 26 }} />
-                </motion.span>
-              )}
-            </AnimatePresence>
+            {/* One logo, not two. This used to crossfade a `mono` monogram
+                against a `full` lockup — and the two were different typefaces in
+                different cases (lowercase `atb.` against uppercase
+                "AT THE BEYOND."), at different heights, dissolving through a
+                blur. Nothing about that could read as the letters expanding.
+                Logo now carries both states in one set of paths and animates
+                between them; the wrapper's width animates with it, so the link's
+                own hover area grows to cover the revealed letters instead of
+                collapsing the moment the cursor moves right. */}
+            {/* In flow, deliberately: the logo's own width transition is the
+                nav's layout animation. As the lockup writes out the anchor grows
+                and the links and CTA slide right; as it collapses they ride the
+                same 520ms back. Taking it out of flow (a fixed-width span with
+                the logo absolute) avoids the reflow but kills that gesture. The
+                links shrink-wrap and the row is justify-between, so the movement
+                is absorbed by the gaps — see min-w-0 on the list. */}
+            <Logo height={31} expanded={showFull} />
           </Link>
 
-          <ul className="hidden items-center gap-7 lg:flex" style={revealStyle}>
+          <ul className="hidden min-w-0 items-center gap-7 lg:flex">
             {primaryNav.map((item) => (
               <li key={item.href}>
                 <Link
@@ -140,7 +136,7 @@ export default function Nav() {
             ))}
           </ul>
 
-          <div className="flex items-center gap-2" style={revealStyle}>
+          <div className="flex shrink-0 items-center gap-2">
             <Link href="/contact" className="btn btn-primary hidden sm:inline-flex">
               Get started
             </Link>

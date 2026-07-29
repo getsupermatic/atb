@@ -31,9 +31,13 @@ export const products = [
     name: "FrontlineOS",
     status: "Live",
     href: "/products/frontline-os",
-    // Shares the hero photograph — the aisle shot is the FrontlineOS setting,
-    // so the spotlight panel and the header now carry the same image.
-    image: "/images/hero-aisle.webp",
+    // Its own photograph: a colleague on a headset serving a customer in the
+    // produce aisle — the frontline moment FrontlineOS supports. Supplied as a
+    // clean monochrome plate, so it needs no duotone; Products.tsx runs it
+    // through .grade-film instead, the same grade as the header.
+    // New filename rather than overwriting the old plate, so the swap doesn't
+    // reuse a cached URL — see the note in HeroMorph.tsx.
+    image: "/images/product-frontline-os-mono.webp",
     summary:
       "An AI-native operating layer for frontline teams. Voice-first guidance, real-time knowledge, and a seamless line to the contact centre and back office behind them.",
     proof: "40%+ frontline productivity.",

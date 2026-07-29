@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Logo from "@/components/brand/Logo";
 
 /**
  * ATBOS — introduces ATB's internal operating system. The panel pins while you
@@ -24,9 +24,17 @@ const headlines = [
 // identically. Presentation lives in `.statement` / `text-3xl`.
 const headlineClass = "statement text-3xl";
 
+// Panel morph geometry, shared by the inline styles (which carry the arrival
+// state, and the whole state under reduced motion) and the GSAP tweens.
+const PAD = "clamp(1.25rem, 5vw, 3rem)";
+const RADIUS = "1.75rem";
+const MIN_H = "82vh";
+
 export default function ATBOS() {
   const section = useRef<HTMLElement>(null);
-  const logo = useRef<HTMLImageElement>(null);
+  const pad = useRef<HTMLDivElement>(null);
+  const card = useRef<HTMLDivElement>(null);
+  const logo = useRef<HTMLDivElement>(null);
   const lines = useRef<(HTMLParagraphElement | null)[]>([]);
   const [index, setIndex] = useState(-1);
   const [reduce, setReduce] = useState(false);
@@ -69,6 +77,8 @@ export default function ATBOS() {
     const ctx = gsap.context(() => {
       gsap.set(els, { opacity: 0, x: 120 });
       gsap.set(logo.current, { y: logoOffset });
+      gsap.set(pad.current, { paddingInline: PAD });
+      gsap.set(card.current, { borderRadius: RADIUS, minHeight: MIN_H });
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -88,6 +98,20 @@ export default function ATBOS() {
           },
         },
       });
+
+      // The panel builds in first — contained and rounded on arrival, opening to
+      // full-bleed as you scroll through, the same gesture as FeatureMorph. It is
+      // on the section's existing scrubbed timeline rather than a second
+      // ScrollTrigger, so the morph and the statements can't drift apart.
+      // 1.5 units against a 12.5-unit runway, so it resolves in the first ~12%
+      // and overlaps the first statement's entrance rather than queueing.
+      tl.fromTo(pad.current, { paddingInline: PAD }, { paddingInline: 0, ease: "none", duration: 1.5 }, 0)
+        .fromTo(
+          card.current,
+          { borderRadius: RADIUS, minHeight: MIN_H },
+          { borderRadius: "0rem", minHeight: "100vh", ease: "none", duration: 1.5 },
+          0,
+        );
 
       tl.to({}, { duration: 0.5 }); // a beat of logo alone on arrival
       els.forEach((el, i) => {
@@ -109,20 +133,79 @@ export default function ATBOS() {
       aria-label="ATBOS — our operating system"
     >
       <div className="sticky top-0 flex min-h-screen items-center overflow-hidden">
-        <div aria-hidden className="duotone absolute inset-0">
-          <Image src="/images/atbos-bg.webp" alt="" fill sizes="100vw" className="object-cover" />
-        </div>
-        {/* Warm Chalk veil keeps the statements legible over the imagery */}
-        <div aria-hidden className="veil-chalk-radial absolute inset-0" />
-
-        <div className="shell relative z-10 flex w-full flex-col items-center text-center">
-          <img
+       <div ref={pad} className="w-full" style={{ paddingInline: PAD }}>
+        {/* .plate-ridge-forest — the same Deep Forest ridge field as the
+            Capability-now panel, so the two statement panels read as one device.
+            It replaces the atbos-bg photograph, and both of that photograph's
+            wrappers went with it: .duotone (nothing left to desaturate) and
+            .veil-chalk-radial (it existed to lift copy off imagery; the flat
+            field needs no help, and Warm Chalk on it is ~9:1).
+            theme-dark comes with the green: it flips --heading and --text to Warm
+            Chalk, which is what the wordmark, the statements and the dots all
+            resolve through — so none of them hardcode a colour. */}
+        <div
+          ref={card}
+          className="theme-dark plate-ridge-forest relative flex w-full items-center overflow-hidden"
+          style={{ borderRadius: RADIUS, minHeight: MIN_H }}
+        >
+        {/* items-center on the card above centres this block vertically in the
+            panel, so the wordmark, the statements and the progress slider stay as
+            one centred group while the panel's min-height morphs 82vh -> 100vh.
+            Without it the group sat top-aligned and drifted as the panel grew.
+            The padding stays as a floor for short viewports. */}
+        <div className="shell relative z-10 flex w-full flex-col items-center py-[7vh] text-center">
+          {/* The wordmark is composed, not an asset: the atb mark itself with
+              its full stop suppressed, then OS set in the display face. It
+              replaces atbos-logo.svg, which was the old uppercase grotesque
+              "ATBos" in #50727c — a retired palette teal.
+              Everything is sized in em off the container's fluid font-size, so
+              the pair scales as one. The mark's box carries 38 of its 384 viewBox
+              units as padding below the baseline (9.9%), so aligning the two
+              boxes' bottoms would float the mark above the OS baseline — hence
+              the marginBottom nudge, which is that padding cancelled out. */}
+          <div
             ref={logo}
-            src="/images/atbos-logo.svg"
-            alt="ATBOS"
-            className="w-auto"
-            style={{ height: "clamp(40px, 5.5vw, 72px)" }}
-          />
+            className="flex items-start justify-center"
+            style={{ fontSize: "clamp(40px, 5.5vw, 72px)" }}
+            role="img"
+            aria-label="ATBOS"
+          >
+            {/* Both nudges live on the mark, not the OS: the mark inherits the
+                container's font-size, so 1em here is unambiguous, whereas an em
+                on the OS span would resolve against its own larger font-size.
+                Measured off the render at the 72px cap of the clamp —
+                marginBottom lifts the mark until the two baselines agree
+                (the OS box bottom sits below its baseline by the font's descent,
+                the mark's by 9.9% of its height, and the two don't match), and
+                marginRight cancels the trailing padding the closed box carries
+                after the b, bringing the b→O gap into line with the 8–11px
+                letter gaps inside the mark itself. */}
+            <Logo
+              hideDot
+              height="1em"
+              style={{ marginRight: "-0.278em" }}
+            />
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                /* Half the mark's ascender height, raised so its cap line sits
+                   on the mark's — a lifted secondary mark rather than a true
+                   superscript. Measured at the 72px cap of the clamp: 0.59em
+                   gives a 29px cap against the mark's 58px — exactly half — and
+                   the marginTop brings the two cap tops level. The OS box top is
+                   not its cap top: half-leading and the font's ascent sit above
+                   it, so the offset has to be measured rather than reasoned. The
+                   residual 0.35px is the O's round overshoot, which should sit
+                   proud of the cap line. */
+                fontSize: "0.59em",
+                lineHeight: 1,
+                letterSpacing: "-0.01em",
+                marginTop: "0.078em",
+              }}
+            >
+              OS
+            </span>
+          </div>
 
           {reduce ? (
             <div className="mt-10 flex max-w-[44rem] flex-col gap-6">
@@ -159,7 +242,9 @@ export default function ATBOS() {
                       height: 11,
                       width: i === index ? 30 : 11,
                       background:
-                        i === index ? "var(--color-ink)" : "rgb(var(--ink-rgb) / 0.28)",
+                        i === index
+                          ? "var(--color-chalk)"
+                          : "rgb(var(--chalk-rgb) / 0.32)",
                     }}
                   />
                 ))}
@@ -180,6 +265,8 @@ export default function ATBOS() {
             </p>
           ))}
         </div>
+        </div>
+       </div>
       </div>
     </section>
   );

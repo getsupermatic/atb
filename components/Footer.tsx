@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import FooterLogo from "./brand/FooterLogo";
+import WordReveal from "./motion/WordReveal";
 import SignupForm from "./SignupForm";
 import { footerNav, site } from "@/lib/site";
 
@@ -23,27 +23,27 @@ function XIcon() {
 /**
  * Deep super-footer (§7.10): a closing statement paired with the Insights
  * sign-up, grouped navigation, and a base row carrying the logo, social links
- * and copyright — Ink Black / smoked-glass material.
+ * and copyright — on a solid black ground.
  */
 export default function Footer() {
   return (
-    <footer className="theme-dark relative overflow-hidden">
-      <div aria-hidden className="duotone absolute inset-0">
-        <Image
-          src="/images/glass-planes-footer.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-right"
-        />
-      </div>
-      <div aria-hidden className="scrim-deep absolute inset-0" />
+    <footer
+      className="theme-dark relative overflow-hidden"
+      style={{ backgroundColor: "var(--color-ink-deep)" }}
+    >
       <div className="shell relative z-10 py-20 lg:py-28">
         {/* Statement + supporting paragraph */}
         <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch lg:gap-20">
           <div>
+            {/* The three disciplines build in one at a time as the footer
+                arrives, each sliding down into its own clipped box — see
+                WordReveal. The lead sentence is static: it is the statement, and
+                animating all of it would bury the effect. */}
             <p className="statement max-w-[15ch] text-5xl">
-              AI-native products for the customer frontline. Operations. Commerce. Marketing.
+              AI-native products for the customer frontline.{" "}
+              <WordReveal delay={0.1}>Operations.</WordReveal>{" "}
+              <WordReveal delay={0.42}>Commerce.</WordReveal>{" "}
+              <WordReveal delay={0.74}>Marketing.</WordReveal>
             </p>
             <Link href="/contact" className="btn btn-primary mt-8">
               Start a conversation

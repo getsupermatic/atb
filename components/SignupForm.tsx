@@ -58,7 +58,14 @@ export default function SignupForm() {
           aria-invalid={status === "error"}
           className="field flex-1"
         />
-        <button type="submit" className="btn btn-primary justify-center">
+        {/* Clay Amber fill instead of the Deep Forest .btn-primary — this
+            button only (SignupForm is used in the footer alone). The label goes
+            to Ink: Chalk on this amber is 2.9:1 and fails normal-size text,
+            where Ink is 5.8:1. */}
+        <button
+          type="submit"
+          className="btn btn-primary justify-center bg-[#c97b45] text-[color:var(--color-ink)]"
+        >
           Subscribe
         </button>
       </div>

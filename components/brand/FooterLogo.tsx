@@ -45,14 +45,14 @@ export default function FooterLogo({ height = 26 }: { height?: number }) {
 
   // Reduced motion / no-JS parity: render the intact mark, no travel.
   if (reduce) {
-    return <Logo variant="mono" style={{ height }} />;
+    return <Logo height={height} />;
   }
 
   const parked = armed && !inView ? travel : 0;
 
   return (
     <span ref={wrapRef} className="relative inline-block">
-      <Logo variant="mono" hideDot style={{ height }} />
+      <Logo height={height} hideDot />
 
       <motion.span
         aria-hidden

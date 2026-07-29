@@ -79,45 +79,54 @@ export default function HeroMorph() {
             className="theme-dark relative w-full overflow-hidden"
             style={{ height: "100vh", borderRadius: 0 }}
           >
-            <Image
-              src={heroPanels}
-              alt="Five monochrome panels of frontline workers using handheld devices: a supermarket colleague in the chilled aisle, a retail assistant serving a customer, a drive-through operator on a headset, a store colleague on a headset checking a phone, and a field engineer at the back of a van."
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
+            {/* .grade-film applies the supplied header grade — see globals.css.
+                The wrapper holds the tone-map blends, so it must contain the
+                image and nothing else; the scrims below stay outside it. */}
+            <div className="grade-film">
+              <Image
+                src={heroPanels}
+                alt="Five monochrome panels of frontline workers using handheld devices: a supermarket colleague in the chilled aisle, a retail assistant serving a customer, a drive-through operator on a headset, a store colleague on a headset checking a phone, and a field engineer at the back of a van."
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
+              />
+              <div aria-hidden className="grade-film-grain" />
+              <div aria-hidden className="grade-film-vignette" />
+            </div>
             <div aria-hidden className="scrim-hero absolute inset-0" />
             <div aria-hidden className="scrim-top absolute inset-x-0 top-0 h-32" />
 
             <div className="absolute inset-0 flex items-center">
               <div className="shell">
                 <div className="max-w-[42rem]">
-                  <motion.p className="eyebrow" {...stagger(0)}>
-                    At the Beyond
-                  </motion.p>
                   {/* Hard break holds the two-line composition; the line is
                       short enough that no max-measure constraint is needed.
                       Newsreader at the base h1 settings — size only here, so it
                       matches the headings further down the page. */}
-                  <motion.h1
-                    className="mt-7 text-6xl text-[color:var(--color-oat)]"
-                    {...stagger(1)}
-                  >
+                  <motion.h1 className="text-6xl text-[color:var(--color-chalk)]" {...stagger(0)}>
                     The future,
                     <br />
                     put to work.
                   </motion.h1>
+                  {/* TRIAL — Instrument Sans regular in place of the Inter body
+                      face, this paragraph only. See --font-intro. */}
                   <motion.p
-                    className="mt-5 max-w-[44ch] text-base text-[color:var(--text-muted)]"
-                    {...stagger(2)}
+                    className="mt-5 max-w-[44ch] font-normal text-base text-[color:var(--text-muted)] font-[family-name:var(--font-intro)]"
+                    {...stagger(1)}
                   >
                     We work at the beyond: where emerging technology meets the real world. We turn
-                    what&rsquo;s next into what&rsquo;s useful, creating intelligent products and
-                    experiences for the people at the heart of your business.
+                    what&rsquo;s next into what&rsquo;s useful, creating intelligent, AI-powered
+                    solutions for the people at the heart of your business.
                   </motion.p>
-                  <motion.div className="mt-7 flex flex-wrap items-center gap-3" {...stagger(3)}>
-                    <Link href="/contact" className="btn btn-primary">
+                  <motion.div className="mt-7 flex flex-wrap items-center gap-3" {...stagger(2)}>
+                    {/* Warm Chalk fill with an Ink label rather than the Deep
+                        Forest .btn-primary — 17.8:1, and the only light-filled
+                        button on the site. */}
+                    <Link
+                      href="/contact"
+                      className="btn btn-primary bg-[color:var(--color-chalk)] text-[color:var(--color-ink)]"
+                    >
                       Talk to us
                     </Link>
                     <Link href="/how-we-work" className="btn btn-outline">

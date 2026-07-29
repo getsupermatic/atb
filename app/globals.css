@@ -7,24 +7,34 @@
    ============================================================ */
 @theme {
   /* Raw brand palette — named after the palette board */
-  --color-chalk: #f7f1e6; /* Warm Chalk  — light text on dark, veils, glass */
+  --color-chalk: #f5f1e8; /* Warm Chalk  — light text on dark, veils, glass */
   --color-paper: #fbfaf6; /* Paper White — the page canvas, barely warm */
   --color-oat: #e5dccb; /* Oat Greige  — elevated surfaces on light */
   --color-stone: #cac6bb; /* Warm Stone  — muted text on dark, soft fills */
   --color-sage: #99a08e; /* Sage Stone  — soft support, diagram fills */
   --color-slate: #5e6576; /* Warm Slate  — muted text on light */
-  --color-ink: #111111; /* Ink Black   — headings, dark base, scrims */
+  --color-ink: #0f1613; /* Deep Pine   — headings, dark base, scrims. A
+                            green-black in the Deep Forest family, in place of
+                            the old neutral #111111. */
   --color-amber: #cc8a55; /* Clay Amber  — CTAs, nodes, the logo dot */
   --color-forest: #2d523d; /* Deep Forest — display accent + primary CTA fill (v3 test) */
+  --color-forest-field: #284836; /* Statement-panel field only, never a fill or a
+                            text colour. Sampled as the mean of the supplied
+                            tex-ridge-ink texture, so the flat fallback matches
+                            the plate it sits under — see .plate-ridge-forest. */
 
   /* Derived shades — tints/shades of the above, not new brand colours */
-  --color-ink-soft: #1f1f1f; /* Ink Black lifted — elevated dark surfaces */
-  --color-ink-deep: #000000; /* True black — deepest scrims */
+  /* Both follow --color-ink's green cast — a neutral black or grey beside the
+     new base reads as a colour mismatch where they meet in a gradient. */
+  --color-ink-soft: #1c2320; /* Deep Pine lifted — elevated dark surfaces */
+  --color-ink-deep: #070b09; /* Deep Pine at its floor — deepest scrims */
   --color-amber-deep: #8f5a2c; /* Clay Amber darkened for text on light */
 
   /* Typefaces (wired to next/font vars in layout.tsx) */
   --font-display: var(--font-newsreader), "Newsreader", Georgia, serif;
   --font-body: var(--font-inter), "Inter", system-ui, sans-serif;
+  /* TRIAL — hero intro paragraph only. Falls back to --font-body's stack. */
+  --font-intro: var(--font-instrument-sans), "Instrument Sans", var(--font-inter), system-ui, sans-serif;
 
   /* Fluid type scale */
   --text-xs: 0.75rem;
@@ -39,6 +49,16 @@
      less than the caps — they govern narrow viewports, where the previous
      round of tuning was what fixed the mobile clipping. */
   --text-2xl: clamp(1.5625rem, 1.3rem + 1.05vw, 2.125rem);
+  /* Paired leading, so `text-2xl` carries the display line-height instead of
+     Tailwind's default. Without this the utility sets font-size AND a 1.333
+     line-height, and because utilities sit in a later layer than @layer base it
+     beat the 1.08 on the heading rule — the card headings that wrap to two
+     lines ("Customise & Accelerate") were reading loose as a result.
+     Safe to pair at the token level because every `text-2xl` on the site is a
+     heading. The shared steps (xs–xl) are deliberately left unpaired: `text-xl`
+     is used by an h3 *and* by FeatureMorph's body paragraph, and 1.08 leading
+     on a paragraph would be unreadable. */
+  --text-2xl--line-height: 1.08;
   --text-3xl: clamp(1.975rem, 1.55rem + 1.7vw, 2.9rem);
   --text-4xl: clamp(2.4rem, 1.75rem + 2.75vw, 4rem);
   --text-5xl: clamp(2.9rem, 1.95rem + 4.2vw, 5.3rem);
@@ -59,8 +79,8 @@
 :root {
   /* Channel triplets so scrims can be authored as rgb(… / alpha)
      without hardcoding the palette hex in every gradient. */
-  --ink-rgb: 17 17 17;
-  --chalk-rgb: 247 241 230;
+  --ink-rgb: 15 22 19;
+  --chalk-rgb: 245 241 232;
   --amber-rgb: 204 138 85;
 
   /* Paper White rather than Warm Chalk — the canvas reads white, and the grain
@@ -75,7 +95,7 @@
   /* Amber fails AA as text on chalk — light fields use the darkened shade */
   --accent-text: var(--color-amber-deep);
   /* Display accent for highlighted words in headings. Deep Forest is a dark
-     green — it reads on the paper canvas (9.0:1) but only 2.2:1 on Ink Black,
+     green — it reads on the paper canvas (9.0:1) but only 2.1:1 on Deep Pine,
      so the dark hero highlight is decorative, not legible. Light fields keep
      falling back to the heading colour, as before. */
   --accent-display: var(--heading);
@@ -92,9 +112,9 @@
   --text-muted: var(--color-stone);
   --heading: var(--color-chalk);
   --accent: var(--color-amber);
-  /* On Ink Black, Clay Amber clears AA comfortably (6.6:1) — no substitute */
+  /* On Deep Pine, Clay Amber clears AA comfortably (6.4:1) — no substitute */
   --accent-text: var(--color-amber);
-  /* Deep Forest on Ink Black is only 2.2:1 — see the note on --accent-display
+  /* Deep Forest on Deep Pine is only 2.1:1 — see the note on --accent-display
      in :root. Kept as the display accent by direction, not by contrast. */
   --accent-display: var(--color-forest);
   --border: rgb(var(--chalk-rgb) / 0.16);
@@ -144,6 +164,12 @@
     letter-spacing: -0.01em;
     line-height: 1.08;
     text-wrap: balance;
+  }
+
+  /* TRIAL — Newsreader Light on the h1 only (the hero is the only h1 on the
+     site). h2 stays at regular, so drop this rule to revert. */
+  h1 {
+    font-weight: 300;
   }
 
   h3, h4, h5 {
@@ -200,7 +226,7 @@
      CTA sit bare over the hero. Scrolling back up brings in a full-width
      smoked-glass bar behind them.
 
-     The bar is Ink Black, not Warm Chalk, so the foreground stays Warm Chalk in
+     The bar is Deep Pine, not Warm Chalk, so the foreground stays Warm Chalk in
      both states — there is no colour flip to cross-fade, and therefore no
      window where the labels are the wrong colour for what is behind them.
 
@@ -209,7 +235,7 @@
      tree, and the pane is a sibling of the content). */
   .nav-bar {
     --nav-fg: var(--color-chalk);
-    /* On Ink Black, full Clay Amber clears AA (6.6:1) */
+    /* On Deep Pine, full Clay Amber clears AA (6.4:1) */
     --accent-text: var(--color-amber);
   }
 
@@ -233,7 +259,7 @@
   }
 
   /* The bar itself — edge to edge and square, so it reads as a bar rather than
-     a floating pill. Kept fairly opaque: the page beneath is Ink Black copy on
+     a floating pill. Kept fairly opaque: the page beneath is Deep Pine copy on
      Warm Chalk, and a thinner tint lets that ghost through as legible text. */
   .nav-pane {
     position: absolute;
@@ -277,6 +303,35 @@
     padding-inline: clamp(1.25rem, 5vw, 3rem);
   }
 
+  /* Runs a direct child of .shell out to the viewport's RIGHT edge, leaving its
+     left edge on the shell's column. Used by the Blueprints spread, where the
+     FrontlineOS plate bleeds off the page while its copy stays aligned.
+
+     The value is derived, not tuned. With the shell at outer width W (capped at
+     78rem, centred) and inline padding P, a child's `50%` resolves against the
+     shell's CONTENT box, so it is (W − 2P)/2. The distance to travel is the auto
+     margin plus the padding: (100vw − W)/2 + P. Negating that target gives
+     W/2 − P − 50vw, and `calc(50% - 50vw)` expands to (W − 2P)/2 − 50vw, i.e.
+     W/2 − P − 50vw. Identical — so it lands exactly on the edge at every width,
+     with no magic number to re-measure if the shell's cap or gutters move.
+
+     Two things to know before reusing it:
+     - It must go on the element whose containing block IS the shell's content
+       box. On a grid ITEM the percentage resolves against the grid area instead
+       and the bleed comes out short — so it belongs on the grid container.
+     - `100vw` includes the classic scrollbar, so on desktop Chrome this overruns
+       the visible viewport by the scrollbar width. Harmless here (the plate is
+       bleeding off the edge by design) and it cannot produce a horizontal
+       scrollbar, because html/body already carry `overflow-x: clip`.
+
+     Gated at the same breakpoint the spread stacks at: below it the columns are
+     single-file and the copy needs its right gutter back. */
+  @media (min-width: 64rem) {
+    .bleed-right {
+      margin-right: calc(50% - 50vw);
+    }
+  }
+
   /* Frosted glass — soft luminous surface on light fields */
   .material-glass {
     background:
@@ -294,15 +349,31 @@
       0 20px 50px -30px rgb(var(--ink-rgb) / 0.5);
   }
 
-  /* Smoked glass — dark translucent for dark sections */
+  /* Smoked glass — dark translucent for dark sections.
+     Opened up from 0.55 → 0.78, then a shade further to 0.34, so the
+     tex-light-aisle plate reads through the cards.
+     0.34 is close to the hard floor and the margin is deliberately thin but not
+     nil. The third card sits where .scrim-side has bottomed out at ink 0.58, and
+     the weakest text there is Warm Stone at text-sm (the kicker and body), which
+     needs 4.5:1. At a combined 0.723 coverage that lands 4.59:1 against the
+     plate's brightest pixel — and 0.33 gives 4.52:1, 0.32 gives 4.45:1 and fails.
+     So there is roughly one more hundredth of transparency available here and no
+     more, unless the scrim or the plate changes.
+     (Against the plate's p95 patch rather than its single brightest pixel there is
+     far more room — 6:1 — so the binding constraint is one bright bokeh spot
+     landing behind small type, which the 20px blur softens in practice.)
+     Blur up 16px → 20px: it averages more of the backdrop, which both helps the
+     worst case and reads as more glass the more transparent the fill gets. The
+     edge is up to 0.18 for the same reason — a lighter fill leans harder on its
+     border to define the card. */
   .material-smoked {
     background: linear-gradient(
       155deg,
-      rgb(var(--ink-rgb) / 0.55),
-      rgb(var(--ink-rgb) / 0.78)
+      rgb(var(--ink-rgb) / 0.34),
+      rgb(var(--ink-rgb) / 0.56)
     );
-    backdrop-filter: blur(16px) saturate(1.05);
-    border: 1px solid rgb(var(--chalk-rgb) / 0.14);
+    backdrop-filter: blur(20px) saturate(1.05);
+    border: 1px solid rgb(var(--chalk-rgb) / 0.18);
   }
 
   /* ----------------------------------------------------------
@@ -310,7 +381,7 @@
      from the palette channels, never raw hex.
      ---------------------------------------------------------- */
 
-  /* Vertical Ink Black wash — dark statement bands (footer, closing band) */
+  /* Vertical Deep Pine wash — dark statement bands (footer, closing band) */
   .scrim-deep {
     background: linear-gradient(
       180deg,
@@ -402,7 +473,7 @@
   /* ----------------------------------------------------------
      Duotone — INTERIM. The photographic set was produced for the
      retired teal/lime palette. This strips the original hue and
-     remaps each image into a Ink Black ↔ Warm Chalk duotone so the
+     remaps each image into a Deep Pine ↔ Warm Chalk duotone so the
      imagery sits inside the new palette. Delete this class (and
      its usages) once re-treated artwork lands.
      Wrap only the image — never a node with text inside, or the
@@ -446,6 +517,201 @@
     /* Deepened further than .duotone — these plates are pale, and the card copy
        sits over them, so the scrim needs something to bite against. */
     filter: grayscale(1) contrast(1.14) brightness(0.86);
+  }
+
+  /* Ridge plate, Deep Forest — the brand's own treated ridge texture as a panel
+     field, in place of a photograph.
+     This used to reconstruct the field from background-cream.webp: a pale cream
+     scan, desaturated and darkened onto a green base through soft-light, with a
+     measured brightness value to stop it washing the whole panel out.
+     tex-ridge-ink is supplied already in the green, so none of that is needed —
+     it is just the image. No filter, no blend mode, no base-colour interaction.
+     --color-forest-field stays underneath as the fallback if the asset fails. */
+  .plate-ridge-forest {
+    background-color: var(--color-forest-field);
+    background-image: url("/images/tex-ridge-ink.webp");
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Drive plate — the supplied defocused drive-through, on the New-model panel.
+     Veil 0.55: the only thing sitting directly on this plate is the h2 in Warm
+     Chalk, and the four cards are opaque --bg-elevated so they ask nothing of it.
+     text-4xl counts as large text (3:1), and 0.55 gives 4.05:1 against the
+     plate's brightest pixel (241,236,227) — clear of the large-text minimum with
+     room, without flattening a plate whose mean is only 29.
+     Side effect worth knowing: this plate is much darker than the tex-lightfield
+     it replaces, which resolves the note that the cards were reading as recessed.
+     Against a field this dark, --bg-elevated now sits above it rather than below.
+
+     (Three of these veiled-plate classes now exist — .plate-aisle, .plate-drive,
+     .plate-lightfield — differing only in URL and veil. If a fourth arrives,
+     factor the mechanics into one class driven by two custom properties and keep
+     the per-plate values in small named classes, so the reasoning stays with the
+     number rather than moving into the markup.) */
+  .plate-drive {
+    background-color: var(--color-ink);
+    background-image:
+      linear-gradient(rgb(var(--ink-rgb) / 0.55), rgb(var(--ink-rgb) / 0.55)),
+      url("/images/tex-light-drive.webp");
+    background-size: cover;
+    /* 78%, not `center` — the crop is framed on the server rather than the car.
+       The source is 1280×720 and the section runs about 1440×1310, so `cover`
+       fits the height and the plate overflows to ~2333px wide: only 790 of the
+       1280 source pixels are ever on screen. Centred, that window was 245–1035,
+       which put the car (0–650) across half the frame and sliced the server's
+       shoulder off at 1035 — he reads as a smudge at the edge. At 78% the window
+       moves to 382–1172: the whole figure is in frame, from the cup in his hand
+       to his back, and the car drops to the leftmost third.
+       It helps most at narrow widths, where the crop is severe. On a 390px
+       viewport only ~200 source pixels survive; centred those were 539–739, the
+       dead gap between car and server, so the plate read as near-black texture.
+       At 78% it is 842–1042 — the server himself. */
+    background-position: 78% center;
+  }
+
+  /* Reading wash — pairs with .plate-drive on the new-model section, which is now
+     a sticky headline on the left and a scrolling column of copy on the right.
+     .plate-drive's 0.55 veil was measured for exactly one thing: the h2, in Warm
+     Chalk, at large-text sizes. Once the opaque cards came off, small body copy
+     sits on the plate directly, and 0.55 does not carry it. Measured against the
+     plate's brightest pixel (241,236,227):
+
+                            Warm Chalk   Warm Stone   Clay Amber
+       plate at 0.55           4.05:1       2.68:1       1.60:1
+       plate + this wash       7.30:1       4.83:1       2.88:1
+
+     Deepening .plate-drive itself to ~0.72 would reach the same numbers, but the
+     plate's mean is only 29 — its character is entirely in the bokeh highlights,
+     and a flat 0.72 dims those everywhere, including behind the headline, which is
+     the part worth keeping. So the depth goes only where the reading happens.
+
+     46% is measured, not chosen. .shell caps at 78rem and centres, so the copy
+     column's left edge lands at 48–49% of the viewport at every width from this
+     breakpoint to 1920px — the wash is at full strength before the first character
+     of it at all of them. Below the breakpoint the columns stack and there is no
+     left/right split to feather, so it degrades to the flat value.
+
+     Note for anyone extending this section: Clay Amber is unusable as text here.
+     It is a mid-tone, so deepening the field moves it TOWARD the type rather than
+     away — it fails even the 3:1 large-text bar at 2.88:1. Hence the index
+     numerals in Warm Stone. Amber is still fine as a non-text mark (.node-dot). */
+  .wash-read {
+    background: rgb(var(--ink-rgb) / 0.4);
+  }
+  @media (min-width: 64rem) {
+    .wash-read {
+      background: linear-gradient(
+        90deg,
+        rgb(var(--ink-rgb) / 0) 0%,
+        rgb(var(--ink-rgb) / 0.06) 28%,
+        rgb(var(--ink-rgb) / 0.4) 46%,
+        rgb(var(--ink-rgb) / 0.4) 100%
+      );
+    }
+  }
+
+  /* Aisle plate — the supplied defocused aisle, on the Capability-now panel.
+     Same veil-as-a-gradient-layer trick as .plate-lightfield, at 0.35 rather
+     than 0.50 because this panel also carries .scrim-panel, which ramps to ink
+     0.78 at the foot where the copy sits.
+     That pairing is required, not belt-and-braces. The panel's highlighted line
+     is Clay Amber, and amber is a MID-TONE: veiling the field darker moves it
+     toward the type rather than away, so amber cannot reach 3:1 on this plate by
+     veiling alone — measured, even a 0.75 flat veil leaves it at 2.62:1. What
+     fixes it is depth where the copy actually is: 0.35 veil plus the scrim's 0.78
+     at the foot combines to 0.857, which puts amber at 3.79:1, Warm Chalk at
+     11.0:1 and Warm Stone at 7.3:1. At the top of the panel the scrim is only
+     0.2, so the combined 0.48 still lets the bokeh read. */
+  .plate-aisle {
+    background-color: var(--color-ink);
+    background-image:
+      linear-gradient(rgb(var(--ink-rgb) / 0.35), rgb(var(--ink-rgb) / 0.35)),
+      url("/images/tex-light-aisle.webp");
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Lightfield plate — the supplied defocused bokeh texture, warm and dark.
+     Unlike tex-ridge-ink this one has real range (std 37 against the ridge
+     plate's 2–4, and a brightest pixel of 205,184,162), so it can't carry copy
+     bare: Warm Chalk over the raw plate falls to 1.8:1 on the brightest bokeh
+     and 2.5:1 across the top 5%.
+     Hence the flat ink veil, folded in as a gradient layer rather than a second
+     element. 0.5 is the floor that works: it puts Warm Chalk at 4.96:1 against
+     the single brightest pixel in the plate, so the heading clears AA wherever
+     `cover` happens to crop it. 0.45 would read a shade lighter but drops the
+     worst case to 4.39:1, just under.
+     Intended for a .theme-dark section, which supplies the same ink base. */
+  .plate-lightfield {
+    background-color: var(--color-ink);
+    background-image:
+      linear-gradient(rgb(var(--ink-rgb) / 0.5), rgb(var(--ink-rgb) / 0.5)),
+      url("/images/tex-lightfield.webp");
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* ----------------------------------------------------------
+     Film grade — the supplied recipe, one line at a time:
+       saturation  −100%     ┐
+       gamma       1.12      │ all four in the #film-grade SVG
+       black point #121110   │ filter — see components/brand/FilmGrade.tsx
+       white point #F4EEE4   ┘
+       grain       fine, 8%  → self-contained SVG noise, overlay
+       vignette    −15%      → ink at the edges
+     Wrap the image only — never a node with copy inside, or the
+     overlay layers pick up the text.
+     ---------------------------------------------------------- */
+  .grade-film {
+    position: absolute;
+    inset: 0;
+    /* Contains the grain's blend, so the page behind the hero card and the
+       scrims stacked on top are both left alone. */
+    isolation: isolate;
+    overflow: hidden;
+    /* The black point doubles as the placeholder. Below the fold the image
+       lazy-loads, and until it lands there is nothing in the frame — it read
+       as a flat grey-brown block. Sitting the group on the same black the
+       grade maps 0 to means the empty state reads as the graded shadow
+       instead. Hidden once the image paints over it. */
+    background: #121110;
+  }
+
+  /* The tone map is a genuine remap, so it belongs in the filter chain rather
+     than in blend layers — a lighten/darken pair only clamps the two ends and
+     leaves the midtones untinted. FilmGrade.tsx has the full reasoning. */
+  .grade-film :where(img) {
+    filter: url(#film-grade);
+  }
+
+  /* Fine grain. feTurbulence rather than the background-cream plate the rest
+     of the site uses: that plate carries large wave forms, and the recipe
+     wants tight film grain. Desaturated in the filter chain so the noise is
+     luminance-only and doesn't speckle colour back into the graded frame. */
+  .grade-film-grain,
+  .grade-film-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .grade-film-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+    mix-blend-mode: overlay;
+    /* 8%, the middle of the recipe's 6–10% band. */
+    opacity: 0.08;
+  }
+
+  /* −15% at the edges, falling off from a clean centre. Ink rather than pure
+     black so the corners sit in the palette. */
+  .grade-film-vignette {
+    background: radial-gradient(
+      115% 115% at 50% 50%,
+      transparent 45%,
+      rgb(var(--ink-rgb) / 0.15) 100%
+    );
   }
 
   /* Print grain — tactile texture over chalk fields (§5.4) */
@@ -514,17 +780,18 @@
     transform: translateY(-2px);
   }
   /* Flat Deep Forest fill, Warm Chalk label — 7.7:1. No border, no shadow.
-     The label has to be Chalk: Ink Black on this green is 2.2:1 and
-     unreadable. Every .btn-primary sits on a dark field (hero, the Ink Black
+     The label has to be Chalk: Deep Pine on this green is 2.1:1 and
+     unreadable. Every .btn-primary sits on a dark field (hero, the Deep Pine
      nav bar, and the theme-dark footer and closing band), where the fill is
-     only 2.2:1 against Ink — the button reads as a shape by its chalk label
-     rather than by fill contrast. */
+     only 2.1:1 against the base — the button reads as a shape by its chalk
+     label rather than by fill contrast. Now a green fill on a green-black
+     ground, so it reads even more as one family than it did on neutral black. */
   .btn-primary {
     background: var(--color-forest);
     color: var(--color-chalk);
   }
 
-  /* No nav-specific override needed: the bar is Ink Black, so the flat Deep
+  /* No nav-specific override needed: the bar is Deep Pine, so the flat Deep
      Forest fill sits on the same field it does over the hero. */
   .btn-outline {
     border: 1px solid var(--border);
@@ -547,7 +814,11 @@
 
   /* Pill field — the insights sign-up input */
   .field {
-    min-height: 48px;
+    /* 44px, not 48 — the Subscribe button stretches to this in the sm:flex-row
+       signup row, so the field's height is what made that button read taller
+       than every other .btn (~41px intrinsic). 44 closes the gap to ~3px while
+       holding the 44px minimum touch target. */
+    min-height: 44px;
     border-radius: 999px;
     border: 1px solid var(--border);
     background: var(--field-bg);
@@ -570,6 +841,76 @@
     border-radius: 999px;
     background: var(--color-amber);
     flex: none;
+  }
+
+  /* Copper stat band — a full-bleed Clay Amber strip behind the Problem
+     figures, in place of the top-and-bottom key lines that used to frame them.
+     It re-points the semantic tokens locally rather than recolouring each
+     element, the same mechanism .theme-dark uses, so the markup keeps using
+     --text-muted / --border and .stat-figure keeps resolving through --heading.
+     That indirection matters here because copper is a hostile field: Deep Pine
+     is the only palette colour that reads on it (6.4:1), while Warm Slate — the
+     usual muted body colour this band would otherwise inherit — is 2.0:1, and
+     Warm Chalk 2.5:1. Both fail outright.
+     Labels sit at ink/0.85, which is 5.2:1: still softer than the figures, and
+     with margin over AA. ink/0.75 would read better as hierarchy but lands at
+     4.3:1, just under.
+     --border is re-pointed too — at the light theme's ink/0.14 the divider is
+     1.27:1 against the copper and all but invisible; 0.25 gives 1.56:1, a
+     hairline that reads without hardening into a rule. */
+  .stat-band {
+    position: relative;
+    isolation: isolate;
+    background: var(--color-amber);
+    --text-muted: rgb(var(--ink-rgb) / 0.85);
+    --border: rgb(var(--ink-rgb) / 0.25);
+  }
+  /* The same ridge texture as the green ATBOS panel, carried onto the copper.
+     It cannot be used as an image here — tex-ridge-ink is a green field, and
+     dropping it on copper would replace the colour rather than texture it. So it
+     goes through soft-light, which transfers only its light and shade.
+     The filter order matters and the values are measured, not guessed: the plate
+     greys out at mean 60 with a standard deviation of just 2.9, so brightness has
+     to come FIRST to lift the mean onto mid-grey (127.5/60 = 2.125) — soft-light
+     against a layer that dark would only ever darken. Contrast then amplifies
+     what is left, ~2.9 → ~18 of deviation, which is enough to read as texture and
+     little enough to leave the copper's hue alone. Contrast first would drive the
+     mean negative (the pivot is 127.5 and the plate sits well below it) and the
+     texture would come out black. */
+  .stat-band::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("/images/tex-ridge-ink.webp");
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(1) brightness(2.125) contrast(3);
+    mix-blend-mode: soft-light;
+    opacity: 0.8;
+  }
+
+  /* Short centred divider between the stat cells.
+     Deliberately not a border: Tailwind's `divide-x` sets border-left on the
+     cell, and a border always spans the cell's full height — there is no way to
+     shorten or centre one. So the rule is drawn as a pseudo-element instead,
+     half height and centred on the cell's midline.
+     Only from `sm` up, where the three stats sit side by side. Below that they
+     stack and the grid's own `divide-y` keeps them apart — a vertical rule has
+     nothing to divide once the cells are in one column. */
+  @media (min-width: 40rem) {
+    .stat-divide > * {
+      position: relative;
+    }
+    .stat-divide > * + *::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 25%;
+      height: 50%;
+      width: 1px;
+      background: var(--border);
+    }
   }
 
   /* Section vertical rhythm */

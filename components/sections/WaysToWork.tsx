@@ -64,8 +64,18 @@ const ways = [
 export default function WaysToWork() {
   return (
     <section className="theme-dark section relative overflow-hidden" aria-label="Three ways to work with us">
-      <div aria-hidden className="duotone absolute inset-0">
-        <Image src="/images/orbit-planet.webp" alt="" fill sizes="100vw" className="object-cover" />
+      {/* tex-light-aisle, in place of the orbit-planet plate. No .duotone: the
+          supplied asset is already a clean monochrome, so there is no legacy hue
+          to strip and the wrapper's soft-light layer would only muddy it.
+          No extra veil either, which is worth recording because the plate is a
+          bright one — brightest pixel (247,242,233), where Warm Chalk alone would
+          be 1.01:1. .scrim-side is what covers it: unlike the other scrims it
+          never fades out, bottoming at ink 0.58 on the right, and the cards add
+          their own smoked glass on top. Measured worst case — Warm Stone at
+          text-sm inside a card top over the plate's brightest pixel — lands past
+          6:1, so an additional veil would only bury the texture. */}
+      <div aria-hidden className="absolute inset-0">
+        <Image src="/images/tex-light-aisle.webp" alt="" fill sizes="100vw" className="object-cover" />
       </div>
       <div aria-hidden className="scrim-side absolute inset-0" />
       <div className="shell relative z-10">
@@ -88,9 +98,18 @@ export default function WaysToWork() {
           ))}
         </ol>
 
+        {/* Clay Amber fill rather than the Deep Forest .btn-primary, following
+            the footer's Subscribe button. The label has to go to Ink: Chalk on
+            this copper is 2.5:1 and fails normal-size text, where Ink is 6.4:1.
+            Uses the --color-amber token rather than the hardcoded #C97B45 the
+            other two copper elements carry, so if that trial is adopted this
+            follows the token automatically. */}
         <Reveal delay={0.1}>
-          <Link href="/how-we-work" className="link-accent mt-10 inline-block">
-            How we work
+          <Link
+            href="/contact"
+            className="btn btn-primary mt-10 bg-[color:var(--color-amber)] text-[color:var(--color-ink)]"
+          >
+            Get in Contact
           </Link>
         </Reveal>
       </div>

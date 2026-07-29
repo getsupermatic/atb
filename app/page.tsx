@@ -35,8 +35,8 @@ export default function Home() {
       <FeatureMorph />
       <Problem />
       <NewModel />
-      <WaysToWork />
       <Products />
+      <WaysToWork />
       <ATBOS />
     </>
   );

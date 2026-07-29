@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -59,31 +58,36 @@ export default function FeatureMorph() {
         <div ref={pad} className="w-full" style={{ paddingInline: "clamp(1.25rem, 5vw, 3rem)" }}>
           <div
             ref={card}
-            className="relative w-full overflow-hidden h-[62vh]"
+            className="relative w-full overflow-hidden min-h-[62vh]"
             style={{ borderRadius: "1.75rem" }}
           >
-            {/* .duotone is interim — remaps the legacy teal plate into the
-                Deep Ink / Warm Chalk palette. See globals.css. */}
-            <div className="duotone absolute inset-0">
-              <Image
-                src="/images/teal-tunnel.webp"
-                alt="A curved corridor of layered light — the far side of a horizon."
-                fill
-                sizes="100vw"
-                className="object-cover"
-                priority
-              />
-            </div>
+            {/* The defocused aisle plate, in place of the Deep Forest ridge field
+                (which has moved to the ATBOS panel). Decorative, so no alt text.
+                .scrim-panel is back, and this time it is load-bearing rather than
+                the black-gradient artefact it was over a flat green field: the
+                copy is bottom-anchored, the scrim ramps to ink 0.78 exactly there,
+                and the amber line cannot clear 3:1 on this plate without it — see
+                the note on .plate-aisle for the measurements. */}
+            <div aria-hidden className="plate-aisle absolute inset-0" />
             <div aria-hidden className="scrim-panel absolute inset-0" />
-            <div className="absolute inset-0 flex items-end">
-              <div className="shell pb-[6vh] sm:pb-[8vh]">
+            {/* In flow rather than absolute, so a heading that runs long pushes
+                the card's min-height out instead of overflowing its top edge —
+                which is what left the copy sitting tight to the top on short
+                (and zoomed) viewports. h-full keeps it bottom-anchored once the
+                morph sets the card to 100vh. */}
+            <div className="relative flex h-full min-h-[62vh] flex-col justify-end">
+              <div className="shell pt-[8vh] pb-[6vh] sm:pb-[8vh]">
                 {/* The one hardcoded display size on the page, so it does not
                     follow --text-*. Lifted 4% in step with the scale floors —
                     kept to that, because this narrow-viewport value is what
                     stopped this bottom-anchored heading clipping on mobile. */}
                 <h2 className="max-w-[18ch] text-[2.45rem] text-[color:var(--color-chalk)] sm:text-5xl">
                   Capability now advances by the month.{" "}
-                  <span className="text-[color:var(--color-amber)]">
+                  {/* TRIAL — hardcoded #C97B45 in place of --color-amber
+                      (#cc8a55) for this line only. 5.8:1 on the panel, so it
+                      still clears large-text contrast. Put the token back to
+                      revert, or move --color-amber if the trial sticks. */}
+                  <span className="text-[#C97B45]">
                     Most frontline tools still change by the year.
                   </span>
                 </h2>

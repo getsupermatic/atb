@@ -1,64 +1,99 @@
 import Reveal from "@/components/motion/Reveal";
+import DrawRule from "@/components/motion/DrawRule";
 
-// One shared iridescent asset, zoomed in and panned to a different region per
-// card so each reads as its own background.
 const pillars = [
   {
     title: "Products, not seats.",
     body: "Rebuild the SaaS you rent as a product that's truly yours — just the features you need, customised to how you work, without the per-seat bill.",
-    position: "16% 28%",
   },
   {
     title: "Shaped to your reality.",
     body: "We start from our IP and customise to how your business actually runs — accelerating delivery, not starting from scratch.",
-    position: "70% 22%",
   },
   {
     title: "Frontier, in weeks.",
     body: "We co-create new capabilities at the edge of what's possible — without the quarter-long discovery phase.",
-    position: "90% 82%",
   },
   {
     title: "Outcomes, not hours.",
     body: "Commercial models tied to the value we create, not people multiplied by rates. We succeed when you do.",
-    position: "44% 92%",
   },
 ];
 
+/**
+ * A new model — an editorial ledger, in place of the 2×2 panel grid this used to
+ * be. Two things drove the change: Products and Ways-to-Work both follow with
+ * grids of their own, so this was the third in a row; and the four opaque cards
+ * covered most of .plate-drive, which is the strongest field on the page.
+ *
+ * So the headline goes sticky and holds against the plate for the whole section,
+ * and the pillars become a single column of ruled beats scrolling past it. The
+ * copy is unchanged — the titles simply move from card-heading scale to display
+ * scale, which is most of why it reads differently.
+ */
 export default function NewModel() {
   return (
-    <section className="section" aria-label="A new model">
-      <div className="shell">
-        <Reveal>
-          <h2 className="max-w-[16ch] text-4xl">A new model for a changed world.</h2>
-        </Reveal>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2">
-          {pillars.map((pillar, i) => (
-            <Reveal
-              key={pillar.title}
-              delay={(i % 2) * 0.08}
-              from={i % 2 === 0 ? "left" : "right"}
-              className="relative flex min-h-[16rem] flex-col justify-end overflow-hidden rounded-3xl p-8"
-            >
-              {/* Distinct crop of the shared iridescent background. The crop
-                  is per-pillar, so position stays inline. */}
-              <span
-                aria-hidden
-                className="plate-legacy absolute inset-0"
-                style={{
-                  backgroundImage: "url('/images/card-modern.webp')",
-                  backgroundSize: "260%",
-                  backgroundPosition: pillar.position,
-                }}
-              />
-              {/* Legibility scrim */}
-              <span aria-hidden className="scrim-card absolute inset-0" />
-              <div className="relative z-10">
-                <h3 className="text-xl text-[color:var(--color-chalk)]">{pillar.title}</h3>
-                <p className="mt-2 text-[color:var(--color-stone)]">{pillar.body}</p>
-              </div>
-            </Reveal>
-          ))}
+    /* .theme-dark remaps the semantic tokens, so the heading and copy pick up
+       Warm Chalk / Warm Stone without being hardcoded. .plate-drive supplies the
+       field: the supplied drive-through plate over the same ink base.
+
+       No `overflow-hidden` here, and that is load-bearing rather than an
+       oversight. `overflow: hidden` on any ancestor makes it the scrollport, and
+       `position: sticky` then resolves against a box that doesn't scroll — the
+       headline below would silently stop sticking. The blocks sliding in from the
+       right are contained by the `overflow-x: clip` already on html/body, and
+       `clip` (unlike `hidden`) does not create a scrollport, so sticky still
+       resolves against the viewport. */
+    <section className="theme-dark plate-drive section" aria-label="A new model">
+      {/* Deepens the plate under the copy column only, leaving it at full strength
+          behind the sticky headline. The veil .plate-drive carries was measured for
+          the h2 alone; body copy needs more. Numbers and the reason it is a
+          gradient rather than a deeper flat veil are in .wash-read (globals.css). */}
+      <div aria-hidden className="wash-read absolute inset-0" />
+
+      <div className="shell relative z-10">
+        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+          {/* The sticky element is a CHILD of the grid item, not the item itself.
+              A sticky box travels inside its parent's box, so the parent has to be
+              the tall one — which it is, because grid items stretch to the row
+              height by default and the row is as tall as the four beats beside it.
+              Putting `sticky` (or `self-start`) on the grid item itself would
+              shrink it to its own content and leave the headline nothing to travel
+              in, which looks exactly like sticky silently not working.
+              top-28 clears the docked nav (~67px) with room to spare. */}
+          <div>
+            <div className="lg:sticky lg:top-28">
+              <Reveal>
+                <h2 className="max-w-[16ch] text-4xl">A new model for a changed world.</h2>
+              </Reveal>
+            </div>
+          </div>
+
+          {/* An ordered list because the numerals are visible and the order is
+              real. They are `aria-hidden`: the <ol> already conveys position, so
+              reading them out gives "1, 01, Products not seats." */}
+          <ol className="space-y-14 lg:space-y-20">
+            {pillars.map((pillar, i) => (
+              <li key={pillar.title}>
+                <DrawRule />
+                {/* The copy slides in along the line just drawn — hence the delay,
+                    which is a beat rather than a stagger. */}
+                <Reveal from="right" delay={0.12} className="pt-6">
+                  <p aria-hidden className="stat-figure text-2xl text-[color:var(--text-muted)]">
+                    {`0${i + 1}`}
+                  </p>
+                  {/* font-normal against the base h3 rule's 500. At display scale
+                      Newsreader wants the lighter weight — the same reasoning the
+                      h1 trial follows — and 500 here would also read heavier than
+                      the h2 it sits beside, which is at 400. */}
+                  <h3 className="mt-3 text-3xl font-normal">{pillar.title}</h3>
+                  <p className="mt-4 max-w-[46ch] text-lg text-[color:var(--text-muted)]">
+                    {pillar.body}
+                  </p>
+                </Reveal>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Newsreader, Inter } from "next/font/google";
+import { Newsreader, Inter, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 import GrainBackground from "@/components/motion/GrainBackground";
+import FilmGrade from "@/components/brand/FilmGrade";
 
 // Headline typeface. Variable, with the optical-size axis loaded so large
 // display settings get the tighter, higher-contrast cut (font-optical-sizing
@@ -21,6 +22,16 @@ const newsreader = Newsreader({
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// TRIAL — currently only the hero intro paragraph (--font-intro). Loaded at
+// regular alone, so it costs one extra weight; drop this if the trial doesn't
+// stick, or move --font-body onto it if it does.
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument-sans",
+  subsets: ["latin"],
+  weight: ["400"],
   display: "swap",
 });
 
@@ -87,7 +98,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${newsreader.variable} ${inter.variable}`}
+      className={`${newsreader.variable} ${inter.variable} ${instrumentSans.variable}`}
     >
       <body>
         <script
@@ -100,6 +111,9 @@ export default function RootLayout({
         />
         <SmoothScroll />
         <GrainBackground />
+        {/* Filter defs only — no visual output. Must be in the document for
+            `.grade-film`'s `filter: url(#film-grade)` to resolve. */}
+        <FilmGrade />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-full focus:bg-[color:var(--color-amber)] focus:px-5 focus:py-2 focus:text-[color:var(--color-ink)]"

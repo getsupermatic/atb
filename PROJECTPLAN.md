@@ -845,3 +845,1506 @@ themselves.
 
 `public/images/atbos-logo.svg` (the ATBOS product mark) is untouched — it is a
 separate lockup, not the company logo.
+
+---
+
+## Round: solid black footer
+
+The super-footer's `glass-planes-footer.webp` background is gone. `components/Footer.tsx`
+now paints the `<footer>` `var(--color-ink-deep)` (`#000`) and drops the `duotone`
+image layer, the `scrim-deep` overlay and the now-unused `next/image` import. The
+`theme-dark` class stays, so all foreground tokens (`--text`, `--text-muted`,
+`--border`) are unchanged and the type/nav/base rows read as before.
+
+The image file itself is left in `public/images/` — nothing else references it,
+but it's cheap to keep in case the background comes back.
+
+**Verification:** `npx tsc --noEmit` and `npx next build` clean. Not checked in a
+browser.
+
+### Tried and reverted: Deep Ink `#202329`
+
+Swapped every black on the site for an inky `#202329` — a four-line change, since
+it all resolves from `--color-ink` and the `--ink-rgb` channel triplet — then
+reverted it on direction. Black stays.
+
+Worth keeping from the attempt, if it comes up again:
+
+- Only four values need to move: `--color-ink`, `--ink-rgb`, `--color-ink-soft`
+  and `--color-ink-deep`. Nothing else in the codebase hardcodes a dark hex, so
+  the scrims, nav pane, glass materials, borders and halftone plate all follow.
+- Lifting the base costs contrast against Deep Forest, which is already the
+  weakest pairing: `--accent-display` and the `.btn-primary` fill go 2.2:1 → 1.8:1.
+- The brief (§2.2) specifies `--color-ink` as `#1B2836` "Deep Ink"; the code uses
+  `#111111`. `app/icon.svg` paints its favicon tile the brief's `#1B2836`, so the
+  favicon and the site's dark base already differ slightly. Untouched.
+
+---
+
+## Round: hero eyebrow removed
+
+`components/sections/HeroMorph.tsx` — dropped the `At the Beyond` eyebrow. The
+`<h1>`, body paragraph and both CTAs are unchanged, so the hero copy block now
+opens on the heading.
+
+- [x] Removed the eyebrow `motion.p`.
+- [x] Renumbered the `stagger()` indices — h1 `0`, paragraph `1`, button row `2`,
+      so the entrance sequence doesn't open with a dead 0.16s gap.
+- [x] Dropped `mt-7` from the `<h1>`, which was spacing it off the eyebrow and is
+      now the block's first element.
+
+**Verification:** `npx tsc --noEmit` and `npx next build` clean. Not checked in a
+browser — the hero copy is vertically centred, so losing the eyebrow re-centres
+the block slightly; that's the thing to eyeball.
+
+---
+
+## Round: FrontlineOS artwork + Capability Now panel spacing
+
+Two small, unrelated fixes.
+
+- [x] **FrontlineOS product image.** The spotlight panel in the Production-ready
+      AI blueprints section was borrowing `hero-aisle.webp`; it now has its own
+      photograph — a colleague on a headset serving a customer in the produce
+      aisle. Source PNG re-encoded to WebP per the project convention
+      (`cwebp -q 80`, 1536×1024, 67 KB) as `public/images/product-frontline-os.webp`,
+      `lib/site.ts` repointed, and the spotlight `alt` rewritten to describe the
+      new shot. CommerceOS and MarketingOS still borrow `hero-aisle.webp` as
+      placeholders; the comment on the two cards was corrected to say so.
+- [x] **"Capability now" sat tight to the top of its panel.** `FeatureMorph`'s
+      card was a fixed `h-[62vh]` with the copy absolutely positioned and
+      bottom-anchored, so whenever the heading plus sub-paragraph were taller
+      than 62vh — short windows, or any window at browser zoom — the text
+      overflowed the card's top edge instead of the card growing. The card is now
+      `min-h-[62vh]` with the copy block in flow (`flex h-full min-h-[62vh]
+      flex-col justify-end`), so tall copy pushes the card out; `h-full` keeps it
+      bottom-anchored once the scroll morph sets the card to `100vh`. Added
+      `pt-[8vh]` so the heading can never kiss the top edge. The GSAP timeline is
+      untouched — it reads the card's computed height as the tween's start value.
+
+**Verification:** `npx tsc --noEmit` clean; dev server renders the homepage 200
+with the new markup and the WebP served 200. Not checked in a browser — the
+Chrome extension wasn't connected. Worth eyeballing: the panel at a short window
+height (~600px) and at 125–150% zoom, which is where the clipping showed.
+
+---
+
+## Round: Deep Pine base + a batch of type/colour trials
+
+**Blacks switched to Deep Pine `#0f1613`.** A green-black in the Deep Forest
+family, replacing the neutral `#111111`. As the earlier Deep Ink attempt
+documented, only four values move and everything else follows from them:
+
+- [x] `--color-ink` → `#0f1613`, `--ink-rgb` → `15 22 19`.
+- [x] `--color-ink-soft` → `#1c2320`, `--color-ink-deep` → `#070b09` — both
+      carried into the same green cast rather than left neutral, since they meet
+      `--color-ink` inside gradients and a neutral black beside a green-black
+      reads as a mismatch.
+- [x] Comments updated where they quoted figures or the old name: Clay Amber on
+      the base 6.6:1 → 6.4:1, Deep Forest on the base 2.2:1 → 2.1:1, and "Ink
+      Black" → "Deep Pine" throughout `globals.css`, `Nav.tsx`, `Logo.tsx`.
+
+Contrast effects: headings on paper 18.3:1 → 17.8:1 and Chalk on the base
+16.8:1 → 16.3:1, both far above AA. Deep Forest as the dark display accent
+loses a hair (2.2:1 → 2.1:1) — already decorative-not-legible by direction, so
+no behaviour change, but it is the pairing that a lifted base costs most.
+
+**Trials, each scoped and commented `TRIAL` so they revert in a line or two:**
+
+- [x] Instrument Sans regular on the hero intro paragraph only — registered via
+      `next/font` at `weight: ["400"]`, exposed as `--font-intro`.
+- [x] Newsreader Light (`font-weight: 300`) on the `h1`. The hero is the only
+      `h1` on the site; `h2`–`h5` unchanged.
+- [x] `#C97B45` in place of `--color-amber` on FeatureMorph's second line
+      (5.8:1 on the panel, clears large-text contrast).
+
+**Other changes:**
+
+- [x] Hero intro copy: "…creating intelligent, AI-powered solutions for the
+      people at the heart of your business."
+- [x] Stat strip in `Problem` — rules stay full-bleed, stats moved inside
+      `.shell` so they align with the copy, outer cells zeroed at the edges.
+- [x] Footer Subscribe button → `#c97b45` fill with an Ink label. Chalk on that
+      amber is 2.9:1 and fails normal-size text; Ink is 5.8:1.
+- [x] `.field` min-height 48px → 44px. The Subscribe button stretches to the
+      field in the `sm:flex-row` signup row, which is why it read ~7px taller
+      than every other `.btn`; 44px closes it to ~3px and holds the 44px touch
+      target. `.field` styles exactly one element on the site.
+
+**Verification:** `npx tsc --noEmit` clean; compiled CSS carries all four new
+token values; homepage 200. Not checked in a browser — the Chrome extension is
+disconnected, so the footer and closing band are the things to eyeball.
+
+**Unrelated, pre-existing:** only `/` and `/insights` are routed. `/contact`,
+`/how-we-work` and the `/products/*` links in the nav, hero CTAs and footer all
+404 today.
+
+## Round: header film grade (supplied recipe)
+
+Recipe as given, and how each line lands in CSS (`.grade-film`, `app/globals.css`):
+
+| Spec | Implementation |
+| --- | --- |
+| Saturation −92% | `saturate(0.08)` on the `<img>` |
+| Contrast +18, crushed blacks | `contrast(1.18)` — pivots on mid-grey, so it pulls the shadows harder than it lifts the highlights |
+| Shadow tint `#16110D` | full-bleed fill, `mix-blend-mode: lighten` → raises the black floor |
+| Highlight `#EED6C0` | full-bleed fill, `mix-blend-mode: darken` → caps the white ceiling |
+| Grain, fine 8–12% | inline `feTurbulence` SVG, desaturated, `overlay` at `opacity: 0.1` |
+| Vignette −15% | radial gradient, transparent to 45%, `rgb(var(--ink-rgb) / 0.15)` at the corners |
+
+Notes:
+
+- [x] `lighten` + `darken` are channel-wise max/min, so the pair clamps the frame
+      into `#16110D → #EED6C0` regardless of order. That is the whole split-tone —
+      no duotone gradient or extra tint layer needed.
+- [x] The wrapper carries `isolation: isolate`, so the blends can't reach the
+      page behind the hero card or the `.scrim-hero` / `.scrim-top` stacked on
+      top. It wraps the image **only** — a node with copy inside would have the
+      tone map blend against the text.
+- [x] The pseudo-elements need `z-index: 1` (and the grain/vignette divs `2`):
+      `next/image` with `fill` is absolutely positioned and later in DOM order,
+      so without it `::before` would paint underneath the photograph.
+- [x] Grain uses `feTurbulence` rather than `background-cream.webp` (the plate
+      `.grain-overlay` reuses) — that plate carries large wave forms and the
+      recipe asks for fine grain. Self-contained data URI, no new asset.
+- [x] `HeroMorph.tsx`: the `<Image>` moved inside `<div className="grade-film">`
+      with the two texture divs; the scrims, copy and keyword strip are untouched.
+
+**Verification:** `npx tsc --noEmit` clean. Eyeballed at 1400×864 in Chrome —
+the frame reads warm-neutral with genuinely crushed blacks, and the pylon sky
+picks up the `#EED6C0` cap as a cream rather than white. Grain and vignette are
+subtle by design and largely invisible through JPEG screenshot compression, so
+they're worth judging on-screen.
+
+## Round: FrontlineOS plate re-shot, graded to match the header
+
+- [x] `FrontlineOS-mono.png` (1536×1024, supplied clean monochrome) converted at
+      `cwebp -q 82 -metadata none` → `public/images/product-frontline-os-mono.webp`
+      (82 KB). Same frame as the plate it replaces, without the cool teal glow
+      the old version carried in the bottom-right.
+- [x] New filename rather than overwriting `product-frontline-os.webp`, so the
+      swap can't serve a cached URL — the problem the `HeroMorph.tsx` comment
+      records. One line in `lib/site.ts`.
+- [x] `Products.tsx`: the spotlight `<Image>` wrapped in `.grade-film`, so the
+      FrontlineOS panel now carries the same grade as the header. No `.duotone` —
+      the plate is already clean mono, so there is no legacy hue to strip.
+- [x] `.grade-film` gained `background: #16110d`. Below the fold the image
+      lazy-loads, and until it lands the tone map has nothing to blend against —
+      the panel read as a flat grey-brown block. The shadow tint doubles as the
+      placeholder, so the empty state reads as the graded black instead. The
+      image paints over it, so the loaded state is unchanged (the header was
+      never affected: `priority`, so it loads eagerly).
+
+**Verification:** `npx tsc --noEmit` clean; asset serves 200. Eyeballed in
+Chrome at 1400×864 — crushed blacks, the `#EED6C0` cap showing as warm cream on
+the shelf edges and the name badge, vignette visible in the corners, and the
+panel now sits in the same grade as the hero.
+
+**Left alone:** `public/images/product-frontline-os.webp` is now unreferenced.
+Untracked, so deleting it isn't recoverable — say the word and it goes.
+
+## Round: Capability-now field flattened and re-greened
+
+Diagnosed by sampling both images rather than by eye. The rendered panel ramped
+`rgb(72,96,83)` at the top to `rgb(29,38,33)` at the foot; the Option B
+"structural field" board is flat at `rgb(48,71,55)` throughout.
+
+- [x] **The black gradient was `.scrim-panel`** — 0.2 → 0.78 ink, bottom-weighted.
+      Removed from `FeatureMorph.tsx`; the copy never needed it (figures below).
+      Both `.scrim-panel` and `.plate-ridge-forest` were used only here, so the
+      change is contained to this panel.
+- [x] **The green.** New token `--color-forest-field: #304737`, sampled off the
+      board — the same hue as `--color-forest` with the green channel ~11 lower.
+      `--color-forest` is untouched, so CTA fills and the display accent are
+      unaffected. Field-only; never a fill or a text colour.
+- [x] **The real cause of the wash.** `.plate-ridge-forest::before` carried
+      `brightness(0.94)`, but the ridge plate means 219/255 after `grayscale(1)`
+      and 236 after `contrast(1.18)` — near-white, so at `soft-light` it could
+      only ever lift. It was holding the whole field +36 levels above its own
+      base colour and contributing a 30-level ramp of its own, which is why the
+      first two dials (drop the scrim, change the base) barely moved it.
+      `127.5/236 = 0.54` centres the plate on mid-grey, so soft-light now shades
+      as much as it lifts.
+
+**Measured result:** flat `#2e4636` mean with a 3–4 level spread top-to-bottom
+and edge-to-edge, against the board's `#304737`. Within a level or two.
+
+**Contrast on the unscrimmed field** — Warm Chalk 8.95:1, Warm Stone 5.91:1,
+both clear of AA unaided, which is why dropping the scrim is safe.
+
+**One thing to look at:** the `#C97B45` amber trial measured 5.8:1 against the
+old scrimmed panel; on the flat field it is **3.08:1**. It still clears the 3:1
+large-text minimum (the line is 2.45rem+), but only just, and the token
+`--color-amber` would be 3.52:1. Left as-is — the trial is a direction call, not
+a compliance one — but it's the figure that moved most in this round.
+
+## Round: header grade corrected — real gamma, real split-tone
+
+The first pass missed the style for a reason worth recording: two of the four
+tone lines have no CSS-filter equivalent, and the approximations I used changed
+what the recipe actually does.
+
+**Corrected values:** shadow `#16110D` → `#1A0F08`, highlight `#EED6C0` →
+`#F8E2C6`, and `contrast +18` → `gamma 1.28`.
+
+- [x] **Gamma is a power curve, not a contrast pivot.** `contrast(1.18)` is
+      linear around mid-grey; `x^1.28` bends the whole transfer curve, which is
+      what crushes the blacks while leaving the highlights near where they were.
+      Now `feComponentTransfer type="gamma" exponent="1.28"`.
+- [x] **The tint pair is a remap, not a clamp.** The `lighten`/`darken` blend
+      pair only raised the floor and capped the ceiling — every value between
+      was left exactly as it was, so the midtones never picked up any copper.
+      This is the main reason the frame read as plain desaturated mono. Now
+      `feComponentTransfer type="linear"`, mapping 0 → shadow and 1 → highlight
+      per channel: `intercept = shadow`, `slope = highlight − shadow`.
+- [x] Both live in `components/brand/FilmGrade.tsx` — an inline SVG filter def
+      (`#film-grade`), rendered once in the root layout, since `filter: url(#…)`
+      only resolves against the same document. `.grade-film :where(img)` is now
+      a one-line `filter: url(#film-grade)`, and the two blend pseudo-elements
+      are gone.
+- [x] `color-interpolation-filters="sRGB"` on the filter. Not optional: SVG
+      filters default to linearRGB, and the slope/intercept values are sRGB, so
+      without it the endpoints land somewhere else entirely.
+- [x] Placeholder background moved `#16110d` → `#1a0f08` to match the new floor.
+- [x] Grain and vignette unchanged, and still applied after the grade — the
+      order the recipe lists them in.
+
+**Verification:** simulated the exact chain in Python over `hero-panels.webp`
+first — darkest pixel lands on `(26,15,8)` and brightest on `(248,226,198)`,
+i.e. the two hexes exactly. In the browser the unscrimmed right side measures
+brightest `(233,212,195)` and darkest `(20,2,0)`; both sit inside the spec
+endpoints because the grain and the −15% vignette apply on top of the grade,
+which is the intended order. `npx tsc --noEmit` clean.
+
+**Worth a look now:** the FrontlineOS spotlight is graded but the CommerceOS and
+MarketingOS cards directly below it are still untreated mono, so the copper stops
+abruptly mid-section. They borrow the hero aisle shot as a placeholder — wrapping
+them in `.grade-film` too is a two-line change if you want the section unified.
+
+## Round: New-model section onto solid ink, section link removed
+
+- [x] `NewModel.tsx` — section is now `theme-dark section`, i.e. solid Deep Pine.
+      `.theme-dark` paints `--bg` and remaps the semantic tokens, so the heading
+      and card copy pick up Warm Chalk / Warm Stone without hardcoding: the
+      per-card `text-[color:var(--color-chalk)]` and `--color-stone` classes are
+      gone in favour of the defaults and `--text-muted`.
+- [x] The four cards were crops of the legacy iridescent plate under a
+      `.scrim-card`. A translucent card has nothing to sit over on a solid field,
+      so they are `--bg-elevated` (Deep Pine lifted, `#1c2320`) with a
+      `--border` hairline. 1.15:1 against the field — reads as lifted without
+      becoming a second colour. Chalk on it is 14.2:1, Warm Stone 9.4:1.
+- [x] The `position` crop coordinates in the `pillars` array went with the
+      plates, along with the wrapper's `relative`/`overflow-hidden` and the inner
+      `relative z-10`.
+- [x] `WaysToWork.tsx` — removed the standalone `link-accent` "How we work" link
+      at the foot of the section, and the now-unused `next/link` import with it.
+
+**Now unreferenced** (left in place, all trivially restorable):
+`.plate-legacy` and `.scrim-card` in `globals.css`, and the
+`public/images/card-modern.webp` asset. `.plate-legacy` was one of the two
+INTERIM duotone helpers written to be deleted once treated artwork landed —
+`.duotone` is still in use, so only its sibling is now dead.
+
+**Worth a look:** the cards keep `min-h-[16rem]` with `justify-end`, which
+existed to give the plate crops room to show above the copy. With the imagery
+gone that reads as ~7rem of empty space at the top of each card. Dropping the
+min-height (or switching to `justify-start`) tightens it up — one class either
+way, but it changes the section's vertical rhythm, so it's your call.
+
+**Verification:** `npx tsc --noEmit` clean; eyeballed in Chrome at 1400×864.
+
+## Round: Capability panel onto the supplied tex-ridge-ink plate
+
+The reconstruction the previous round tuned is no longer needed — the brand
+asset is already treated and already in the green.
+
+- [x] `tex-ridge-ink.png` (1600×899) → `public/images/tex-ridge-ink.webp`, 19 KB.
+      Its last pixel column was semi-transparent for all 899 rows, which
+      `background-size: cover` would have stretched into a faint right-edge
+      seam, so the column is cropped and the image flattened to RGB.
+- [x] `.plate-ridge-forest` is now four lines: the image, `cover`, `center`, and
+      a `background-color` fallback. Gone with the rewrite: the
+      `background-cream.webp` source, `grayscale(1) contrast(1.18)
+      brightness(0.54)`, `mix-blend-mode: soft-light`, `opacity: 0.85`,
+      `isolation: isolate`, the `::before` pseudo-element, and the whole
+      measured-brightness derivation that existed only to stop a near-white
+      cream scan washing the panel out.
+- [x] `--color-forest-field` re-pointed `#304737` → `#284836`, the supplied
+      texture's own mean, so the flat fallback matches the plate above it.
+- [x] `background-cream.webp` is still in use by `.grain-overlay`; only this
+      panel stops borrowing it.
+
+**Measurement note, worth knowing for future rounds:** browser screenshots come
+back tagged with a Skia display profile, while the source assets are untagged
+sRGB — so comparing screenshot pixel values directly against a source hex
+carries a colour-space offset (here it read as a spurious +5.5 red). Converting
+the capture to sRGB first brings the plate to within 2–3 levels of the asset's
+own mean, i.e. it renders faithfully. The earlier field match against the Option
+B board was screenshot-against-screenshot from the same pipeline, so that
+comparison was sound.
+
+**Also in that assets folder**, unused so far and likely to supersede more of the
+interim artwork: `tex-lightfield`, `tex-ridge-cream-strong`, `tex-wave-cream`,
+`duo-copper`, `duo-green`, and four `atb-mark` variants (plain/ink/green/copper).
+`.duotone` and the borrowed hero-aisle placeholders are the obvious candidates.
+
+**Verification:** `npx tsc --noEmit` clean; eyeballed and sampled in Chrome.
+
+## Round: New-model section onto the supplied tex-lightfield plate
+
+- [x] `tex-lightfield.png` (1400×790, fully opaque, no edge artifact) →
+      `public/images/tex-lightfield.webp` at `-q 88`, 53 KB.
+- [x] New `.plate-lightfield`, applied alongside `theme-dark` on the section.
+      Replaces last round's flat ink field.
+- [x] **It needed a veil, unlike the ridge plate.** `tex-ridge-ink` is flat
+      (std 2–4), so it carries copy bare. This one is a defocused bokeh with real
+      range — std 37, brightest pixel `(205,184,162)` — and Warm Chalk over it
+      raw falls to **1.8:1** on the brightest bokeh and 2.5:1 across the top 5%.
+      A flat ink veil at **0.5** is the floor that works: Warm Chalk lands at
+      4.96:1 against the single brightest pixel in the plate, so the heading
+      clears AA wherever `cover` crops. 0.45 reads a shade lighter but drops the
+      worst case to 4.39:1, just under. Folded in as a `linear-gradient`
+      background layer rather than a second element.
+
+**The thing to decide:** the cards now read as recessed rather than elevated.
+`--bg-elevated` (`#1c2320`) was picked last round to lift off *flat ink*
+(`#0f1613`); the veiled texture field sits lighter than that, so measured in the
+render the card interiors come out **10 luminance levels darker than the field**
+around them. Two ways out, both one line, and it's a look decision rather than a
+correctness one:
+
+1. Cards back to translucent — `.material-smoked` is exactly "dark translucent
+   for dark sections", and the texture would read through them, which is
+   probably the point of putting a texture there.
+2. Keep them solid but lift the fill above the field value, so they read as
+   panels floating on the texture rather than holes cut into it.
+
+I've left them solid and unchanged, since going translucent would undo the call
+from last round.
+
+**Verification:** `npx tsc --noEmit` clean; measured and eyeballed in Chrome at
+1400×864.
+
+## Round: grade switched to neutral monochrome; badge removed; copper stat band
+
+### Grade — neutral, shadows lifted a fraction warm
+
+Same filter architecture as the copper grade, new constants only. This is what
+`FilmGrade.tsx` was built for: `blackPoint` / `whitePoint` / the gamma exponent /
+the saturate value, and nothing structural.
+
+| Spec | Before (copper) | Now |
+| --- | --- | --- |
+| Saturation | −92% (`saturate 0.08`) | −100% (`saturate 0`) |
+| Gamma | 1.28 | 1.12 |
+| Black point | `#1A0F08` | `#121110` |
+| White point | `#F8E2C6` | `#F4EEE4` |
+| Grain | 10% | 8% (recipe band moved 8–12% → 6–10%) |
+| Vignette | −15% | −15%, unchanged |
+
+- [x] Simulated over `hero-panels.webp` before wiring: darkest pixel lands on
+      `(18,17,16)` and brightest on `(244,238,228)` — both hexes exactly.
+- [x] **"Contrast up, not colour" is measurable.** Mean per-pixel channel spread
+      drops 21.8 → 3.9 (at saturation 0 the only colour left is what the two
+      endpoints put there), while luminance std rises 38.3 → 42.6. So the frame
+      is more neutral *and* higher contrast than the grade it replaces.
+- [x] Placeholder background follows the black point, `#1a0f08` → `#121110`.
+- [x] **Scope taken as all four product images**, per "header image and
+      FrontlineOS/product images": the CommerceOS and MarketingOS cards are now
+      wrapped in `.grade-film` too, closing the gap flagged two rounds ago. The
+      scale-on-hover stays on the image alone — the grain and vignette are
+      siblings, and a vignette that zoomed with the picture would pull its own
+      edges into frame.
+- [x] Removed the stale recipe hexes quoted in `Products.tsx` — they still named
+      the *first* recipe and had been wrong since the copper correction. The
+      recipe now lives in one place so the two can't drift again.
+
+### Live badge
+
+- [x] Removed the Deep Forest "Live" pill beside the FrontlineOS heading, and the
+      `flex items-center gap-3` wrapper that existed only to sit it next to the
+      h3. `products[].status` is still in `lib/site.ts` but is no longer rendered
+      anywhere — left in the data rather than ripped out.
+
+### Copper stat band
+
+- [x] New `.stat-band`: a full-bleed Clay Amber strip. The `border-y` key lines
+      that framed the figures are gone; the only rule left is the vertical
+      divider between them.
+- [x] It re-points the semantic tokens locally rather than recolouring each
+      element — the same mechanism `.theme-dark` uses — so the markup keeps using
+      `--text-muted` / `--border` and `.stat-figure` keeps resolving through
+      `--heading`.
+- [x] **That indirection is doing real work, because copper is a hostile field.**
+      Deep Pine is the only palette colour that reads on it (6.4:1). Warm Slate —
+      the muted body colour the labels would otherwise have inherited — is
+      **2.0:1**, and Warm Chalk 2.5:1. Both fail outright. Labels sit at ink/0.85
+      (5.2:1): still softer than the figures, with margin over AA. ink/0.75 would
+      read better as hierarchy but lands at 4.3:1, just under.
+- [x] `--border` re-pointed as well: at the light theme's ink/0.14 the divider is
+      1.27:1 against the copper and all but invisible; 0.25 gives 1.56:1.
+- [x] Below `sm` the three stats stack, where a vertical divider can't apply, so
+      the existing `divide-y sm:divide-x sm:divide-y-0` idiom is kept — the same
+      divider lies down as a horizontal one rather than the figures running
+      together.
+
+**Verification:** `npx tsc --noEmit` clean throughout; each section eyeballed in
+Chrome at 1400×864.
+
+## Round: Get-in-Contact button + heading leading fix
+
+### Get in Contact
+
+- [x] Copper `.btn` at the foot of `WaysToWork`, where the removed "How we work"
+      link used to sit. Clay Amber fill rather than the Deep Forest
+      `.btn-primary`, following the footer's Subscribe button. Label goes to Ink:
+      Chalk on this copper is 2.5:1 and fails normal-size text, Ink is 6.4:1.
+- [x] Uses the `--color-amber` token rather than the hardcoded `#C97B45` the two
+      other copper elements carry, so if that trial is adopted this follows
+      automatically.
+- [x] `href="/contact"` — still unrouted, along with the rest of the nav targets.
+
+### Panel heading leading — a systemic bug, not a local one
+
+The card headings were computing to **1.333** line-height, not the 1.08 the base
+heading rule sets. Cause: `@theme` defines `--text-xs … --text-6xl` as font sizes
+with no paired `--text-*--line-height`, so Tailwind's `text-*` utilities supply
+their own default leading — and because utilities sit in a later cascade layer
+than `@layer base`, they beat the `line-height: 1.08` on `h1–h5`.
+
+Measured across the homepage: **17 of 21 headings** were overridden, landing on
+five different ratios (1, 1.111, 1.2, 1.333, 1.4). The smaller the step, the
+looser the leading, which is why the card headings were the most visibly wrong.
+
+- [x] Fixed at the token level for the step in question: `--text-2xl--line-height:
+      1.08`. Verified — all six `text-2xl` headings now compute 1.080 (the three
+      Ways-to-work cards, CommerceOS, MarketingOS, and the footer's Insights h2).
+- [x] Safe to pair at the token level because every `text-2xl` on the site is a
+      heading.
+
+**Deliberately not fixed yet, and worth a decision:**
+
+- The shared steps (`xs`–`xl`) can't be paired the same way. `text-xl` is used by
+  NewModel's h3s **and** by FeatureMorph's body paragraph — 1.08 leading on a
+  paragraph would be unreadable. Those four h3s are still at 1.4 and want an
+  explicit `leading-[1.08]` instead.
+- `text-3xl` (1.2) and `text-4xl` (1.111) are heading-only and could be paired
+  exactly as `2xl` was — that would bring the remaining h2s to 1.08.
+- `text-5xl` is shared with `.stat-figure`, which sets its own `line-height: 1`;
+  pairing it would loosen the stat figures, so it needs the same explicit-class
+  treatment.
+- `text-6xl` (the hero h1) and FeatureMorph's arbitrary `text-[2.45rem]` both
+  compute to 1, i.e. tighter than the 1.08 intent. Pairing would *loosen* them,
+  which at those display sizes may not be wanted — a look call.
+
+**Verification:** `npx tsc --noEmit` clean; line-heights and button colours read
+back from the live DOM rather than eyeballed.
+
+## Review: supplied "at the beyond." SVG for the nav logo hover
+
+Reviewed `~/Downloads/file (4).svg` against the existing nav mark. Findings are
+measured, not eyeballed — renders normalised to a common x-height and compared.
+
+**1. The file is "at the beyond." in lowercase, not "ATBOS".** Which fits the
+described gesture: a·t·b are the initials of *at the beyond*.
+
+**2. It is a raster auto-trace, not vector artwork.** 294 `<path>` elements, 3813
+Bézier curves, and — the giveaway — **zero straight-line commands** in a typeface
+built almost entirely from straight stems. 22 distinct fill colours forming a grey
+ramp (`#010101` … `#FDFDFD`): quantised anti-aliasing. Plus a full-canvas white
+plate with the letterforms knocked out of it. 290 KB.
+
+**3. Cleanup works but only goes so far.** Keeping the 159 near-black paths and
+dropping the white plate and grey bands renders the lockup correctly and removes
+the halo: 290 KB → 150 KB. But that is still ~12 paths per glyph, against the
+hand-cleaned mono mark's 1 path per glyph (6.8 KB for all four shapes).
+
+**4. The a/t/b are not identical to the closed mark, and cleanup can't fix it.**
+IoU after normalising to a common x-height: **a 0.811, t 0.571, b 0.831** (1.000
+would be pixel-identical). Root cause for the t: the supplied lockup's ascenders
+are **5.5% shorter** relative to x-height (1.313 vs the mono mark's 1.389). Weight
+is fine — stem/x-height 0.201 vs 0.193, within 4%, both matching the 47/236 that
+`Logo.tsx` records. So: right typeface, right weight, wrong optical proportions,
+plus trace noise.
+
+**5. The current hover cannot feel like expansion, for a bigger reason than the
+artwork.** `Nav.tsx` crossfades `variant="mono"` against `variant="full"` — and
+`variant="full"` is **uppercase "AT THE BEYOND."** in a different, wider face. So
+the hover currently dissolves lowercase into uppercase across two unrelated
+typefaces, at two different heights (31px vs 26px), with an opacity+blur
+crossfade. The supplied lowercase artwork is the right direction precisely
+because it fixes the case and face mismatch.
+
+**6. `atb.` is the word "at" + b(eyond), not three letterspaced initials.**
+Measured side-bearings, normalised to x-height: the closed mark's a→t gap is
+0.163 against the lockup's 0.199 for the same pair, while its t→b gap is 0.232 —
+noticeably wider. The a-t pair is set as a tight word pair and the b sits apart.
+That determines the animation: "at" travels as a unit, " the " reveals after it,
+and b translates out with "eyond" following.
+
+### Recommended approach — identity by construction, not by correction
+
+Reuse the existing mono `a`, `t`, `b` and dot **path data verbatim** in the
+expanded lockup, and take only the genuinely new glyphs (`the`, `eyond`) from the
+cleaned trace. Then the three letters are identical because they are the same
+path data, not because two traces were matched. One SVG, one set of paths, no
+crossfade: the anchors animate their x-positions from closed to lockup spacing
+while the new glyphs wipe in from the anchor they belong to.
+
+**Status:** review only, no code changed. Awaiting a decision on how to source the
+new glyph artwork before rebuilding.
+
+### Implemented — one logo that expands, replacing the crossfade
+
+- [x] **`Logo.tsx` rewritten.** One SVG, one set of paths, `expanded` boolean.
+      The a, t, b and full stop are `<use>` references to the *same* path data in
+      both states, so they are identical by construction. Only h, e, y, o, n, d
+      are new; t and e are each used twice.
+- [x] **The six new glyphs rebuilt, not just cleaned.** Stripped the white plate
+      and the 22-step grey ramp, then re-contoured each glyph off a supersampled
+      raster and simplified with Douglas–Peucker. **64.8 KB → 10.3 KB**, worst-case
+      IoU **0.9936** against the trace. They are polygons, so their curves are
+      dense-polygonal rather than true Béziers — invisible at 31px, and swappable
+      for proper vector artwork without touching the animation.
+      Two bugs worth recording from that work: Douglas–Peucker degenerates on a
+      *closed* ring (first and last point coincide, so the anchor line is
+      zero-length and everything collapses to 2 points) — fixed by splitting at
+      the farthest point and simplifying two open chains; and ImageMagick does
+      not honour an SVG's explicit width/height, so the raster scale has to be
+      measured off the bitmap rather than assumed (assuming it put every glyph
+      out by 8/6 and dropped IoU to 0.14).
+- [x] **Layout derived from the lockup's own side-bearings**, not absolute
+      positions, so each glyph's true width is respected — the mono a is 5% wider
+      than the traced one it replaces. Travel on expand: a +0, t +8.7, b +1048.6,
+      full stop +2419.3 units. The a and t barely moving is the "at" reading
+      paying off.
+- [x] **Nested transforms rather than one.** The outer `<g transform>` places a
+      glyph at its expanded slot and never changes; an inner group carries the
+      closed offset and animates. CSS `transform` and the SVG `transform`
+      attribute are the same property, so they cannot both drive one element.
+- [x] **`RATIO_CLOSED` is 949/384**, the original mono viewBox including its right
+      padding, not the ink bounds. `FooterLogo` derives its travelling full stop
+      from that geometry (`homeLeft = 860 * height/384`), so cropping to the ink
+      would have moved the dock point. Footer verified unchanged.
+- [x] `hideDot` kept for `FooterLogo`, whose two call sites moved from
+      `variant="mono" style={{height}}` to the new `height` prop. (`FooterLogo`
+      does import Logo — an early grep of mine wrongly filtered it out.)
+- [x] **Nav keeps its layout.** The link reserves the *closed* width and the
+      lockup is taken out of flow, overhanging into the gap before the first nav
+      link. Verified: the nav items hold position exactly on hover. Because the
+      lockup is still a descendant of the anchor, hovering the revealed letters
+      keeps it open — which the old absolutely-positioned crossfade did not do.
+- [x] Reduced motion: transitions off, states swap instantly.
+
+**Still open:** the new glyphs are polygonal. If clean vector artwork for h, e, y,
+o, n, d arrives, it drops into the `<defs>` and nothing else changes.
+
+### Round: longer first-load hold on the expanded lockup
+
+- [x] The intro hold went **780ms → 1250ms** (+470ms, ~60% longer) before the
+      lockup collapses. The 520ms collapse itself is unchanged (it is Logo's own
+      transition), as is the 260ms gap before the nav links fade in — that gap
+      deliberately starts them partway through the collapse so the two overlap
+      rather than queue, so the links now begin at 1510ms.
+- [x] Both values pulled out as `HOLD_MS` / `LINKS_GAP_MS` at the top of
+      `Nav.tsx` with the reasoning, rather than sitting as bare numbers inside the
+      effect — this is a feel value that will get dialled again.
+- [x] Unchanged: the intro is session-gated on the `atb-intro` sessionStorage key,
+      so it plays once per session, and reduced motion skips it entirely.
+
+**Verification:** caught the intro mid-hold in a capture immediately after
+navigation (lockup written out), and confirmed the wrapper settles back to 77px —
+the closed width — once it elapses. Precise in-page timing wasn't measurable:
+tool-call latency spans the intro window, so the hold is asserted from the literal
+constant rather than measured.
+
+Two things that looked like bugs during verification and were not: the logo
+appeared to vanish from a fixed-region capture (the browser window had resized,
+moving the logo out of the crop), and the lockup refused to collapse across a
+whole reload (the cursor was parked at x=190, which is inside the *expanded*
+lockup's box — incidentally a good confirmation that the enlarged hover area
+works as intended).
+
+## Round: longer intro hold, footer word build-in, colour audit
+
+### Intro hold, again
+
+- [x] `HOLD_MS` 1250 → **2000ms**. The full name now sits written out for two
+      seconds before collapsing. Everything downstream is derived, so this stayed
+      a one-line change.
+
+### Footer — "Operations. Commerce. Marketing." build in
+
+- [x] New `components/motion/WordReveal.tsx`: each word sits in a clipped box and
+      slides down into it, so it reads as being drawn in from the top edge of its
+      own space rather than fading up the way `Reveal` does everywhere else.
+      Staggered 0.05 / 0.22 / 0.39s as the footer arrives. The lead sentence stays
+      static — animating all of it would bury the effect.
+- [x] **The observer has to be on the wrapper, not the moving span.** First
+      attempt used `whileInView` on the inner span and the words never appeared at
+      all — they held layout height and rendered nothing. IntersectionObserver
+      accounts for clipping ancestors, and the inner span starts translated fully
+      outside its `overflow: hidden` parent, so its visible area is zero: it could
+      never register as in view, and sat hidden forever waiting for itself.
+      Rewritten to `useInView` on the wrapper, which is always visible, driving
+      the inner span's `animate`.
+- [x] The `paddingBottom: 0.22em` / `marginBottom: -0.22em` pair is load-bearing.
+      `overflow: hidden` clips to the line box and `.statement` runs line-height
+      1.14 in Newsreader, tighter than the face's descender depth — without it the
+      p of "Operations" and the g of "Marketing" get sliced off at rest. The
+      negative margin takes the space back out so the paragraph's metrics are
+      unchanged. Verified in the browser: both descenders intact.
+
+### Colour audit — is dark type ink or 100% black?
+
+Asked and answered: **all ink, never pure black.**
+
+- `--text` and `--heading` both resolve to `--color-ink` = **`#0f1613`**, Deep
+  Pine — a green-black, so not neutral black either.
+- Muted body copy is `--color-slate` `#5e6576` (Warm Slate); amber-as-text on
+  light is `--color-amber-deep` `#8f5a2c`. Neither is black.
+- On the copper stat band, `.stat-band` re-points `--text-muted` to
+  `rgb(var(--ink-rgb) / 0.85)` and the figures resolve through `--heading` — so
+  ink there too, at 85% for the labels.
+- The **only** literal `#000` in the codebase is the marquee's
+  `mask-image: linear-gradient(90deg, transparent, #000 12%, …)` in `globals.css`,
+  where only the alpha channel is read — the colour is arbitrary. Every other
+  "black" match is prose in a comment.
+- Separately: the image grade's black point is `#121110`, a deliberately warm
+  near-black. That's imagery, not type.
+
+### ATBOS wordmark — composed from the atb mark + OS in Newsreader
+
+Replaces `public/images/atbos-logo.svg`, which was the old uppercase grotesque
+"ATBos" set in `#50727c` — a **retired palette teal**, so the section had been
+carrying a dead brand colour.
+
+- [x] `ATBOS.tsx` now composes the wordmark: `<Logo hideDot />` for the mark
+      itself — the same paths as the nav, full stop suppressed — followed by "OS"
+      in `--font-display` (Newsreader).
+- [x] `Logo` gained support for a CSS-length `height` (width then comes from
+      `aspect-ratio` rather than a px multiplication), so the mark keeps the
+      section's fluid `clamp(40px, 5.5vw, 72px)`. Numeric heights are unchanged,
+      which is what the nav's width transition needs — noted in the prop docs that
+      a string height shouldn't be combined with `expanded` toggling.
+- [x] The GSAP `logo` ref moved from `HTMLImageElement` to `HTMLDivElement`; the
+      rise-on-arrival tween is untouched.
+- [x] **Both alignment nudges sit on the mark, not the OS**, because the mark
+      inherits the container's font-size so 1em there is unambiguous — an em on
+      the OS span would resolve against its own larger font-size.
+      `marginBottom: 0.1926em` aligns the baselines (the OS box bottom sits below
+      its baseline by the font's descent, the mark's by 9.9% of its height, and
+      the two don't agree), and `marginRight: -0.278em` cancels the trailing
+      padding the closed box carries after the b.
+- [x] `fontSize: 1.12em` on the OS puts its caps on the mark's ascender height.
+
+**Measured result** at the 72px cap of the clamp: ascender 57px vs cap 57px
+(exact), baselines within 1px (the O's round overshoot, which is correct), and the
+b→O gap 10px against the mark's own letter gaps of 8px (a–t) and 11px (t–b) — so
+the join sits inside the mark's existing spacing rather than reading as two
+elements pushed together.
+
+**Left in place:** `public/images/atbos-logo.svg` is now unreferenced. Tracked, so
+it is recoverable — say the word and it goes.
+
+**Note on the earlier plan:** the drawn-`s` approach was abandoned mid-way on your
+call. Worth keeping the measurements it produced, since they characterise the
+face: stem **47.3** units, horizontal bar **43.7** (bars run ~8% lighter than
+stems), outer corner radius **70.5**, x-height 237, and the `o` is 238.0 × 237.3.
+
+### Round: OS raised and halved
+
+- [x] The OS moved from baseline-aligned at full ascender height to **half the
+      ascender height, cap-top aligned** — a lifted secondary mark rather than a
+      true superscript. Container switched from `items-end` to `items-start`, the
+      mark's `marginBottom` nudge dropped (it existed to reconcile baselines and
+      is meaningless under top alignment), `marginRight` kept.
+- [x] `fontSize: 0.59em` and `marginTop: 0.078em` on the OS, both measured off the
+      render rather than derived: the OS box top is *not* its cap top, because
+      half-leading and the font's ascent sit above it, so the offset can't be
+      reasoned from the font-size alone.
+
+**Measured result:** OS cap 29px against the mark's 57px ascender — **0.509**, i.e.
+half. Cap tops level to within 1px, which is the O's round overshoot plus
+antialiasing; a round letter *should* sit slightly proud of the cap line. b→O gap
+7px, against the mark's own 8px (a–t) and 11px (t–b) — a touch tighter, which is
+right for a raised, smaller element.
+
+Took three measure-and-correct passes: the first landed the cap ratio at 0.474 and
+the cap top 4px high, the second at 0.500 and 1.5px high.
+
+## Round: tex-light-aisle behind Three-ways, panels opened up
+
+### Background
+
+- [x] `tex-light-aisle.png` (1280×720, fully opaque) → `public/images/tex-light-aisle.webp`
+      at `-q 86`, 38 KB. Replaces the `orbit-planet.webp` plate.
+- [x] Despite the filename, "light" means *lights* — it's a dark, heavily blurred
+      aisle with bright bokeh, so the section stays `theme-dark`. No theme flip.
+- [x] **No `.duotone`** — the asset is already clean monochrome, so there's no
+      legacy hue to strip and the wrapper's soft-light layer would only muddy it.
+- [x] **No extra veil**, which is the non-obvious part. The plate is bright
+      (brightest pixel `(247,242,233)`, where Warm Chalk alone is **1.01:1**), so
+      the instinct is to veil it like `.plate-lightfield`. But `.scrim-side` is
+      unlike the other scrims in that it never fades out — it bottoms at ink 0.58
+      on the right rather than reaching 0 — and the cards add their own smoked
+      glass. Measured worst case clears 6:1, so a veil would only bury the plate.
+- [x] `orbit-planet.webp` is now unreferenced. Left in place.
+
+### Panels — more transparency
+
+- [x] `.material-smoked` opened from `0.55 → 0.78` to **`0.38 → 0.60`**, blur
+      16px → 20px, edge chalk 0.14 → 0.18.
+- [x] **0.38 is a measured floor, not a preference.** The third card sits where
+      `.scrim-side` has bottomed out at ink 0.58, and the weakest text there is
+      Warm Stone at text-sm (kicker and body), needing 4.5:1. At a combined 0.740
+      coverage that lands **4.86:1** against the plate's brightest pixel and
+      6.12:1 against its p95 patch. 0.32 drops the worst case to 4.45:1 — under.
+- [x] Blur up because it averages more of the backdrop, which both helps the worst
+      case and reads as more glass as the fill lightens; edge up because a lighter
+      fill leans harder on its border to define the card.
+
+**Two verification traps worth recording:**
+
+1. I measured the section as a flat ink field and concluded the plate wasn't
+   rendering. It was: `next/image` lazy-loads (no `priority` on a background
+   plate), and it simply hadn't arrived when I sampled. The "texture" I thought I
+   saw on the left was the chalk heading. Sampling a lazy-loaded background needs
+   an explicit wait on `img.complete`, not just a scroll-and-shoot.
+2. Diagnosing it, I set `display: none` on the scrim **via JavaScript in the live
+   tab** — which is the same tab the user is watching, so it changed what they
+   were looking at and read as an unexplained design change. Reloading reverted
+   it (no code was touched). Live-DOM probes on a shared tab need undoing
+   immediately, or doing somewhere else.
+
+**Verified:** the browser extension dropped mid-check and then reconnected —
+eyeballed at 1286×852 with the plate loaded. The bokeh reads through the panels and
+the card text holds. Asset serves 200, `npx tsc --noEmit` clean.
+
+### Round: section order swapped
+
+- [x] `Products` and `WaysToWork` swapped in `app/page.tsx` — "Production-ready AI
+      blueprints." now precedes "Three ways to work with us." Confirmed in the
+      rendered HTML's section order.
+- [x] Side effect worth noting: this fixes the light/dark rhythm rather than
+      disturbing it. The old order ran Problem (light) → NewModel (dark) →
+      WaysToWork (dark) → Products (light) → ATBOS (light), i.e. two darks then two
+      lights. It now alternates cleanly: light → dark → light → dark → light.
+
+## Round: plates redistributed, ATBOS panelised, copper textured
+
+### Capability-now → the aisle plate (`.plate-aisle`)
+
+- [x] Replaces the Deep Forest ridge field, which has moved to ATBOS.
+- [x] **`.scrim-panel` is back, and this time it earns its place.** It was removed
+      two rounds ago as "a black gradient artefact" over a flat green field. Over
+      this plate it is required, for a reason worth recording: the panel's
+      highlighted line is Clay Amber, and **amber is a mid-tone**, so veiling the
+      field darker moves it *toward* the type rather than away. Measured, amber
+      cannot reach 3:1 on this plate by veiling alone — even a 0.75 flat veil
+      leaves it at 2.62:1. What fixes it is depth where the copy actually is: the
+      copy is bottom-anchored, the scrim ramps to ink 0.78 there, and a 0.35 plate
+      veil combines to 0.857 → amber **3.79:1**, Chalk 11.0:1, Stone 7.3:1. At the
+      panel top the scrim is only 0.2, so the bokeh still reads.
+
+### New-model → the drive plate (`.plate-drive`)
+
+- [x] Veil 0.55. Only the h2 (Warm Chalk, text-4xl = large) sits on the plate; the
+      four cards are opaque `--bg-elevated`. 0.55 gives 4.05:1 against the plate's
+      brightest pixel (241,236,227), clear of the 3:1 large-text minimum.
+- [x] Resolves an earlier flag for free: this plate is much darker than the
+      `tex-lightfield` it replaces (mean 29 vs 64), so `--bg-elevated` now reads as
+      *lifted* off the field rather than recessed into it.
+
+### ATBOS → green ridge field + panel morph + centred
+
+- [x] `.plate-ridge-forest` (the Capability-now green) with `theme-dark`, so the
+      wordmark, statements and dots all resolve through `--heading`/`--text` rather
+      than hardcoding chalk.
+- [x] The FeatureMorph gesture: contained rounded panel on arrival, opening to
+      full-bleed as you scroll. Added to ATBOS's **existing** scrubbed timeline
+      rather than a second ScrollTrigger, so the morph can't drift from the
+      statements — 1.5 units against its 12.5-unit runway.
+- [x] `items-center` on the card centres the wordmark/statements/dots as one group
+      while the panel's min-height morphs 82vh → 100vh. Without it the group sat
+      top-aligned and drifted as the panel grew.
+
+### Copper stat band → the same ridge texture
+
+- [x] It can't be used as an image: `tex-ridge-ink` is a *green field*, so dropping
+      it on copper would replace the colour rather than texture it. It goes through
+      `soft-light`, which transfers only light and shade.
+- [x] **Filter order is load-bearing and the values are measured.** The plate greys
+      out at mean 60 with a standard deviation of just 2.9, so `brightness` must
+      come FIRST to lift the mean onto mid-grey (127.5/60 = 2.125) — soft-light
+      against a layer that dark could only ever darken. `contrast(3)` then
+      amplifies what's left, ~2.9 → ~18 of deviation: enough to read, little enough
+      to leave the copper's hue alone. Contrast first would drive the mean
+      *negative* (the pivot is 127.5, the plate sits far below it) and the texture
+      would come out black.
+
+### Icon build-in, slowed
+
+- [x] `DRAW` 0.75s → **1.6s**, stagger 0.14s → **0.9s**, trigger margin −15% →
+      −30%. At the old timings the three finished within half a second of each
+      other, which read as one burst of movement rather than three icons building.
+- [x] Chevron sub-delays made proportional to `DRAW` so they scale with it.
+
+**Now unreferenced:** `tex-wave-cream.webp` (converted, then superseded within the
+round), `tex-lightfield.webp`, `orbit-planet.webp`, `atbos-bg.webp`,
+`atbos-logo.svg`.
+
+**Worth your eye:** `tex-light-aisle` is now the plate for **two** sections —
+Three-ways and Capability-now. Deliberate on my part only in the sense that you
+asked for each; if the repetition isn't wanted, `tex-light-store` or
+`tex-light-grocery` from the same folder would differentiate them.
+
+**Not verified in motion:** the icon draw. Chrome restores scroll position on
+reload, so the icons animated during hydration before any of my four measurement
+attempts could sample them — I confirmed the mechanism (framer-motion is driving
+`pathLength`) and the end state, but never caught it mid-draw. The timing change is
+reasoned from your description, not measured.
+
+## Round: sequential icons, half-height stat rules, green quote, count-down
+
+### Icons — strictly sequential
+
+- [x] Each icon now starts only once the previous has **finished**, rather than on a
+      fixed stagger.
+- [x] **A single stagger couldn't do this**, which is why the schedule is derived:
+      the three icons are not the same length. `forward` has two chevrons, the
+      second starting a third of the way in, so it runs ~2.14s against `deploy`'s
+      ~1.78s and `frontier`'s ~1.86s. Any one stagger value would either cut the
+      long one short or leave dead air after the short ones.
+- [x] `WayIcon` now exports `ICON_DURATION` per kind, computed from the same `AT`
+      offsets the render uses, so the schedule can't drift from the animation.
+      `WaysToWork` accumulates it. The spring's contribution (`POP`) is *derived*,
+      not set — a spring has no duration, so it comes from stiffness 520 / damping
+      17 → settling time ≈ 4/(0.37·22.8) ≈ 0.47s, rounded to 0.5.
+- [x] Resulting timeline: deploy 0.30→2.08s, forward 2.20→4.34s, frontier
+      4.46→6.32s. **The full sequence is 6.3s** — long for a scroll reveal, and the
+      dial is `DRAW` (1.6s) if that's too slow to sit through.
+
+### Stat rules — half height, centred
+
+- [x] Tailwind's `divide-x` sets `border-left` on the cell, and a border always
+      spans the full cell height — it cannot be shortened or centred. So the rule
+      is a pseudo-element now: `top: 25%; height: 50%`. Verified in the browser —
+      cell 318px, divider 158.79px (49.9%) at 79.39px (24.96%).
+- [x] Scoped to `sm`+ only. Below that the stats stack into one column, where a
+      vertical rule has nothing to divide; the grid's own `divide-y` covers it.
+
+### Closing quote in Deep Forest
+
+- [x] `TRIAL` — `--color-forest` on the Problem section's closing quote, overriding
+      the Deep Pine that `.statement` carries via `--heading`. **8.43:1** on the
+      paper canvas (against Deep Pine's 17.57:1), so still clear of AA for body text
+      let alone this size. Uses the token rather than a hardcoded hex, unlike the
+      other trials, so the quote follows if the green moves.
+
+### The ~1% stat counts down
+
+- [x] `CountUp` gained a `from` prop (default 0), so it counts *between* two values
+      and reverses to `from` on leaving rather than always resting at 0.
+- [x] The ~1% figure runs **100 → 1**. The stat is about how little of the spend
+      reached the floor, so the fall is the point. Verified live: ~100% → ~63% →
+      ~21% → ~4% while the other two count up alongside.
+
+### Panels a shade more transparent
+
+- [x] `.material-smoked` 0.38 → **0.34** at the top of the gradient (0.60 → 0.56 at
+      the foot). **Close to the hard floor:** Warm Stone lands 4.59:1 against the
+      plate's brightest pixel where AA needs 4.5:1; 0.33 gives 4.52:1 and 0.32
+      fails at 4.45:1. Roughly one more hundredth is available and no more, unless
+      `.scrim-side` deepens or the plate changes. The binding case is one bright
+      bokeh spot behind small type — against the plate's p95 patch there is ~6:1.
+
+### Reverted: the icon draw-on animation
+
+Removed entirely at your call — the icons were rendering broken. `WayIcon.tsx` is
+deleted and `WaysToWork.tsx` is back to the three local `DeployIcon` /
+`ForwardIcon` / `FrontierIcon` components with their shared `stroke`/`node` consts,
+rendered as `<way.Icon />`. Verified: `grep` for every name the module exported
+returns nothing, and the DOM shows 44×44 icons with the original 2 / 3 / 2 shape
+counts.
+
+**Two likely culprits, if it's ever retried** — worth recording rather than
+rediscovering:
+
+1. `originX` / `originY` given as px strings on `motion.circle`. framer-motion
+   expects 0–1 fractions or unitless numbers there, and SVG's `transform-box` /
+   `transform-origin` handling differs from HTML — a springing `scale` about a
+   mis-resolved origin throws the shape well off its intended position, which
+   would look exactly like a broken icon.
+2. `pathLength` on `<circle>`. framer-motion drives it via `stroke-dasharray` /
+   `stroke-dashoffset`, which needs the element's own `pathLength` attribute to
+   normalise against; support for that on `<circle>` is less reliable than on
+   `<path>`. Drawing the orbit as a `<path>` arc instead would avoid it.
+
+Also worth noting: every attempt I made to verify the animation mid-flight failed
+because Chrome restores scroll position on reload, so the icons animated during
+hydration before any sampling could start. I confirmed the mechanism and the end
+state but never actually observed the motion — which is why a visibly broken result
+got past me. For scroll-triggered motion, the check needs a genuinely unseen
+element, not a reload plus a scroll.
+
+---
+
+# A new model — from a 2×2 panel grid to an editorial ledger
+
+## The problem with what's there now
+
+`NewModel.tsx` is four opaque `--bg-elevated` cards in a 2×2 grid. Three issues:
+
+1. **It's the third grid in a row.** Products (spotlight + 2-col) and Ways to Work
+   (3-col smoked cards) both follow it. By the time you reach the third the page
+   has stopped making an argument and started listing things.
+2. **The cards fight the plate.** `.plate-drive` is the strongest field on the
+   page, and four opaque rectangles sit on top of it hiding most of it. The one
+   thing that reads beautifully — the headline over the drive-through bokeh — gets
+   about two seconds of screen time before the cards cover the rest.
+3. **The copy has no argument shape.** Four title/body pairs of equal weight,
+   read in whatever order your eye lands. Nothing tells you these are four
+   *rejections* of an old model.
+
+## The concept — a sticky headline and four crossed-out beats
+
+Two columns, no cards, no grid.
+
+**Left column:** the h2 goes `lg:sticky`, so "A new model for a changed world."
+holds against the drive plate for the entire length of the section rather than
+scrolling out after a second. This is the thing you said looks beautiful, so the
+design's job is to keep it on screen.
+
+**Right column:** the four pillars become a single scrolling column of ruled
+beats, each arriving in two moves past the fixed headline:
+
+```
+────────────────────────────────  ← rule draws left to right
+01                                ← Warm Stone, display face
+Products, not seats.              ← was text-xl, now text-3xl
+Rebuild the SaaS you rent as a product that's truly
+yours — just the features you need, customised to how
+you work, without the per-seat bill.
+```
+
+1. **The rule draws itself** across the column, left to right (`scaleX`, origin
+   left). A line ruled across the page before anything is written on it.
+2. **The copy slides in from the right** a beat behind it, along the line just
+   drawn.
+
+Two effects, one per element — a single choreographed arrival rather than a pile of
+animations. The transforms are deliberately kept on separate elements: the rule
+scales, the copy translates, so neither compounds the other.
+
+Generous spacing between the beats (`space-y-14 lg:space-y-20`) so they arrive one
+at a time. That's what makes them read as four separate arguments rather than a
+list — your ask for "individual sections that slide in".
+
+## Copy — unchanged
+
+All four title/body pairs stay exactly as they are. No lines added, none reworded.
+The layout does the work instead:
+
+- The **titles go from `text-xl` to `text-3xl`** — the pillars stop being card
+  headings and become display statements, which is most of the reason the section
+  will read differently.
+- The **`01`–`04` numerals** are the only thing added, and they aren't copy —
+  they're the structure, telling you there are four beats and where you are in
+  them. In the display face, Warm Stone.
+
+## The contrast problem this creates, and the fix
+
+Losing the opaque cards puts small body copy directly on the plate for the first
+time, and `.plate-drive`'s 0.55 veil was measured for *one* thing: the h2, in Warm
+Chalk, at large-text sizes. Measured against the plate's brightest pixel
+(241,236,227):
+
+| Field | Warm Chalk | Warm Stone | Clay Amber |
+|---|---|---|---|
+| plate at 0.55 (today) | 4.05:1 | **2.68:1** | **1.60:1** |
+| plate + 0.40 reading wash | 7.30:1 | 4.83:1 | **2.88:1** |
+
+So the body copy needs a deeper field, but deepening the whole plate to ~0.72
+would dim the bokeh everywhere — including behind the headline, which is the part
+worth keeping.
+
+**New `.wash-read` class:** a feathered horizontal wash that is fully transparent
+over the left column and reaches ink/0.40 by 46% of the viewport, holding it
+across the copy column. The plate stays at its original 0.55 behind the sticky
+headline and deepens only where you actually read. 46% is measured, not guessed —
+the copy column starts at 48–49% of the viewport at every width from the `lg`
+breakpoint to 1920px, because `.shell` caps at 78rem and centres. Below `lg` the
+columns stack, so it degrades to a flat ink/0.40.
+
+**One consequence to record:** Clay Amber cannot be used as text anywhere in this
+section — it's a mid-tone, so deepening the field moves it *toward* the type, and
+it fails even the 3:1 large-text bar at 2.88:1. So the index numerals are Warm
+Stone rather than the amber they'd naturally want to be. Amber is still available
+as a non-text mark (`.node-dot`) if the numerals want company.
+
+**No `overflow-hidden` on this section.** `overflow: hidden` on any ancestor makes
+it the scrollport, and `position: sticky` then resolves against a container that
+doesn't scroll — the headline would silently stop sticking. The global
+`overflow-x: clip` on html/body already contains the slide-in, and `clip` does not
+create a scrollport, so it's safe.
+
+## To do
+
+- [x] Add `.wash-read` to `globals.css` with the measured reasoning above
+- [x] Rewrite `NewModel.tsx`: sticky h2 column + `<ol>` of four ruled beats
+- [x] Add the drawn rule — `components/motion/DrawRule.tsx`, `scaleX` from the
+      left, static under reduced motion
+- [x] Reframe `.plate-drive` onto the server rather than the car (added mid-round,
+      see below)
+- [x] Verify in the browser: headline sticks and clears the docked nav, beats
+      arrive one at a time, wash lands under the copy column
+- [x] Confirm the section still reads as distinct from ATBOS (which owns the
+      pinned/scrubbed right-to-left grammar — this one is unpinned and unscrubbed)
+
+## Deliberately not doing
+
+- **Not pinning the section.** ATBOS already pins and scrubs statements in from
+  the right. A second pinned scroll-jacked panel two sections earlier would read
+  as a tic rather than a device.
+- **Not four full-height chapters.** It would repeat the headline four times and
+  add roughly three screens of scroll to a page that already has two morphs.
+- **Not reusing `WordReveal`** on the pillar titles. The title is already moving —
+  it's inside the block that slides in — so masking it as well is motion on top of
+  motion. Easy to add later if the beats want more.
+- **Not adding copy.** The old-way / new-way struck-line treatment from §1.6 of the
+  copy deck was the first draft of this section and is recorded in the git history
+  of this plan if it's ever wanted. Ruled out at your call: the layout carries it.
+
+## Review — what shipped
+
+**`components/sections/NewModel.tsx`** — rewritten. The 2×2 grid of opaque
+`--bg-elevated` cards is gone. In its place: a two-column `.shell` grid, the h2 in
+a `lg:sticky` wrapper on the left, and an `<ol>` of four ruled beats on the right.
+Copy is byte-for-byte what it was; the titles moved `text-xl` → `text-3xl` and
+`font-normal` (against the base h3 rule's 500 — at display scale Newsreader wants
+the lighter weight, and 500 read heavier than the h2 beside it at 400).
+
+**`components/motion/DrawRule.tsx`** — new. A hairline that scales in from
+`origin-left` when it enters view, matching `Reveal`'s duration, easing and
+viewport margin so the rule and the copy behind it read as one arrival. `scaleX`
+rather than an animated `width`, so it composites instead of relaying out.
+
+**`.wash-read` in `globals.css`** — new. Feathered horizontal wash that deepens the
+plate under the copy column only. Full reasoning and the measured table are in the
+class comment; the short version is that `.plate-drive`'s 0.55 veil was measured for
+the h2 alone, small copy on it is 2.68:1, and deepening the whole plate to fix that
+would dim the bokeh behind the headline — the one thing the section is built around.
+
+**`.plate-drive` reframed** — `background-position: center` → `78% center`, added
+mid-round at your request to favour the server over the car. The geometry is in the
+class comment. Worth knowing: only 790 of the source's 1280 pixels are ever on
+screen at desktop, and centred that window sliced the server's shoulder off. It
+helps most at narrow widths, where the visible window is ~200 source pixels and
+centred it was landing on the dead gap between car and server.
+
+### Verified
+
+- Sticky engages at exactly `top: 112px` (measured `h2Top: 112` mid-section),
+  clearing the docked nav's ~67px.
+- The copy column's left edge sits at 48.4% of the viewport, so the wash is at full
+  strength before its first character — which is what the 46% stop was chosen for.
+- Rules draw to the full 598px column width; beats arrive independently (caught 03
+  mid-draw with 04 still untriggered).
+- The single-column stack below `lg` renders correctly.
+- Contrast, measured against the plate's brightest pixel with the wash applied:
+  Warm Chalk 7.30:1, Warm Stone 4.83:1. Both clear AA for their sizes.
+
+### Two things to know
+
+**Verifying scroll motion needs the tab genuinely visible.** The first pass looked
+like a total failure — rules stuck at 40% width, copy at opacity 0 — and the cause
+was `document.visibilityState === 'hidden'`, which pauses `requestAnimationFrame`
+and freezes framer-motion mid-tween. Nothing was wrong with the code. This is the
+same trap recorded under the reverted icon animation above, in a new costume: that
+time it was scroll restoration, this time tab visibility. Check
+`document.visibilityState` before concluding anything about motion.
+
+**Lenis owns the scroll position.** `window.scrollTo` fights it — a programmatic
+scroll gets reverted to Lenis's internal target a moment later, which produced
+wildly inconsistent measurements (a section reported at three different offsets in
+as many calls). Drive the page with real wheel events when verifying anything
+scroll-dependent.
+
+### Open
+
+- The reframed crop puts the server behind the copy column, where the wash is at
+  full strength — he reads as a silhouette rather than a subject, and his reaching
+  arm lands in the lighter gap between the two columns, which is the part that
+  actually carries. If he ever wants to be in the *bright* half, the only lever is
+  mirroring the plate (`scaleX(-1)`), since that is simply where he stands in the
+  photograph. Not done: flipping a photograph of a person is a real intervention,
+  not a crop tweak.
+- `.plate-aisle` / `.plate-drive` / `.plate-lightfield` are now three classes
+  differing only in URL, veil and position, and `.wash-read` is a fourth veil
+  mechanism beside them. The note under `.plate-drive` about factoring these into
+  one class driven by custom properties is now overdue.
+
+## Round: the intro hold that was never running
+
+Reported as "the logo collapses really quickly on first load, I need a couple of
+seconds". `HOLD_MS` was **already 2000** — the round above set it. Raising it again
+would have changed nothing.
+
+### The gate was the bug, not the duration
+
+- [x] Removed the `atb-intro` **sessionStorage gate** from `components/Nav.tsx`.
+      The gate can only be read on the client, so the server always rendered the
+      lockup **expanded**. On any load where the key was already set — i.e. every
+      load after the first in a tab — the page painted the full name and then the
+      hydration effect flipped `phase` to `mono` in the same tick. Result: the
+      lockup flashes and collapses immediately, with the 2s hold never running at
+      all. That is the "instant collapse", and it is the state you hit on every
+      reload while reviewing. The intro now plays on every full document load; the
+      header lives in the layout, so client-side route changes don't re-trigger it.
+- Worth keeping in mind as a class of bug: **an SSR'd component cannot gate its
+  first paint on client-only storage.** The gate silently inverts — it suppresses
+  the animation's *timing* while leaving its *starting state* in the HTML.
+
+### Links and CTA stay, and ride the collapse
+
+- [x] The logo is back **in flow**: dropped the fixed-width span that reserved the
+      closed size and the `position: absolute` on `Logo`. `Logo` already animates
+      its own wrapper width (that is what the numeric `height` prop is for), so the
+      anchor now grows with the lockup and the links + Get started slide right as
+      it opens and left as it closes, over the same 520ms. That push is what had
+      gone missing.
+- [x] Deleted `revealed` / `revealStyle` / `LINKS_GAP_MS` entirely. The links and
+      CTA used to sit at `opacity: 0` for the whole hold, which is why Get started
+      looked *removed* — with a 2s hold the header stood empty but for the logo.
+      Everything is now present from first paint and only the logo animates.
+
+### Measured, at the tightest desktop width
+
+At 1024px (the `lg` breakpoint, so the narrowest width where the links show) the
+**expanded** row measures logo `48→318`, links `352→820`, Get started `854→976`:
+34px of clearance either side of the list, single-line, `scrollWidth == clientWidth`.
+No reflow risk at any desktop width. Verified at 1024 / 1100 / 1152 / 1280 / 1440.
+
+### Open
+
+- Reduced motion still paints the expanded lockup for one frame before snapping
+  shut, because the skip path is an effect and the SSR'd HTML is expanded — the
+  same inversion as the gate, one layer down. Pre-existing, not a regression from
+  this round. A real fix means rendering the closed state on the server, which
+  would break the intro for everyone else; leaving it deliberately.
+- The 2s hold itself is **not stopwatch-verified in the browser**. The automation
+  tab runs `visibilityState: hidden`, and Chrome throttles it hard enough that
+  React never finishes hydrating in there — the collapse never fires, so the probe
+  reads 270px forever. Same trap as the two notes above, third costume: this time
+  it blocks hydration rather than a tween. Layout measurements are unaffected
+  (pure layout, no rAF), which is why the 1024px numbers are trustworthy.
+
+## Review — slow the footer word reveal (2026-07-29)
+
+The three disciplines in the footer statement built in too fast to catch when you
+were still scrolling into the section. Two changes, both timing only:
+
+- `components/motion/WordReveal.tsx`: duration 0.72s → 1.05s, and the ease moved
+  off expo-out `[0.16, 1, 0.3, 1]` to cubic-out `[0.33, 1, 0.68, 1]`. The ease was
+  the bigger culprit — expo-out covers ~90% of the travel in the first third of
+  the duration, so lengthening the duration alone would have kept the snap and
+  just added a longer tail on nothing.
+- `components/Footer.tsx`: stagger widened from ~0.17s to ~0.32s (delays
+  0.1 / 0.42 / 0.74) so the three words stay legibly separate over the longer
+  duration instead of overlapping into one movement. Full sequence now runs
+  ~1.8s.
+
+No change to the observer, the clip geometry, or the reduced-motion path. `tsc
+--noEmit` clean. Not yet checked in the browser — the animation is scroll-
+triggered and needs a real scroll-in to judge.
+
+## Round: Blueprints section off the three-panel grid — editorial spread + type pair
+
+**Status:** Plan written, awaiting sign-off. No code yet.
+**Trigger:** "not a massive fan of the design of that section and would prefer it
+not to use the three rounded-edge panels… prioritise FrontlineOS as the primary
+product." Direction chosen: **editorial spread + type-only pair**, with a
+**scroll-linked parallax** on the photograph.
+
+### Why the current section fails, beyond taste
+
+Three separate diagnoses, and each one independently argues for the same change:
+
+1. **It is the third card grid in a row.** NewModel was rebuilt off a 2×2 panel
+   grid precisely because "Products and Ways-to-Work both follow with grids of
+   their own, so this was the third in a row" (see the header comment in
+   `NewModel.tsx`). That fix moved the problem down one section rather than
+   solving it: Products → WaysToWork is now the surviving grid-then-grid pair,
+   and WaysToWork's three rounded smoked-glass cards are the stronger of the two
+   uses. So Products is the one that gives.
+2. **The placeholder images actively damage the hierarchy.** CommerceOS and
+   MarketingOS both point at `/images/hero-aisle.webp` in `lib/site.ts`. The
+   section therefore renders *the same photograph twice, side by side*, and it is
+   the hero's photograph at that. It reads as a bug, and it spends the section's
+   only real asset — the FrontlineOS plate — competing against two copies of
+   something already seen twice on the page.
+3. **`status` is fetched and never used.** `products[0].status === "Live"` has
+   been in `lib/site.ts` the whole time and `Products.tsx` never renders it. The
+   brief's product-card component (§6) explicitly lists "status/tag". The one
+   piece of data that would mark FrontlineOS as the shipped product is being
+   dropped on the floor.
+
+### The layout
+
+Section stays on the light paper canvas and keeps `.section` rhythm — it is the
+only light punctuation between the dark NewModel above and the dark WaysToWork
+below, so it must not go dark.
+
+```
+┌── viewport ────────────────────────────────┐
+│ shell                                      │
+│  Production-ready AI blueprints.           │
+│  AI products for where your business…      │
+│                                            │
+│  ● Live            ████████████████████████╡ bleeds
+│  FrontlineOS       ███  the graded      ███╡ off the
+│  An AI-native      ███  frontline plate ███╡ right
+│  operating layer…  ████████████████████████╡ edge
+│  40%+ frontline productivity.              │
+│  Explore the product →                     │
+│                                            │
+│  ────────────────────  ──────────────────   ← two drawn rules
+│  CommerceOS            MarketingOS         │
+│  AI-native commerce…   A unified marketing…│
+│  15–25% revenue uplift 50%+ cost reduction │
+└────────────────────────────────────────────┘
+```
+
+No `border-radius` anywhere in the section, no `.material-glass`, no
+`.img-frame`, no `border`. One photograph. Hairlines are the only structure.
+
+**The bleed is exact, not approximate.** `margin-right: calc(50% - 50vw)` on a
+direct child of `.shell` lands precisely on the viewport's right edge, and this
+is worth deriving once rather than tuning by eye. With the shell at outer width
+`W` (capped at 78rem, centred) and inline padding `P`, a child's `50%` resolves
+against the shell's *content* box, so it is `(W − 2P)/2`. The distance we need to
+travel is the auto margin plus the padding: `(100vw − W)/2 + P`. Setting
+`margin-right = (W − 2P)/2 − 50vw` gives `W/2 − P − 50vw`, and the negated target
+is `W/2 − P − 50vw`. They are the same expression — no magic number, and it holds
+at every width because both sides are functions of the same two variables.
+
+- Applied to the **grid container**, not the image column, so the percentage
+  resolves against the shell's content box rather than a grid area.
+- Gated at `min-width: 64rem` in `globals.css` alongside the other measured
+  classes. Below that the columns stack and the image sits full-width *inside*
+  the shell, where the copy needs its right padding back.
+- `100vw` includes the classic scrollbar, so on desktop Chrome the grid overruns
+  the visible viewport by the scrollbar width. Harmless and invisible here — the
+  image is bleeding off the edge by design, and `html`/`body` already carry
+  `overflow-x: clip`, so nothing gains a horizontal scrollbar.
+
+**The two secondary products get one drawn hairline each, and no vertical
+rule.** Considered reusing `.stat-divide` (the half-height centred pseudo-element
+divider from the copper band) for a vertical rule between them, and rejected it:
+that class is gated at `40rem` to match Problem's grid, and this pair wants to
+stay one column until `48rem` — MarketingOS's summary is the longest string in
+the section and breaks to seven ragged lines in a 250px column. Matching the
+breakpoints would mean either a cramped pair or a near-duplicate CSS class.
+Two side-by-side rules read as one broken rule across the page, which is the
+better editorial detail anyway, and they animate for free with the existing
+`DrawRule`. No new CSS, no new breakpoint to keep in sync.
+
+### The motion
+
+Three layers, each on its own element — following `DrawRule`'s rule that a
+transform should never be nested inside another animating transform.
+
+| What | How | Notes |
+|---|---|---|
+| Heading | `WordReveal` on `blueprints.` only | Footer's pattern: lead static, the key word slides in from the top of its own box. |
+| Photograph, entrance | `clip-path` inset wipe, gutter → bleed edge | framer-motion, in-view once, ~0.9s on `--ease-entrance`. On the **frame**. |
+| Photograph, drift | GSAP `ScrollTrigger`, scrubbed, **not pinned** | `yPercent` ≈ −8 → 8 on an over-sized wrapper **inside** `.grade-film`. |
+| Rules + copy | existing `DrawRule` + `Reveal`, staggered | Unchanged vocabulary. |
+
+**Not pinned, deliberately.** `FeatureMorph` and `ATBOS` both own the pinned
+card→full-bleed morph, and a third pin on one page reads as a tic. A scrubbed
+trigger with no `pin` also needs no scroll runway, so it cannot collide with
+either of their sticky sections — and the `overflow: hidden` trap documented in
+`NewModel.tsx` does not apply, because nothing here sticks.
+
+**The drift goes on a wrapper inside `.grade-film`, not on the image.**
+`.grade-film` is already `position: absolute; inset: 0; overflow: hidden`, so it
+is the containing frame. The parallax wrapper sits inside it at roughly
+`-inset-y-[10%]` so there is travel to spend without pulling an empty edge into
+frame. The grain and vignette stay siblings and stay still — the same reasoning
+already recorded on the hover-scale in `Products.tsx`: a vignette that moved with
+the picture would drag its own edges through the frame.
+
+**Reduced motion:** early return before `gsap.registerPlugin`, as `FeatureMorph`
+does. `Reveal`, `DrawRule` and `WordReveal` all already render statically, and
+the wipe must resolve to `inset(0 0 0 0)` rather than staying clipped.
+
+### To do
+
+- [ ] `.bleed-right` in `globals.css` — the derivation above as the comment,
+      gated at `64rem`.
+- [ ] Rebuild `Products.tsx`: header (unchanged copy) → FrontlineOS spread →
+      two ruled type columns. Delete the `rounded-[1.75rem]`, `material-glass`,
+      `img-frame` and `border` usages; keep `.grade-film` + grain + vignette.
+- [ ] Surface `frontline.status` as a `.node-dot` + "Live" marker. Existing data,
+      existing class, no new copy.
+- [ ] Drop the two placeholder `<Image>`s. `lib/site.ts` keeps the `image` keys —
+      the product detail pages will want them — but the home section stops asking
+      for artwork that does not exist.
+- [ ] Client component for the parallax (`"use client"`), or a small
+      `ImageParallax` motion component if it wants reuse later. Prefer keeping it
+      in the section until there is a second caller.
+- [ ] Verify with the tab **genuinely visible** — `document.visibilityState`
+      throttling has now cost three rounds (icon animation, new-model rules, the
+      intro hold). Drive with real wheel events; Lenis owns the scroll position
+      and fights `window.scrollTo`.
+- [ ] Check the bleed at 1024 / 1280 / 1440 / 1920 and confirm no horizontal
+      scrollbar appears at any of them.
+
+### Decisions taken, so they are not re-litigated
+
+- **Copy is unchanged.** Section heading, intro, all three summaries and proofs
+  stay exactly as they are in `lib/site.ts`. The only new text is the word "Live",
+  which is existing data.
+- **CommerceOS and MarketingOS stay unlinked**, as they are today. Their `href`s
+  exist and the footer already points at them, so linking would not be new dead
+  ground — but it is a separate decision from this layout change.
+- **Section stays light.** See above: it is the only light punctuation in a
+  dark→light→dark run.
+
+## Review — footer word reveal now replays on scroll-out (2026-07-29)
+
+The three disciplines now un-reveal when the footer leaves view, so scrolling back
+in replays the build. Consistent with the rest of the site's motion: `CountUp` and
+the footer's full-stop dot already reverse on scroll-out.
+
+Both changes in `components/motion/WordReveal.tsx`:
+
+- Dropped `once: true` from `useInView`. `animate` was already written as
+  `y: inView ? "0%" : "-105%"`, so the reverse branch existed but was dead code —
+  `once` latched `inView` permanently true. Removing it activated it.
+- Made the transition direction-aware, which is the part that actually needed
+  thought. framer-motion's `delay` is direction-agnostic, so reusing the entry
+  transition would have each word wait out its stagger and then take another
+  second to leave — ~1.8s of un-revealing playing behind you as you scroll up, and
+  a scroll back in sooner than that catching words mid-flight, so the re-reveal
+  starts from partial positions with the stagger smeared. Exit is now 0.4s,
+  accelerating (`[0.4, 0, 1, 1]`), no stagger: a quick uniform retreat that parks
+  every word before a plausible re-entry.
+
+The observer stays on the wrapper, and that matters more now than before: the
+inner span returns to fully-clipped on exit, so an observer on it would be
+permanently unobservable after the first exit — the trap the component's comment
+already warned about. Clip geometry and reduced-motion path untouched.
+
+`tsc --noEmit` clean. **Not browser-verified** — replay is scroll-triggered in
+both directions and needs a real scroll down-up-down past the footer to judge,
+particularly whether the 0.4s exit reads as tidy or as a snatch. Two things to
+watch there: the exit ease is a guess, and `once: false` means the threshold can
+flip repeatedly if a scroll parks right on it (same exposure `CountUp` already
+carries, but three words sliding is louder than a number ticking).
+
+### Built
+
+- [x] `.bleed-right` in `globals.css`, gated at `64rem`, with the derivation as
+      its comment.
+- [x] `components/motion/PlateReveal.tsx` — new. Owns the wipe, the drift and the
+      `.grade-film` markup for one photographic plate.
+- [x] `Products.tsx` rebuilt. All `border-radius`, `.material-glass`, `.img-frame`
+      and `border` usages gone from the section; both placeholder `<Image>`s gone.
+- [x] Two `DrawRule` hairlines instead of a vertical divider, as planned.
+
+### Changed during review, on request
+
+- **The "Live" badge came out.** It went in as a `.node-dot` + `.eyebrow` marker
+      (finding 3 in the original diagnosis) and was removed on sight. `status`
+      stays in `lib/site.ts`, unrendered, as it was before.
+- **"Explore the product" is now a green button** — `.btn btn-primary`, not a new
+      class: that class is *already* a flat Deep Forest fill with a Warm Chalk
+      label, so the green button the section wanted is the one the site had.
+      This is its first use on a **light** field, which makes the note on the class
+      in `globals.css` ("every `.btn-primary` sits on a dark field") out of date.
+      It still holds up: Deep Forest is 8.3:1 on the paper canvas, so for the first
+      time the pill reads as a shape by its own fill rather than by its label, and
+      the label keeps the 7.7:1 the class was measured for. Verified computed:
+      `rgb(45, 82, 61)` on `rgb(245, 241, 232)`.
+      The pill's radius is now the only curve in a section whose whole premise is
+      square corners. Kept deliberately — the no-radius rule is about panels, and
+      breaking the button system to honour it would cost more than it buys.
+- **The intro sentence is removed, temporarily.** It was reported as messy and
+      space-hungry. Measured: the h2 is 128px (two lines at 64.1px leading) and the
+      sentence added ~100px beneath it — a ragged two-line block under a ragged
+      two-line heading. It was first moved *beside* the heading as a bottom-aligned
+      standfirst, which measured **128px for the whole row** — the sentence cost
+      nothing — and then pulled entirely on request. The masthead recipe is
+      recorded in a comment in `Products.tsx` so restoring it is one step, and the
+      note explains why the track has to be `auto` rather than `1fr`.
+- The heading itself was left alone: "AI blueprints." orphaning to line two was
+      confirmed as wanted.
+
+### Verified
+
+- **The bleed identity holds on both branches.** At the real viewport (1080, where
+  the shell is viewport-wide and the auto margin is 0) `margin-right` computes to
+  exactly `-48px` and the grid's right edge lands on 1080 — `gapToEdge: 0.00`.
+  The auto-margin branch — the one that governs every viewport above 1248px — was
+  exercised by capping `.shell` narrower at the real viewport, which keeps `%` and
+  `vw` in the same coordinate space: at caps of 50/40/34rem the predicted
+  `-(autoMargin + P)` came out −188 / −268 / −316 and the computed
+  `margin-right` matched **exactly**, with `gapToEdge: 0.00` every time.
+- Square corners: computed `border-radius` is `0px` on every `article`, the
+  `.grade-film` wrapper and the `<img>`. The button keeps its pill.
+- The two hairlines measure 460px each at x=48 and x=572 — 460 + 64 gap + 460 =
+  984, the full shell content width, symmetric.
+- No horizontal overflow introduced. The only element past the viewport edge is
+  the hero's pre-existing `.marquee-track` (`w-max`), which is why
+  `body.scrollWidth` reads 16px over; nothing in Products contributes.
+- Plate geometry: 528×422 at 1080 (5/4 at `lg`), right edge exactly on 1080.
+
+### Not verified, and why
+
+**The motion timing has not been observed running.** The automation tab reports
+`visibilityState: hidden` and **rAF is completely dead — 0 frames in 1200ms**,
+measured, so Lenis cannot scroll and no tween can advance. React does hydrate
+(the h1 has text), which is a new wrinkle: this is the *fourth* costume of the
+trap already recorded three times in this document, and it now presents as
+"hydrated but frozen" rather than "not hydrated".
+
+Two new details worth keeping, because they cost real time here:
+
+1. **Forcing tweens must happen AFTER scrolling, not before.** framer-motion's
+   `whileInView` uses IntersectionObserver, which fires on scroll *without* rAF.
+   Forcing the end state and then scrolling let IO re-write every opening keyframe
+   and start tweens that can never advance — which renders as washed-out copy, a
+   sage-coloured button (Deep Forest at partial opacity) and a 23%-revealed plate.
+   All three look exactly like layout bugs and are not.
+2. **Inline styles lose to framer-motion; `!important` wins.** v12 drives
+   opacity/transform/clip-path through the **Web Animations API**, whose effect
+   stack overrides inline style — so `el.style.opacity = '1'` silently does
+   nothing. `document.getAnimations().forEach(a => a.finish())` works, and an
+   `!important` author declaration outranks animations in the cascade. Note
+   `cancel()` is NOT the same: it drops the effect and reverts to the `initial`
+   keyframe, i.e. it *hides* a `Reveal`.
+
+Also learned, as a dead end to not repeat: **CSS `zoom` cannot simulate a wider
+viewport.** `100vw` does not respond to it in this Chrome (verified with a `100vw`
+probe as a control), so a zoom test compares a zoomed `%` against an unzoomed
+`vw` and reports a positive `margin-right` — a convincing false failure. Real page
+zoom does scale the layout viewport, so there is no product implication.
+
+### Open
+
+- The animation set — the clip-path wipe, the `WordReveal`, the drift's direction
+  and amount — needs one pass in a real, visible browser. Everything static about
+  the section is measured; nothing about its timing is.
+- `resize_window` reports success but does not change `innerWidth` (the window has
+  `outerWidth: 0`, i.e. it is not a foreground window), so per-width visual checks
+  at 1280/1440/1920 were done by computation rather than by eye.
+- `.bleed-right` assumes `%` and `vw` share a coordinate space. True for real
+  viewports and for page zoom; not true under a CSS `zoom` on an ancestor. Nobody
+  is likely to hit this, but the class is now a shared utility, so it is written
+  down.
+- The note on `.btn-primary` in `globals.css` still says every use sits on a dark
+  field. Left as-is rather than rewritten mid-round; it wants updating next time
+  that file is open.
