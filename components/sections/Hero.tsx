@@ -81,7 +81,10 @@ export default function Hero() {
               >
                 Talk to us
               </Link>
-              <Link href="/how-we-work" className="btn btn-outline">
+              {/* Anchors into the homepage, same as the primary nav's "How we
+                  work" — the dedicated page is not built yet. See primaryNav in
+                  lib/site.ts. */}
+              <Link href="/#how-we-work" className="btn btn-outline">
                 See how we work
               </Link>
             </motion.div>

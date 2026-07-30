@@ -3337,3 +3337,9 @@ homepage anchor from another route, so the footer links work from any page.
 
 Still outstanding from the earlier list: the hero's second CTA (`Hero.tsx:84`) points
 at `/how-we-work`, which 404s — `/#how-we-work` would work today.
+
+### Hero's second CTA now anchors too
+
+`Hero.tsx` — "See how we work" pointed at `/how-we-work`, a 404. Now `/#how-we-work`,
+the same target the primary nav and the footer use. That closes the last link to an
+unbuilt route.
