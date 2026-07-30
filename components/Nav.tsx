@@ -21,7 +21,7 @@ import Logo from "./brand/Logo";
  *             as long as you keep going down
  *   docked  — scrolling back up: it returns as a full-width glass bar
  *
- * Because the header is fully off-screen in `hidden`, the Warm Chalk → Deep Pine
+ * Because the header is fully off-screen in `hidden`, the Cream → Ink
  * foreground flip happens out of sight — no contrast flash mid-transition.
  * On load the logo holds "at the beyond." written out, then collapses to "atb." —
  * see HOLD_MS. The links and CTA are present throughout and slide left with the
@@ -63,7 +63,7 @@ export default function Nav() {
     return () => clearTimeout(t);
   }, [reduce]);
 
-  // A reload can restore a mid-page scroll position, where the bare Warm Chalk
+  // A reload can restore a mid-page scroll position, where the bare Cream
   // treatment would be invisible over light content. Dock immediately in that
   // case rather than waiting for the first scroll event.
   useEffect(() => {

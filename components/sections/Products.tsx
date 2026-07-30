@@ -79,15 +79,15 @@ export default function Products() {
             </p>
             <p className="mt-5 font-medium text-[color:var(--heading)]">{frontline.proof}</p>
             {/* The existing `.btn-primary` rather than a new green variant: it is
-                already a flat Deep Forest fill with a Warm Chalk label, so the
+                already a flat Green fill with a Cream label, so the
                 green button the section wants is the one the site already has.
                 This is its FIRST use on a light field, though, which is worth
                 recording because the note on the class in globals.css states the
                 opposite ("every .btn-primary sits on a dark field") — that note is
                 now out of date rather than wrong. It still holds up here:
-                Deep Forest is 8.3:1 against the paper canvas, so the pill reads as
+                Green is 8.43:1 against the paper canvas, so the pill reads as
                 a shape by its own fill for the first time, and the Chalk label
-                stays at the 7.7:1 the class was measured for.
+                stays at the 7.81:1 the class was measured for.
                 The pill's radius is the one curve left in the section. Kept
                 deliberately: the no-radius rule is about panels and cards, and
                 breaking the button system to honour it would cost more than it

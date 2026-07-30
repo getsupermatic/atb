@@ -134,14 +134,13 @@ export default function ATBOS() {
     >
       <div className="sticky top-0 flex min-h-screen items-center overflow-hidden">
        <div ref={pad} className="w-full" style={{ paddingInline: PAD }}>
-        {/* .plate-ridge-forest — the same Deep Forest ridge field as the
+        {/* .plate-ridge-forest — the same Green ridge field as the
             Capability-now panel, so the two statement panels read as one device.
             It replaces the atbos-bg photograph, and both of that photograph's
             wrappers went with it: .duotone (nothing left to desaturate) and
             .veil-chalk-radial (it existed to lift copy off imagery; the flat
-            field needs no help, and Warm Chalk on it is ~9:1).
-            theme-dark comes with the green: it flips --heading and --text to Warm
-            Chalk, which is what the wordmark, the statements and the dots all
+            field needs no help, and Cream on it is ~9:1).
+            theme-dark comes with the green: it flips --heading and --text to Cream, which is what the wordmark, the statements and the dots all
             resolve through — so none of them hardcode a colour. */}
         <div
           ref={card}
@@ -243,8 +242,8 @@ export default function ATBOS() {
                       width: i === index ? 30 : 11,
                       background:
                         i === index
-                          ? "var(--color-chalk)"
-                          : "rgb(var(--chalk-rgb) / 0.32)",
+                          ? "var(--color-cream)"
+                          : "rgb(var(--cream-rgb) / 0.32)",
                     }}
                   />
                 ))}

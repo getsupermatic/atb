@@ -15,6 +15,15 @@ import Logo from "./Logo";
  * (viewBox -12 -3 949 384, period at cx 875 / cy 319 / r 27), so it always
  * lands with the correct optical spacing regardless of the rendered height.
  */
+/**
+ * Copper's channels as a literal. Framer Motion has to parse and interpolate the
+ * colour inside the box-shadow keyframes below, and it cannot resolve a var() to
+ * do that — so this is the one place in the codebase that repeats a palette
+ * value rather than reading the token. Keep it in step with --color-copper.
+ */
+const COPPER = "201, 123, 69";
+const GLOW_OFF = `0 0 0px 0px rgba(${COPPER}, 0)`;
+
 export default function FooterLogo({ height = 26 }: { height?: number }) {
   const reduce = useReducedMotion();
   const wrapRef = useRef<HTMLSpanElement>(null);
@@ -67,17 +76,10 @@ export default function FooterLogo({ height = 26 }: { height?: number }) {
         initial={false}
         animate={{
           x: inView && armed ? 0 : parked,
-          // Literal Clay Amber (--color-amber, #CC8A55) rather than the token:
-          // Framer Motion has to parse and interpolate the colour inside the
-          // box-shadow keyframes, and it cannot resolve var() to do that.
-          // Keep in step with --color-amber in globals.css.
+          // Pulses once as it travels — see the note on COPPER above.
           boxShadow: inView
-            ? [
-                "0 0 0px 0px rgba(204, 138, 85, 0)",
-                "0 0 14px 3px rgba(204, 138, 85, 0.65)",
-                "0 0 0px 0px rgba(204, 138, 85, 0)",
-              ]
-            : "0 0 0px 0px rgba(204, 138, 85, 0)",
+            ? [GLOW_OFF, `0 0 14px 3px rgba(${COPPER}, 0.65)`, GLOW_OFF]
+            : GLOW_OFF,
         }}
         transition={{
           x: { duration: 1.5, ease: [0.16, 1, 0.3, 1] },
@@ -95,7 +97,7 @@ export default function FooterLogo({ height = 26 }: { height?: number }) {
             width: diameter * 9,
             transformOrigin: "left center",
             background:
-              "linear-gradient(90deg, rgb(var(--amber-rgb) / 0.55), rgb(var(--amber-rgb) / 0))",
+              "linear-gradient(90deg, rgb(var(--copper-rgb) / 0.55), rgb(var(--copper-rgb) / 0))",
           }}
           animate={{ opacity: inView ? [0, 0.9, 0] : 0, scaleX: inView ? [0.2, 1, 0.2] : 0.2 }}
           transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}

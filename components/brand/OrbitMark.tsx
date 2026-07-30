@@ -1,6 +1,6 @@
 /**
  * Orbit motif — the signature brand device (§2.1): an elliptical ring with a
- * Clay Amber node at its centre and small nodes travelling the ring. Used for
+ * Copper node at its centre and small nodes travelling the ring. Used for
  * the loader, favicon and as a recurring ambient accent.
  */
 type Props = {
@@ -48,11 +48,11 @@ export default function OrbitMark({
         opacity="0.35"
         transform="rotate(28 50 50)"
       />
-      {/* Central Clay Amber node — intelligence at the centre */}
-      <circle cx="50" cy="50" r="6" fill="var(--color-amber)" />
+      {/* Central Copper node — intelligence at the centre */}
+      <circle cx="50" cy="50" r="6" fill="var(--color-copper)" />
       {/* Travelling nodes */}
       <g className={animated ? "orbit-spin" : undefined} style={{ transformOrigin: "50px 50px" }}>
-        <circle cx="94" cy="50" r="3" fill="var(--color-amber)" />
+        <circle cx="94" cy="50" r="3" fill="var(--color-copper)" />
         <circle cx="6" cy="50" r="2" fill="var(--color-ink)" />
       </g>
     </svg>

@@ -34,7 +34,7 @@ const pillars = [
 export default function NewModel() {
   return (
     /* .theme-dark remaps the semantic tokens, so the heading and copy pick up
-       Warm Chalk / Warm Stone without being hardcoded. .plate-drive supplies the
+       Cream / Stone without being hardcoded. .plate-drive supplies the
        field: the supplied drive-through plate over the same ink base.
 
        No `overflow-hidden` here, and that is load-bearing rather than an

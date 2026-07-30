@@ -3,10 +3,295 @@
 **Branch:** `v3` — a creative-direction test forked from `v2` at `2637034`.
 `v2` is untouched and remains the incumbent.
 
-> **Part 0** below is the live v3 plan. Everything from Part 1 onward is the v2
-> record, kept for reference — the tokens, copy sources and quality bar it
-> documents still apply, because v3 forks the design system rather than
+> **Part A** below is the live plan: v3 is locked, and this is the consolidation
+> pass that turns what was iterated on-site into a clean design system.
+> **Part 0** is the v3 creative direction, now delivered. Everything from Part 1
+> onward is the v2 record, kept for reference — the copy sources and quality bar
+> it documents still apply, because v3 forked the design system rather than
 > replacing it.
+
+---
+
+# Part A — v3 consolidation & design-system cleanup
+
+**Status:** Awaiting sign-off.
+**Goal:** v3 is the locked direction. It was built by iterating directly on the
+live site, which cost structure, centralisation and token discipline. This pass
+pays that back: one palette, one type system, no dead elements, no duplicated
+mechanics — a foundation the remaining pages can be built on.
+
+**Constraint:** this is a cleanup, not a redesign. Other than the palette and
+typography corrections in A.2 (which bring the build into line with the locked
+brand), **the rendered site should look the same when this is done.**
+
+## A.1 What's actually wrong
+
+Audited the whole tree — 4,008 lines across 33 files. It is not a mess; the
+motion work and the contrast reasoning are genuinely good. The damage is
+specific and it is all the residue of iterating in place.
+
+### Dead elements from the previous versions
+
+| What | Evidence |
+|---|---|
+| `components/brand/OrbitMark.tsx` | Zero imports. The orbit motif was v1's secondary mark. |
+| 11 CSS classes | `.halftone` `.img-frame` `.link-accent` `.material-glass` `.node-dot` `.plate-legacy` `.plate-lightfield` `.scrim-card` `.veil-chalk` `.veil-chalk-radial` `.orbit-spin` — all zero usages in TSX. |
+| `@keyframes orbit-spin` | Only `.orbit-spin` used it, only `OrbitMark` used that. |
+| `--color-sage` | Defined in `@theme`, referenced nowhere. |
+| 18 image files, ~2.7 MB of 3.4 MB | `atbos-bg` `card-modern` `glass-planes-footer` `hero-frontline` `hero-hand` `hero-hand-v2` `hero-prism` `iridescent` `orbit-planet` `product-commerce` `product-frontline` `product-frontline-os` `product-marketing` `teal-tunnel` `tex-wave-cream` `tex-lightfield` `hero-aisle` `atbos-logo.svg`. |
+
+`tex-lightfield.webp` is reachable only through `.plate-lightfield`, which nothing
+uses. `hero-aisle.webp` is reachable only through two placeholder `image` keys in
+`lib/site.ts` that no component reads any more.
+
+### The same mechanic implemented three times
+
+The card ↔ full-bleed scroll morph is written out separately in `HeroMorph`,
+`FeatureMorph` and `ATBOS` — same GSAP shape, same `scrub: 0.6`, same
+`start: "top top" / end: "bottom bottom"`, and the same two magic values
+(`clamp(1.25rem, 5vw, 3rem)`, `1.75rem`) retyped as literals in each. `ATBOS`
+additionally hoists them to `PAD` / `RADIUS` / `MIN_H` consts, so there are two
+conventions for the same numbers. The padding value is also `.shell`'s
+`padding-inline`, duplicated rather than shared.
+
+The `.grade-film` + grain + vignette trio is likewise duplicated in `HeroMorph`
+and `PlateReveal`.
+
+### Three different ways to ask about reduced motion
+
+`window.matchMedia(...)` inline in an effect (`FeatureMorph`, `HeroMorph`,
+`SmoothScroll`); `useReducedMotion()` from framer-motion (8 components);
+`useState` + `useEffect` + `matchMedia` (`ATBOS`). Same question, three answers,
+different SSR behaviour each.
+
+### Motion constants copy-pasted instead of tokenised
+
+`--dur-*` and `--ease-*` exist in `@theme` and **nothing in JS reads them**. The
+entrance curve `[0.16, 1, 0.3, 1]` is retyped in 8 files, `duration: 0.7` in 4,
+the viewport margin `"0px 0px -12% 0px"` in 4, `scrub: 0.6` in 4. Brief §5.6
+asks explicitly for shared motion tokens "reused everywhere".
+
+### Hardcoded hexes, against the brief's one hard rule
+
+Brief §0: *"Where a value is a design token, use the token — do not hard-code
+hexes or magic numbers in components."* Currently violated in four places, all
+of them the copper: `#C97B45` in `FeatureMorph` and `SignupForm`,
+`rgba(204, 138, 85, …)` in `FooterLogo`, and `#121110` in `.grade-film`. Three
+are labelled `TRIAL` with a note to resolve them once the direction sticks. It
+has stuck (A.2).
+
+### Comments written as a change log
+
+The measured reasoning in `globals.css` is the most valuable thing in the
+codebase and must survive. But a large share of it documents *history* rather
+than *state* — "this used to be", "in place of the X that used to sit here",
+"it replaces `atbos-bg`", "TRIAL —", "PLACEHOLDER —", "INTERIM". One is already
+self-admittedly stale: `Products.tsx` says of `.btn-primary`, *"that note is now
+out of date rather than wrong."* Anyone reading this cold gets the archaeology of
+three design rounds instead of the current system.
+
+### Structure
+
+- `components/motion/FeatureMorph.tsx` is a **page section** — headline, copy,
+  plate, scrims — filed with the motion primitives.
+- `components/sections/Hero.tsx` is a wrapper that renders `HeroMorph` plus the
+  client-logo strip. Two files, one section, and the strip is unrelated content.
+- `Nav`, `Footer`, `SignupForm` sit loose at the `components/` root; everything
+  else is foldered.
+- Section copy (`stats`, `pillars`, `ways`, `clients`, `keywords`, ATBOS
+  `headlines`) is inline in each component. Most of it will be reused by
+  What-we-do / How-we-work / product pages.
+- `.plate-aisle` / `.plate-drive` / `.plate-lightfield` differ only in URL and
+  veil strength. `globals.css` already flags this: *"If a fourth arrives, factor
+  the mechanics into one class driven by two custom properties."*
+- `globals.css` is 982 lines covering tokens, base, materials, scrims, plates,
+  the film grade, buttons, fields and keyframes in one file.
+
+### Documentation drift
+
+`README.md` is materially wrong: it names **Manrope / Source Serif 4 / IBM Plex
+Mono** as the typefaces (all three retired), gives a home-page order ending in
+`ClosingBand` (it doesn't), claims the logo is "a text placeholder" (it's the
+real animated wordmark), lists `OrbitMark`, and documents `npm run lint` — which
+does not exist, because **there is no ESLint in the project at all**.
+
+`CLAUDE.md` instructs reviewing `/docs/brand/`, which does not exist (it is
+`briefs/`). The design brief's §2.2 palette and §2.5 typography both predate the
+locked v3 system and now contradict the build.
+
+## A.2 The locked design system
+
+Supplied and locked. Six brand colours; Newsreader for display and pull quotes,
+Instrument Sans for everything functional.
+
+| Token | Hex | Role | Currently |
+|---|---|---|---|
+| `--color-ink` | `#0F1613` | Headings, dark base, scrims | ✅ correct |
+| `--color-green` | `#2D523D` | Display accent, primary CTA fill, statement panels | ✅ value correct, named `--color-forest` |
+| `--color-copper` | `#C97B45` | Accent: CTAs, stat band, the logo dot | ⚠️ named `--color-amber`, value `#CC8A55` |
+| `--color-cream` | `#F5F1E8` | Text on dark, veils, glass | ✅ value correct, named `--color-chalk` |
+| `--color-steel` | `#5C665F` | Muted text on light | ⚠️ is `--color-slate` `#5E6576` (a blue-grey) |
+| `--color-stone` | `#D8D2C4` | Muted text on dark, soft fills, elevated surfaces on light | ⚠️ value `#CAC6BB` |
+
+**Renaming to match the brand names** (`forest`→`green`, `amber`→`copper`,
+`chalk`→`cream`, `slate`→`steel`) is mechanical — ~45 call sites — and is the
+point of the exercise: the code should read as the brand palette, not as a
+private vocabulary that has to be translated.
+
+**Surfaces and derived shades** — kept, but documented as *not brand colours*:
+
+- `--color-paper` `#FBFAF6` — the page canvas. Your decision: it stays. It is a
+  near-white surface, warmer than white, with the grain plate supplying the
+  texture on top. Now named as a surface token so it stops reading as drift.
+- `--color-ink-soft` `#1C2320`, `--color-ink-deep` `#070B09` — elevated dark
+  surface, and the footer's floor.
+- `--color-copper-deep` `#975C34` — **re-derived** (copper × 0.75). Copper is
+  only 3.14:1 on paper, so `--accent-text` on light fields still needs a
+  darkened shade; this one lands 5.16:1. Replaces `--color-amber-deep`.
+- `--color-green-field` `#284836` — flat fallback under `.plate-ridge-forest`.
+- **Dropped:** `--color-sage` (unused), `--color-oat` (Stone takes over
+  `--bg-elevated`), `--color-amber-deep` (superseded).
+
+### Contrast — re-measured against the locked palette
+
+Every measured claim in `globals.css` involving amber, slate or stone is
+invalidated by these changes. All recomputed; **everything still clears, and two
+things improve.**
+
+| Pair | Ratio | Verdict |
+|---|---|---|
+| INK on PAPER — body, headings | 17.57:1 | ✅ |
+| STEEL on PAPER — muted body *(was slate 5.59)* | 5.71:1 | ✅ AA |
+| GREEN on PAPER — pull quote | 8.43:1 | ✅ |
+| CREAM on GREEN — `.btn-primary` label | 7.81:1 | ✅ |
+| STONE on INK — muted on dark *(was 10.75)* | 12.18:1 | ✅ improves |
+| COPPER on INK — `--accent-text` dark *(was 6.41)* | 5.59:1 | ✅ AA |
+| INK on COPPER — Subscribe / CTA labels | 5.59:1 | ✅ AA |
+| COPPER on PAPER | 3.14:1 | ❌ never text on light — hence `copper-deep` |
+| STEEL on INK | 3.08:1 | ❌ never text on dark — Stone is the dark muted |
+
+Component-level re-measurements:
+
+- **`.stat-band`** (copper field): figures INK 5.59:1; labels at `ink/0.85`
+  **4.63:1** (was 5.2:1 — still clears AA, and `ink/0.80` would not at 4.27:1,
+  so 0.85 is now the floor rather than a preference); hairline at `ink/0.25`
+  1.53:1, unchanged in effect.
+- **`.wash-read`** table rewritten: CREAM 4.05→**7.30:1**, STONE 3.03→**5.46:1**
+  (up from 4.83), COPPER 1.39→**2.51:1**. The note that copper is unusable as
+  text on this plate gets *stronger*, not weaker.
+- **`.plate-aisle`** + `.scrim-panel` at the foot: CREAM 11.03:1, STONE 8.25:1,
+  COPPER **3.79:1** — clears the 3:1 large-text bar, so the `FeatureMorph`
+  headline is fine. Its comment currently claims 5.8:1, which is simply wrong;
+  correct it to 3.79:1.
+- **`.material-smoked`**: the 0.34 fill floor was derived from the *old* Stone at
+  4.59:1. New Stone gives **5.19:1** at the same fill, and would still hold
+  4.76:1 at 0.28. Real headroom now exists. **Recording it, not spending it** —
+  opening the cards up is a visual decision, not a cleanup.
+
+### Typography
+
+Only the **body family** changes. The Newsreader weight ladder stays exactly as
+built — your call, and it is the version that has been reviewed on screen.
+
+- **Display — Newsreader, weights unchanged:** `h1` 300 (Light), `h2` 400,
+  `h3`–`h5` 500, `.statement` 400, `.stat-figure` 400. Nothing to do here beyond
+  dropping the `TRIAL` marker on the `h1` 300 rule, which is now settled rather
+  than provisional. The `font-normal` overrides on `h3` in `NewModel` and
+  `Products` **stay** — with the base rule at 500 they are still load-bearing,
+  and their comments explaining why are still accurate.
+- **Functional — Instrument Sans**, as `--font-body`: body copy, buttons, nav,
+  eyebrows, labels. **Inter is dropped entirely** (referenced only in
+  `layout.tsx`). `--font-intro` and its one-paragraph hero override collapse into
+  `--font-body` — the trial is simply adopted.
+- Instrument Sans must load as a **variable** font, not `weight: ["400"]` as
+  now: buttons need 600, nav and eyebrows 500.
+- ⚠️ `body { letter-spacing: -0.011em }` was tuned for Inter's metrics. Carried
+  over unchanged, flagged for a look on screen — a tracking judgement, not
+  something to guess at.
+
+## A.3 To do
+
+**1 — Palette & type migration** (visible change, do it first and review it)
+- [ ] Rename tokens to the brand names; add `--color-paper` as a documented surface
+- [ ] Move copper to `#C97B45`, Steel to `#5C665F`, Stone to `#D8D2C4`
+- [ ] Re-derive `--color-copper-deep` `#975C34`; drop `sage`, `oat`, `amber-deep`
+- [ ] Instrument Sans → `--font-body` as a variable font; remove Inter and `--font-intro`
+- [ ] Leave every Newsreader weight untouched; drop only the `TRIAL` marker on `h1`
+- [ ] Replace all four hardcoded hexes with tokens
+- [ ] Update every measured contrast comment to the A.2 figures
+
+**2 — Remove the dead elements**
+- [ ] Delete `OrbitMark.tsx`, the 11 dead classes, `@keyframes orbit-spin`
+- [ ] Delete the 18 unused images (~2.7 MB)
+- [ ] Make `products[].image` optional; drop the two `hero-aisle` placeholders
+- [ ] Downscale the client logos — 3840×2160 PNGs rendered at ~65px tall
+
+**3 — Centralise the duplicated mechanics**
+- [ ] `components/motion/MorphPanel.tsx` — one card ↔ full-bleed morph, both
+      directions, returning its timeline so `ATBOS` can chain onto it
+- [ ] `--panel-radius` / `--panel-pad` tokens; `--panel-pad` shared with `.shell`
+- [ ] `lib/motion.ts` — the eases, durations, viewport margin and scrub, read
+      from the CSS tokens rather than retyped
+- [ ] `lib/usePrefersReducedMotion.ts` — one hook, replacing all three patterns
+- [ ] `components/motion/GradedImage.tsx` — the grade + grain + vignette trio
+- [ ] Collapse the plate classes into `.plate` + `--plate-image` / `--plate-veil`,
+      with per-plate classes carrying only their two values and their measurement note
+
+**4 — Restructure** (agreed: full)
+- [ ] `components/layout/` ← `Nav`, `Footer`, `SignupForm`
+- [ ] `FeatureMorph` → `components/sections/CapabilityGap.tsx`
+- [ ] `HeroMorph` → `sections/Hero.tsx`; the logo strip → `sections/Clients.tsx`;
+      compose both in `app/page.tsx`
+- [ ] `lib/content.ts` — section copy out of the components; SVG icons stay put
+- [ ] Split `globals.css` into `app/styles/{tokens,base,materials,components}.css`
+
+**5 — Comments: state, not history**
+- [ ] Rewrite to present tense. **Preserve every measured number** and every
+      load-bearing warning — specifically: the sticky/`overflow-hidden` note in
+      `NewModel`, the `.bleed-right` derivation, `WordReveal`'s
+      observer-on-the-wrapper note, `DrawRule`'s one-transform-per-element rule,
+      `FilmGrade`'s why-SVG-not-CSS reasoning, `Logo`'s geometry, and
+      `.plate-drive`'s 78% crop derivation
+- [ ] Remove `TRIAL` / `PLACEHOLDER` / `INTERIM` markers now resolved; delete the
+      stale `.btn-primary` note in `Products.tsx`
+
+**6 — Tooling & docs**
+- [ ] Add ESLint + `eslint-config-next` and the `lint` script the README already
+      documents — this is the check that would have caught most of the above
+- [ ] Rewrite `README.md`: correct typefaces, real page order, real component
+      tree, `/insights` noted as a known placeholder
+- [ ] Add a v3 revision note to brief §2.2 / §2.5 recording the locked palette
+      and type, so the brief stops contradicting the build
+- [ ] Fix `CLAUDE.md`'s `/docs/brand/` → `briefs/`
+
+**7 — Verify**
+- [ ] `tsc --noEmit` and `next build` clean
+- [ ] Homepage reviewed at 360 / 768 / 1024 / 1440 against the current live site
+- [ ] Reduced-motion pass — every section still legible and complete
+- [ ] Keyboard pass — focus visible against the new copper outline
+
+## A.4 Decisions taken
+
+| Question | Decision |
+|---|---|
+| The `#C97B45` trials | **Adopted.** Copper *is* the locked accent; it becomes `--color-copper`. |
+| Instrument Sans trial | **Adopted and widened** to the functional face. Inter dropped. |
+| Newsreader weights | **Unchanged** — `h1` 300, `h2` 400, `h3`–`h5` 500, `.statement` / `.stat-figure` 400. The brief note in item 6 records this actual ladder, not "Light throughout". |
+| Page canvas | **Stays Paper White `#FBFAF6`**, documented as a surface token rather than a brand colour. |
+| `ClosingBand` | **Stays on `/insights`.** Not restored to the homepage. `.duotone` and `glass-planes.webp` therefore survive; `/insights` is recorded as a known placeholder. |
+| Restructure depth | **Full.** |
+
+## A.5 Explicitly out of scope
+
+- Wiring `SignupForm` to a provider — still a validated UI stub.
+- Building the remaining pages. This pass is the foundation for them.
+- Opening up `.material-smoked` to use the new Stone headroom (a visual call).
+- Retuning body tracking for Instrument Sans (flagged, needs eyes on screen).
+- The v2 record below in this file. It is the history; it stays.
+
+## A.6 Review
+
+*To be completed once the work is done.*
 
 ---
 

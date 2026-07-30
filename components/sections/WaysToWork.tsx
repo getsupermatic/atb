@@ -4,10 +4,10 @@ import Reveal from "@/components/motion/Reveal";
 
 /**
  * Icons built from the brand's orbit + node motif — one per engagement model.
- * Warm Chalk shapes on the dark section, with the Clay Amber node as the accent.
+ * Cream shapes on the dark section, with the Copper node as the accent.
  */
-const stroke = { fill: "none", stroke: "var(--color-chalk)", strokeWidth: 4, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-const node = { fill: "var(--color-amber)" };
+const stroke = { fill: "none", stroke: "var(--color-cream)", strokeWidth: 4, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+const node = { fill: "var(--color-copper)" };
 
 // Subscribe & Deploy — a node in orbit: plug into the system that's already running.
 function DeployIcon() {
@@ -68,12 +68,13 @@ export default function WaysToWork() {
           supplied asset is already a clean monochrome, so there is no legacy hue
           to strip and the wrapper's soft-light layer would only muddy it.
           No extra veil either, which is worth recording because the plate is a
-          bright one — brightest pixel (247,242,233), where Warm Chalk alone would
+          bright one — brightest pixel (247,242,233), where Cream alone would
           be 1.01:1. .scrim-side is what covers it: unlike the other scrims it
           never fades out, bottoming at ink 0.58 on the right, and the cards add
-          their own smoked glass on top. Measured worst case — Warm Stone at
-          text-sm inside a card top over the plate's brightest pixel — lands past
-          6:1, so an additional veil would only bury the texture. */}
+          their own smoked glass on top. Measured worst case — Stone at
+          text-sm in a card over the plate's brightest pixel — lands at 5.19:1,
+          so an additional veil would only bury the texture. See the note on
+          .material-smoked for that measurement. */}
       <div aria-hidden className="absolute inset-0">
         <Image src="/images/tex-light-aisle.webp" alt="" fill sizes="100vw" className="object-cover" />
       </div>
@@ -98,16 +99,13 @@ export default function WaysToWork() {
           ))}
         </ol>
 
-        {/* Clay Amber fill rather than the Deep Forest .btn-primary, following
-            the footer's Subscribe button. The label has to go to Ink: Chalk on
-            this copper is 2.5:1 and fails normal-size text, where Ink is 6.4:1.
-            Uses the --color-amber token rather than the hardcoded #C97B45 the
-            other two copper elements carry, so if that trial is adopted this
-            follows the token automatically. */}
+        {/* Copper fill rather than the Green .btn-primary, following the
+            footer's Subscribe button. The label has to go to Ink: Cream on
+            Copper is 2.18:1 and fails normal-size text, where Ink is 5.59:1. */}
         <Reveal delay={0.1}>
           <Link
             href="/contact"
-            className="btn btn-primary mt-10 bg-[color:var(--color-amber)] text-[color:var(--color-ink)]"
+            className="btn btn-primary mt-10 bg-[color:var(--color-copper)] text-[color:var(--color-ink)]"
           >
             Get in Contact
           </Link>

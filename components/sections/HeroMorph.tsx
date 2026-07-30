@@ -104,15 +104,13 @@ export default function HeroMorph() {
                       short enough that no max-measure constraint is needed.
                       Newsreader at the base h1 settings — size only here, so it
                       matches the headings further down the page. */}
-                  <motion.h1 className="text-6xl text-[color:var(--color-chalk)]" {...stagger(0)}>
+                  <motion.h1 className="text-6xl text-[color:var(--color-cream)]" {...stagger(0)}>
                     The future,
                     <br />
                     put to work.
                   </motion.h1>
-                  {/* TRIAL — Instrument Sans regular in place of the Inter body
-                      face, this paragraph only. See --font-intro. */}
                   <motion.p
-                    className="mt-5 max-w-[44ch] font-normal text-base text-[color:var(--text-muted)] font-[family-name:var(--font-intro)]"
+                    className="mt-5 max-w-[44ch] text-base text-[color:var(--text-muted)]"
                     {...stagger(1)}
                   >
                     We work at the beyond: where emerging technology meets the real world. We turn
@@ -120,12 +118,11 @@ export default function HeroMorph() {
                     solutions for the people at the heart of your business.
                   </motion.p>
                   <motion.div className="mt-7 flex flex-wrap items-center gap-3" {...stagger(2)}>
-                    {/* Warm Chalk fill with an Ink label rather than the Deep
-                        Forest .btn-primary — 17.8:1, and the only light-filled
+                    {/* Cream fill with an Ink label rather than the Green .btn-primary — 16.28:1, and the only light-filled
                         button on the site. */}
                     <Link
                       href="/contact"
-                      className="btn btn-primary bg-[color:var(--color-chalk)] text-[color:var(--color-ink)]"
+                      className="btn btn-primary bg-[color:var(--color-cream)] text-[color:var(--color-ink)]"
                     >
                       Talk to us
                     </Link>

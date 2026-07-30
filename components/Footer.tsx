@@ -75,7 +75,7 @@ export default function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-[0.95rem] text-[color:var(--color-chalk)]/85 transition-colors hover:text-[color:var(--color-amber)]"
+                      className="text-[0.95rem] text-[color:var(--color-cream)]/85 transition-colors hover:text-[color:var(--color-copper)]"
                     >
                       {link.label}
                     </Link>
@@ -83,12 +83,12 @@ export default function Footer() {
                 ))}
               </ul>
               {group === "More" && (
-                <div className="mt-5 flex items-center gap-4 text-[color:var(--color-chalk)]/85">
+                <div className="mt-5 flex items-center gap-4 text-[color:var(--color-cream)]/85">
                   <a
                     href={site.social.linkedin}
                     aria-label="ATB. on LinkedIn"
                     rel="me noopener"
-                    className="transition-colors hover:text-[color:var(--color-amber)]"
+                    className="transition-colors hover:text-[color:var(--color-copper)]"
                   >
                     <LinkedInIcon />
                   </a>
@@ -96,7 +96,7 @@ export default function Footer() {
                     href={site.social.x}
                     aria-label="ATB. on X"
                     rel="me noopener"
-                    className="transition-colors hover:text-[color:var(--color-amber)]"
+                    className="transition-colors hover:text-[color:var(--color-copper)]"
                   >
                     <XIcon />
                   </a>

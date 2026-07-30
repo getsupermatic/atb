@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Newsreader, Inter, Instrument_Sans } from "next/font/google";
+import { Newsreader, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 import Nav from "@/components/Nav";
@@ -18,20 +18,13 @@ const newsreader = Newsreader({
   display: "swap",
 });
 
-// Body + all UI copy (buttons, nav, eyebrows, labels).
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-// TRIAL — currently only the hero intro paragraph (--font-intro). Loaded at
-// regular alone, so it costs one extra weight; drop this if the trial doesn't
-// stick, or move --font-body onto it if it does.
+// Everything functional: body copy, buttons, nav, eyebrows, labels. Loaded as a
+// variable font rather than a fixed weight list — the type system uses 400
+// (body), 500 (nav, eyebrows) and 600 (buttons), and one variable file covers
+// the range for less than three static cuts would cost.
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
   subsets: ["latin"],
-  weight: ["400"],
   display: "swap",
 });
 
@@ -98,7 +91,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${newsreader.variable} ${inter.variable} ${instrumentSans.variable}`}
+      className={`${newsreader.variable} ${instrumentSans.variable}`}
     >
       <body>
         <script
@@ -116,7 +109,7 @@ export default function RootLayout({
         <FilmGrade />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-full focus:bg-[color:var(--color-amber)] focus:px-5 focus:py-2 focus:text-[color:var(--color-ink)]"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[110] focus:rounded-full focus:bg-[color:var(--color-copper)] focus:px-5 focus:py-2 focus:text-[color:var(--color-ink)]"
         >
           Skip to content
         </a>

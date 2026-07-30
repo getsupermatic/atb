@@ -31,8 +31,7 @@ const stats = [
 export default function Problem() {
   return (
     <section className="section relative overflow-hidden" aria-label="The problem">
-      {/* No section background of its own — the iridescent plate and the Warm
-          Chalk veil that used to sit here are both gone, so the page's own
+      {/* No section background of its own — the iridescent plate and the Cream veil that used to sit here are both gone, so the page's own
           textured canvas reads straight through this section. */}
 
       <div className="shell relative z-10">
@@ -98,12 +97,11 @@ export default function Problem() {
 
       <div className="shell relative z-10">
         <Reveal delay={0.1}>
-          {/* TRIAL — Deep Forest rather than the Deep Pine that .statement carries
-              via --heading. 9.0:1 on the paper canvas, so it clears AA for body
-              text let alone this size. Drop the text-[color:…] class to revert.
-              --color-forest, not the #C97B45 the other trials hardcode: this is
-              the palette's green, and if it moves the quote follows. */}
-          <p className="statement mx-auto mt-20 max-w-[24ch] text-center text-4xl text-[color:var(--color-forest)]">
+          {/* Green rather than the Ink that .statement carries via --heading —
+              the pull quote is the one place the display accent is used on a
+              light field. 8.43:1 on the paper canvas, so it clears AA for body
+              text let alone at this size. */}
+          <p className="statement mx-auto mt-20 max-w-[24ch] text-center text-4xl text-[color:var(--color-green)]">
             &ldquo;The technology is ready. The customer frontline is waiting. What&rsquo;s been
             missing is a partner who can actually ship.&rdquo;
           </p>

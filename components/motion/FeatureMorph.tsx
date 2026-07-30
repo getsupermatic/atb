@@ -61,12 +61,12 @@ export default function FeatureMorph() {
             className="relative w-full overflow-hidden min-h-[62vh]"
             style={{ borderRadius: "1.75rem" }}
           >
-            {/* The defocused aisle plate, in place of the Deep Forest ridge field
+            {/* The defocused aisle plate, in place of the Green ridge field
                 (which has moved to the ATBOS panel). Decorative, so no alt text.
                 .scrim-panel is back, and this time it is load-bearing rather than
                 the black-gradient artefact it was over a flat green field: the
                 copy is bottom-anchored, the scrim ramps to ink 0.78 exactly there,
-                and the amber line cannot clear 3:1 on this plate without it — see
+                and the Copper line cannot clear 3:1 on this plate without it — see
                 the note on .plate-aisle for the measurements. */}
             <div aria-hidden className="plate-aisle absolute inset-0" />
             <div aria-hidden className="scrim-panel absolute inset-0" />
@@ -81,13 +81,14 @@ export default function FeatureMorph() {
                     follow --text-*. Lifted 4% in step with the scale floors —
                     kept to that, because this narrow-viewport value is what
                     stopped this bottom-anchored heading clipping on mobile. */}
-                <h2 className="max-w-[18ch] text-[2.45rem] text-[color:var(--color-chalk)] sm:text-5xl">
+                <h2 className="max-w-[18ch] text-[2.45rem] text-[color:var(--color-cream)] sm:text-5xl">
                   Capability now advances by the month.{" "}
-                  {/* TRIAL — hardcoded #C97B45 in place of --color-amber
-                      (#cc8a55) for this line only. 5.8:1 on the panel, so it
-                      still clears large-text contrast. Put the token back to
-                      revert, or move --color-amber if the trial sticks. */}
-                  <span className="text-[#C97B45]">
+                  {/* Copper against the plate's brightest pixel at the foot,
+                      where .plate-aisle's veil and .scrim-panel combine to
+                      0.857 coverage: 3.79:1. That clears the 3:1 large-text
+                      bar and nothing more, so this line has to stay at display
+                      size — see the note on .plate-aisle. */}
+                  <span className="text-[color:var(--color-copper)]">
                     Most frontline tools still change by the year.
                   </span>
                 </h2>
