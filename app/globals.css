@@ -121,8 +121,6 @@
   --accent-display: var(--heading);
   --border: rgb(var(--ink-rgb) / 0.14);
   --field-bg: rgb(var(--cream-rgb) / 0.55);
-  --glass-tint: rgb(var(--cream-rgb) / 0.62);
-  --glass-edge: rgb(var(--cream-rgb) / 0.75);
 }
 
 .theme-dark {
@@ -139,8 +137,6 @@
   --accent-display: var(--color-green);
   --border: rgb(var(--cream-rgb) / 0.16);
   --field-bg: rgb(var(--ink-rgb) / 0.5);
-  --glass-tint: rgb(var(--ink-rgb) / 0.45);
-  --glass-edge: rgb(var(--cream-rgb) / 0.14);
   background-color: var(--bg);
   color: var(--text);
 }
@@ -355,23 +351,6 @@
     }
   }
 
-  /* Frosted glass — soft luminous surface on light fields */
-  .material-glass {
-    background:
-      linear-gradient(
-        135deg,
-        var(--glass-tint),
-        rgb(var(--cream-rgb) / 0.4) 45%,
-        rgb(var(--cream-rgb) / 0.5)
-      ),
-      var(--bg-elevated);
-    backdrop-filter: blur(14px) saturate(1.1);
-    border: 1px solid var(--glass-edge);
-    box-shadow:
-      0 1px 0 rgb(var(--cream-rgb) / 0.4) inset,
-      0 20px 50px -30px rgb(var(--ink-rgb) / 0.5);
-  }
-
   /* Smoked glass — dark translucent for dark sections. Held at 0.34 so the
      tex-light-aisle plate reads through the cards.
      The binding case: the third card sits where .scrim-side has bottomed out at
@@ -424,22 +403,6 @@
     );
   }
 
-  /* Steeper bottom weight — small cards where text sits at the base.
-     Carries a warm Copper note through the midtones so the desaturated
-     legacy plates underneath read clay rather than flat grey. */
-  /* Measured: the copy in these cards starts at ~39% of the card height, so the
-     ink is at full strength by 40% and the warm luminous band is kept to the
-     top third. Reads as a smoked card over the plate rather than a wash. */
-  .scrim-card {
-    background: linear-gradient(
-      180deg,
-      rgb(var(--ink-rgb) / 0.35) 0%,
-      rgb(var(--copper-rgb) / 0.28) 18%,
-      rgb(var(--ink-rgb) / 0.88) 40%,
-      rgb(var(--ink-rgb) / 0.97) 100%
-    );
-  }
-
   /* Horizontal — copy on the left, imagery breathing to the right */
   .scrim-side {
     background: linear-gradient(
@@ -480,20 +443,6 @@
     );
   }
 
-  /* Cream veils — lift light sections off their imagery */
-  .veil-chalk {
-    background: rgb(var(--cream-rgb) / 0.62);
-  }
-
-  .veil-chalk-radial {
-    background: radial-gradient(
-      120% 90% at 50% 40%,
-      rgb(var(--cream-rgb) / 0.82) 0%,
-      rgb(var(--cream-rgb) / 0.58) 55%,
-      rgb(var(--cream-rgb) / 0.38) 100%
-    );
-  }
-
   /* ----------------------------------------------------------
      Duotone — INTERIM. The photographic set was produced for the
      retired teal/lime palette. This strips the original hue and
@@ -531,16 +480,6 @@
       rgb(var(--ink-rgb) / 0.24)
     );
     mix-blend-mode: soft-light;
-  }
-
-  /* INTERIM, sibling of .duotone — for legacy plates painted as a CSS
-     background-image rather than an <img>, where the blend-mode approach
-     can't reach. Strips the retired teal/lime hue and leaves it neutral,
-     matching .duotone. Delete alongside .duotone. */
-  .plate-legacy {
-    /* Deepened further than .duotone — these plates are pale, and the card copy
-       sits over them, so the scrim needs something to bite against. */
-    filter: grayscale(1) contrast(1.14) brightness(0.86);
   }
 
   /* Ridge plate, Green — the brand's own treated ridge texture as a panel
@@ -657,26 +596,6 @@
     background-position: center;
   }
 
-  /* Lightfield plate — the supplied defocused bokeh texture, warm and dark.
-     Unlike tex-ridge-ink this one has real range (std 37 against the ridge
-     plate's 2–4, and a brightest pixel of 205,184,162), so it can't carry copy
-     bare: Cream over the raw plate falls to 1.8:1 on the brightest bokeh
-     and 2.5:1 across the top 5%.
-     Hence the flat ink veil, folded in as a gradient layer rather than a second
-     element. 0.5 is the floor that works: it puts Cream at 4.96:1 against
-     the single brightest pixel in the plate, so the heading clears AA wherever
-     `cover` happens to crop it. 0.45 would read a shade lighter but drops the
-     worst case to 4.39:1, just under.
-     Intended for a .theme-dark section, which supplies the same ink base. */
-  .plate-lightfield {
-    background-color: var(--color-ink);
-    background-image:
-      linear-gradient(rgb(var(--ink-rgb) / 0.5), rgb(var(--ink-rgb) / 0.5)),
-      url("/images/tex-lightfield.webp");
-    background-size: cover;
-    background-position: center;
-  }
-
   /* ----------------------------------------------------------
      Film grade — the supplied recipe, one line at a time:
        saturation  −100%     ┐
@@ -758,30 +677,6 @@
     will-change: transform;
   }
 
-  /* Halftone dot veil — printed-dot atmosphere over hero imagery */
-  .halftone::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image: radial-gradient(
-      rgb(var(--ink-rgb) / 0.5) 1px,
-      transparent 1.4px
-    );
-    background-size: 5px 5px;
-    mix-blend-mode: soft-light;
-    opacity: 0.5;
-  }
-
-  /* Image frame — rounded, layered edge for editorial imagery */
-  .img-frame {
-    position: relative;
-    overflow: hidden;
-    border-radius: 1.25rem;
-    border: 1px solid var(--border);
-    box-shadow: 0 30px 70px -45px rgb(var(--ink-rgb) / 0.65);
-  }
-
   /* Buttons */
   .btn {
     display: inline-flex;
@@ -827,15 +722,6 @@
     background: var(--bg-elevated);
   }
 
-  /* Inline text link — accent-safe in both themes */
-  .link-accent {
-    color: var(--accent-text);
-    font-weight: 500;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    transition: color var(--dur-base) var(--ease-standard);
-  }
-
   /* Pill field — the insights sign-up input */
   .field {
     /* 44px, not 48 — the Subscribe button stretches to this in the sm:flex-row
@@ -856,15 +742,6 @@
   }
   .field[aria-invalid="true"] {
     border-color: var(--accent);
-  }
-
-  /* The amber node dot used on the Contact pill / links */
-  .node-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 999px;
-    background: var(--color-copper);
-    flex: none;
   }
 
   /* A full-bleed Copper strip behind the Problem figures.
@@ -953,15 +830,6 @@
 /* ============================================================
    Keyframes / animation utilities
    ============================================================ */
-@keyframes orbit-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-.orbit-spin {
-  animation: orbit-spin 9s linear infinite;
-}
-
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -995,7 +863,6 @@
   .grain-overlay {
     display: none;
   }
-  .orbit-spin,
   .marquee-track {
     animation: none !important;
   }

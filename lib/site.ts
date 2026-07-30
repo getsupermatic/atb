@@ -26,17 +26,31 @@ export const primaryNav = [
   { label: "Careers", href: "/careers" },
 ] as const;
 
-export const products = [
+/**
+ * `image` is optional and present only where real artwork exists. CommerceOS and
+ * MarketingOS have none yet, and they deliberately carry no key rather than a
+ * placeholder: the Products spread renders them as type only, and a borrowed
+ * photograph there put the hero's own shot on the page twice.
+ * Add the key when artwork lands — no consumer needs changing, they just start
+ * rendering a plate.
+ */
+type Product = {
+  name: string;
+  status: string | null;
+  href: string;
+  image?: string;
+  summary: string;
+  proof: string;
+};
+
+export const products: readonly Product[] = [
   {
     name: "FrontlineOS",
     status: "Live",
     href: "/products/frontline-os",
-    // Its own photograph: a colleague on a headset serving a customer in the
-    // produce aisle — the frontline moment FrontlineOS supports. Supplied as a
-    // clean monochrome plate, so it needs no duotone; Products.tsx runs it
-    // through .grade-film instead, the same grade as the header.
-    // New filename rather than overwriting the old plate, so the swap doesn't
-    // reuse a cached URL — see the note in HeroMorph.tsx.
+    // A colleague on a headset serving a customer in the produce aisle — the
+    // frontline moment FrontlineOS supports. Already a clean monochrome plate,
+    // so Products.tsx runs it through .grade-film, the same grade as the header.
     image: "/images/product-frontline-os-mono.webp",
     summary:
       "An AI-native operating layer for frontline teams. Voice-first guidance, real-time knowledge, and a seamless line to the contact centre and back office behind them.",
@@ -46,10 +60,6 @@ export const products = [
     name: "CommerceOS",
     status: null,
     href: "/products/commerce-os",
-    // PLACEHOLDER — borrowing the FrontlineOS aisle shot until CommerceOS
-    // artwork lands. Its own plate (product-commerce.webp) is legacy teal/lime
-    // and reads wrong against the black treatment.
-    image: "/images/hero-aisle.webp",
     summary:
       "AI-native commerce that bridges frontline staff, contact-centre agents and customers. Conversational experiences that lift both service and top line.",
     proof: "15–25% revenue uplift.",
@@ -58,8 +68,6 @@ export const products = [
     name: "MarketingOS",
     status: null,
     href: "/products/marketing-os",
-    // PLACEHOLDER — see the CommerceOS note above.
-    image: "/images/hero-aisle.webp",
     summary:
       "A unified marketing intelligence and experience layer — AI-native strategy, campaign, creative and communications across your whole stack.",
     proof: "50%+ cost reduction. 10× faster campaigns.",
