@@ -37,7 +37,7 @@ export default function ATBOS() {
   const section = useRef<HTMLElement>(null);
   const pad = useRef<HTMLDivElement>(null);
   const card = useRef<HTMLDivElement>(null);
-  const logo = useRef<HTMLDivElement>(null);
+  const logo = useRef<HTMLHeadingElement>(null);
   const lines = useRef<(HTMLParagraphElement | null)[]>([]);
   const [index, setIndex] = useState(-1);
   const reduce = usePrefersReducedMotion();
@@ -159,13 +159,22 @@ export default function ATBOS() {
               units as padding below the baseline (9.9%), so aligning the two
               boxes' bottoms would float the mark above the OS baseline — hence
               the marginBottom nudge, which is that padding cancelled out. */}
-          <div
+          {/* A real h2, not a div with role="img": the wordmark IS this
+              section's heading, and the statements below it are only
+              attributable to ATBOS — for the document outline, and for the
+              passage-level extraction search engines and LLMs do — if a heading
+              element says so. The accessible name moves to an sr-only span
+              rather than an aria-label, because role="img" would have replaced
+              the heading role in the accessibility tree. Every inherited h2
+              style is already overridden here (font-family and letter-spacing
+              on the OS span, font-size inline, and Tailwind's preflight resets
+              heading size and margin), so nothing moves. */}
+          <h2
             ref={logo}
             className="flex items-start justify-center"
             style={{ fontSize: "clamp(40px, 5.5vw, 72px)" }}
-            role="img"
-            aria-label="ATBOS"
           >
+            <span className="sr-only">ATBOS</span>
             {/* Both nudges live on the mark, not the OS: the mark inherits the
                 container's font-size, so 1em here is unambiguous, whereas an em
                 on the OS span would resolve against its own larger font-size.
@@ -181,7 +190,11 @@ export default function ATBOS() {
               height="1em"
               style={{ marginRight: "-0.278em" }}
             />
+            {/* aria-hidden so the composed glyphs don't re-read as "ATBOS OS"
+                over the sr-only name above. The Logo hides itself already —
+                it sets aria-hidden whenever no `label` is passed. */}
             <span
+              aria-hidden
               style={{
                 fontFamily: "var(--font-display)",
                 /* Half the mark's ascender height, raised so its cap line sits
@@ -201,7 +214,7 @@ export default function ATBOS() {
             >
               OS
             </span>
-          </div>
+          </h2>
 
           {reduce ? (
             <div className="mt-10 flex max-w-[44rem] flex-col gap-6">

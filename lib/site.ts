@@ -13,7 +13,7 @@ export const site = {
   description:
     "At The Beyond is an AI-native product and consulting company built for the customer frontline. We imagine, build and forward-deploy AI products for everywhere your business meets the customer — operations, commerce and marketing.",
   social: {
-    linkedin: "https://www.linkedin.com/company/at-the-beyond",
+    linkedin: "https://www.linkedin.com/company/atbeyond",
     x: "https://x.com/atbeyond",
   },
 } as const;
