@@ -216,7 +216,7 @@ For the customer frontline.
 
 Every boardroom has an AI strategy. Every consultancy has a transformation deck. Every vendor has a demo. But the shop floor, the warehouse and the drive-through are running the same software they had five years ago.
 
-Frontier capability advances every month. The value reaching frontline teams and their customers barely moves. Strategy decks don't close that gap. Only shipped products do.
+Frontier capability moves quickly. The value reaching frontline teams and their customers does not. Strategy matters — but only shipped, adopted products close the gap.
 
 *Stat band (from your material — 80% stat deliberately omitted):*
 - **100M+** frontline workers in the US alone, across retail, manufacturing, healthcare and logistics — the largest, most underserved workforce for AI-driven productivity.
@@ -234,9 +234,9 @@ Frontier capability advances every month. The value reaching frontline teams and
 *(Four-pillar module from §1.6)*
 
 - **Products, not seats.** Production-ready AI Blueprints you subscribe to and deploy — not licences for generic UX.
-- **Shaped to your reality.** We start from our IP and customise to how your business actually runs — accelerating delivery, not starting from scratch.
-- **Frontier, in weeks.** We co-create new capabilities at the edge of what's possible — without the quarter-long discovery phase.
-- **Outcomes, not hours.** Commercial models tied to the value we create, not people multiplied by rates. We succeed when you do.
+- **Shaped to your reality.** Start from our IP and customise to how your business actually runs — accelerating delivery without starting from scratch.
+- **Frontier, in weeks.** Co-create new capabilities at the edge of what is possible — with rapid pilots tested in real operating environments.
+- **Outcomes, not hours.** Use commercial models tied to the value created and the IP leveraged, not people multiplied by rates.
 
 ---
 
@@ -247,13 +247,13 @@ Frontier capability advances every month. The value reaching frontline teams and
 Subscribe to a ready-made Blueprint, customise one to your exact needs, or co-create something entirely new at the frontier.
 
 **AI Blueprints — Subscribe & Deploy**
-Immediate access to production-grade frontline AI. We host and run it; you deploy from day one.
+Immediate access to a production-ready product. Fully managed, maintained and continuously improved.
 
 **Forward Deploy — Customise & Accelerate**
-Our Blueprints, shaped to your brand, workflows and systems. Leading practice, live fast.
+Our Blueprints, shaped to your brand, workflows, systems and operating reality.
 
 **Frontier Advisory — Co-Innovate & Pioneer**
-New capabilities built with your team at the edge of what AI can do.
+New capabilities built with your team at the edge of what AI can do — tested in the real world.
 
 **[CTA]** How we work →
 
@@ -266,7 +266,7 @@ New capabilities built with your team at the edge of what AI can do.
 AI products for where your business meets the customer — operations, commerce and marketing.
 
 **FrontlineOS** · *Live*
-An AI-native operating layer for frontline teams. Voice-first guidance, real-time knowledge, and a seamless line to the contact centre and back office behind them. *40%+ frontline productivity. Live with Burger King UK.*
+An AI-native operating layer for frontline teams. Integrated with the common platforms and tools — from scheduling systems to SOP libraries — to provide a single, unified view, with voice-first guidance, real-time knowledge and a seamless connection to central operations and the back office. *40%+ frontline productivity. Live with Burger King UK.*
 **[CTA]** See the live product →
 
 **CommerceOS**

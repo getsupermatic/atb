@@ -120,15 +120,15 @@ export const pillars = [
   },
   {
     title: "Shaped to your reality.",
-    body: "We start from our IP and customise to how your business actually runs — accelerating delivery, not starting from scratch.",
+    body: "Start from our IP and customise to how your business actually runs — accelerating delivery without starting from scratch.",
   },
   {
     title: "Frontier, in weeks.",
-    body: "We co-create new capabilities at the edge of what's possible — without the quarter-long discovery phase.",
+    body: "Co-create new capabilities at the edge of what is possible — with rapid pilots tested in real operating environments.",
   },
   {
     title: "Outcomes, not hours.",
-    body: "Commercial models tied to the value we create, not people multiplied by rates. We succeed when you do.",
+    body: "Use commercial models tied to the value created and the IP leveraged, not people multiplied by rates.",
   },
 ] as const;
 
@@ -141,19 +141,19 @@ export const engagementModels = [
     icon: "deploy",
     name: "Subscribe & Deploy",
     kicker: "AI Blueprints",
-    body: "Immediate access to production-grade frontline AI. We host and run it; you deploy from day one.",
+    body: "Immediate access to a production-ready product. Fully managed, maintained and continuously improved.",
   },
   {
     icon: "forward",
     name: "Customise & Accelerate",
     kicker: "Forward Deploy",
-    body: "Our Blueprints, shaped to your brand, workflows and systems. Leading practice, live fast.",
+    body: "Our Blueprints, shaped to your brand, workflows, systems and operating reality.",
   },
   {
     icon: "frontier",
     name: "Co-Innovate & Pioneer",
     kicker: "Frontier Advisory",
-    body: "New capabilities built with your team at the edge of what AI can do.",
+    body: "New capabilities built with your team at the edge of what AI can do — tested in the real world.",
   },
 ] as const;
 

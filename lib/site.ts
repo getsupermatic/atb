@@ -53,7 +53,7 @@ export const products: readonly Product[] = [
     // so Products.tsx runs it through .grade-film, the same grade as the header.
     image: "/images/product-frontline-os-mono.webp",
     summary:
-      "An AI-native operating layer for frontline teams. Voice-first guidance, real-time knowledge, and a seamless line to the contact centre and back office behind them.",
+      "An AI-native operating layer for frontline teams. Integrated with the common platforms and tools — from scheduling systems to SOP libraries — to provide a single, unified view, with voice-first guidance, real-time knowledge and a seamless connection to central operations and the back office.",
     proof: "40%+ frontline productivity.",
   },
   {

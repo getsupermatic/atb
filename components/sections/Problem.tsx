@@ -24,9 +24,9 @@ export default function Problem() {
                 running the same software they had five years ago.
               </p>
               <p>
-                Frontier capability advances every month. The value reaching frontline teams and
-                their customers barely moves. Strategy decks don&rsquo;t close that gap. Only shipped
-                products do.
+                Frontier capability moves quickly. The value reaching frontline teams and their
+                customers does not. Strategy matters &mdash; but only shipped, adopted products close
+                the gap.
               </p>
             </div>
           </Reveal>
