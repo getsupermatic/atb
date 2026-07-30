@@ -4,7 +4,7 @@
 
 ## Standard Workflow
 
-1. First, think through the problem, read the codebase for relevant files and review /docs/brand/ files for brand alignment, then write a plan to PROJECTPLAN.md.
+1. First, think through the problem, read the codebase for relevant files and review the brief and copy deck in /briefs/ for brand alignment, then write a plan to PROJECTPLAN.md.
 2. The plan should also have a list of to-do items that you can check off as you complete them.
 3. Before you begin working, check in with me and I’ll verify the plan.
 4. Then, begin working on the to-do items, marking them as complete as you go.

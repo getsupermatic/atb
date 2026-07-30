@@ -26,18 +26,16 @@ import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 type Mode = "top" | "hidden" | "docked";
 
 /**
- * How long the lockup sits fully written out before it collapses; the collapse
+ * How long the lockup sits fully written out before it collapses. The collapse
  * itself then takes 520ms (Logo's own transition), and the links ride that same
  * 520ms leftward because the logo is in flow — see the row below.
  *
- * This runs on every page load, not once per session. It used to be gated on an
- * `atb-intro` sessionStorage key, but the gate is unreadable during SSR: the
- * server always rendered the lockup expanded, so on a gated load it painted
- * written-out and then snapped shut the moment the effect below hydrated — the
- * hold never ran and the collapse read as an instant flash. Playing it every
- * time is the honest version of the same gesture. Only full document loads
- * trigger it; the header lives in the layout, so client-side route changes don't
- * remount it.
+ * It plays on every full page load, deliberately, and NOT once per session. A
+ * sessionStorage gate cannot work here: the value is unreadable during SSR, so
+ * the server always renders the lockup expanded, and on a gated load the page
+ * painted written-out and then snapped shut the instant the effect hydrated —
+ * the hold never ran and the collapse read as a flash. Client-side route changes
+ * don't remount it, because the header lives in the layout.
  */
 const HOLD_MS = 2000;
 
@@ -46,23 +44,35 @@ export default function Nav() {
   const { scrollY } = useScroll();
   const [mode, setMode] = useState<Mode>("top");
   const [open, setOpen] = useState(false);
-  const [phase, setPhase] = useState<"full" | "mono">("full");
+  /** True while the opening hold is still running — see HOLD_MS. */
+  const [holding, setHolding] = useState(true);
   const [hovered, setHovered] = useState(false);
-  const showFull = phase === "full" || hovered;
+  /**
+   * Derived rather than stored. Under reduced motion the lockup starts collapsed
+   * instead of the effect below immediately setting it that way, which would be a
+   * synchronous setState in an effect — a cascading render, and the reason React's
+   * lint flags the pattern. Hover still expands it either way; Logo's own
+   * transition is 0ms under reduced motion, so it snaps rather than animating.
+   */
+  const showFull = (holding && !reduce) || hovered;
 
   useEffect(() => {
-    if (reduce) {
-      setPhase("mono");
-      return;
-    }
-    const t = setTimeout(() => setPhase("mono"), HOLD_MS);
+    if (reduce) return;
+    const t = setTimeout(() => setHolding(false), HOLD_MS);
     return () => clearTimeout(t);
   }, [reduce]);
 
   // A reload can restore a mid-page scroll position, where the bare Cream
   // treatment would be invisible over light content. Dock immediately in that
   // case rather than waiting for the first scroll event.
+  //
+  // This genuinely has to be an effect: window.scrollY does not exist during SSR,
+  // so it cannot seed useState, and nothing else fires until the visitor scrolls.
+  // It runs once on mount and is exactly the "synchronise with an external system"
+  // case the rule exists to allow — but the rule cannot tell that apart, so it is
+  // suppressed here rather than worked around.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (window.scrollY > 8) setMode("docked");
   }, []);
 
@@ -100,22 +110,19 @@ export default function Nav() {
             onFocus={() => setHovered(true)}
             onBlur={() => setHovered(false)}
           >
-            {/* One logo, not two. This used to crossfade a `mono` monogram
-                against a `full` lockup — and the two were different typefaces in
-                different cases (lowercase `atb.` against uppercase
-                "AT THE BEYOND."), at different heights, dissolving through a
-                blur. Nothing about that could read as the letters expanding.
-                Logo now carries both states in one set of paths and animates
-                between them; the wrapper's width animates with it, so the link's
-                own hover area grows to cover the revealed letters instead of
-                collapsing the moment the cursor moves right. */}
-            {/* In flow, deliberately: the logo's own width transition is the
-                nav's layout animation. As the lockup writes out the anchor grows
-                and the links and CTA slide right; as it collapses they ride the
-                same 520ms back. Taking it out of flow (a fixed-width span with
-                the logo absolute) avoids the reflow but kills that gesture. The
-                links shrink-wrap and the row is justify-between, so the movement
-                is absorbed by the gaps — see min-w-0 on the list. */}
+            {/* One logo carrying both states in a single set of paths, animating
+                between them — not two wordmarks crossfading, which cannot read as
+                letters expanding. The wrapper's width animates with it, so the
+                link's own hover area grows to cover the revealed letters instead
+                of collapsing the moment the cursor moves right.
+
+                In flow, deliberately: the logo's own width transition IS the nav's
+                layout animation. As the lockup writes out, the anchor grows and
+                the links and CTA slide right; as it collapses they ride the same
+                520ms back. Taking it out of flow (a fixed-width span with the logo
+                absolute) would avoid the reflow but kill that gesture. The links
+                shrink-wrap and the row is justify-between, so the movement is
+                absorbed by the gaps — hence min-w-0 on the list. */}
             <Logo height={31} expanded={showFull} />
           </Link>
 

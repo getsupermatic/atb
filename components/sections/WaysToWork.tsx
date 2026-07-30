@@ -59,17 +59,16 @@ const ICONS = {
 export default function WaysToWork() {
   return (
     <section className="theme-dark section relative overflow-hidden" aria-label="Three ways to work with us">
-      {/* tex-light-aisle, in place of the orbit-planet plate. No .duotone: the
-          supplied asset is already a clean monochrome, so there is no legacy hue
-          to strip and the wrapper's soft-light layer would only muddy it.
-          No extra veil either, which is worth recording because the plate is a
-          bright one — brightest pixel (247,242,233), where Cream alone would
-          be 1.01:1. .scrim-side is what covers it: unlike the other scrims it
-          never fades out, bottoming at ink 0.58 on the right, and the cards add
-          their own smoked glass on top. Measured worst case — Stone at
-          text-sm in a card over the plate's brightest pixel — lands at 5.19:1,
-          so an additional veil would only bury the texture. See the note on
-          .material-smoked for that measurement. */}
+      {/* No .duotone on this plate — the asset is already a clean monochrome, so
+          there is no legacy hue to strip and the wrapper's soft-light layer would
+          only muddy it.
+          No extra veil either, which is worth recording because this is a BRIGHT
+          plate: its brightest pixel is (247,242,233), where Cream alone would be
+          1.01:1. .scrim-side is what covers it — unlike the other scrims it never
+          fades out, bottoming at ink 0.58 on the right — and the cards add their
+          own smoked glass on top. Measured worst case, Stone at text-sm in a card
+          over that brightest pixel, lands at 5.19:1, so a further veil would only
+          bury the texture. See .material-smoked for the measurement. */}
       <div aria-hidden className="absolute inset-0">
         <Image src="/images/tex-light-aisle.webp" alt="" fill sizes="100vw" className="object-cover" />
       </div>

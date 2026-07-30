@@ -1,0 +1,142 @@
+/* Interactive and figure components — buttons, the input field, the copper
+   stat band and its dividers. */
+
+@layer components {
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    letter-spacing: 0.01em;
+    padding: 0.85rem 1.4rem;
+    border-radius: 999px;
+    transition:
+      transform var(--dur-base) var(--ease-standard),
+      background-color var(--dur-base) var(--ease-standard),
+      box-shadow var(--dur-base) var(--ease-standard),
+      border-color var(--dur-base) var(--ease-standard);
+    cursor: pointer;
+    line-height: 1;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  /* Flat Green fill, Cream label — 7.81:1. No border, no shadow.
+     The label has to be Cream: Ink on this green is 2.08:1 and
+     unreadable. Every .btn-primary sits on a dark field (hero, the Ink
+     nav bar, and the theme-dark footer and closing band), where the fill is
+     only 2.08:1 against the base — the button reads as a shape by its Cream
+     label rather than by fill contrast. Now a green fill on a green-black
+     ground, so it reads even more as one family than it did on neutral black. */
+  .btn-primary {
+    background: var(--color-green);
+    color: var(--color-cream);
+  }
+
+  /* No nav-specific override needed: the bar is Ink, so the flat Green fill sits on the same field it does over the hero. */
+  .btn-outline {
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: transparent;
+  }
+  .btn-outline:hover {
+    border-color: var(--heading);
+    background: var(--bg-elevated);
+  }
+
+  /* Pill field — the insights sign-up input */
+  .field {
+    /* 44px, not 48 — the Subscribe button stretches to this in the sm:flex-row
+       signup row, so the field's height is what made that button read taller
+       than every other .btn (~41px intrinsic). 44 closes the gap to ~3px while
+       holding the 44px minimum touch target. */
+    min-height: 44px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--field-bg);
+    padding-inline: 1.25rem;
+    color: var(--text);
+    font-family: var(--font-body);
+  }
+  .field::placeholder {
+    color: var(--text-muted);
+    opacity: 0.8;
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--accent);
+  }
+
+  /* A full-bleed Copper strip behind the Problem figures.
+     It re-points the semantic tokens locally rather than recolouring each
+     element, the same mechanism .theme-dark uses, so the markup keeps using
+     --text-muted / --border and .stat-figure keeps resolving through --heading.
+     That indirection matters here because Copper is a hostile field: Ink is the
+     only palette colour that reads on it (5.59:1), while Steel — the usual
+     muted body colour this band would otherwise inherit — is 1.82:1, and Cream
+     2.18:1. Both fail outright.
+     Labels sit at ink/0.85, which is 4.63:1: still softer than the figures, and
+     clear of AA. This is now the FLOOR, not a preference — ink/0.80 lands at
+     4.27:1 and fails. (It was ink/0.75 → 4.3:1 against the previous, lighter
+     copper; the field darkened, so the label had to follow.)
+     --border is re-pointed too — at the light theme's ink/0.14 the divider is
+     all but invisible against the copper; 0.25 gives 1.53:1, a hairline that
+     reads without hardening into a rule. */
+  .stat-band {
+    position: relative;
+    isolation: isolate;
+    background: var(--color-copper);
+    --text-muted: rgb(var(--ink-rgb) / 0.85);
+    --border: rgb(var(--ink-rgb) / 0.25);
+  }
+  /* The same ridge texture as the green ATBOS panel, carried onto the copper.
+     It cannot be used as an image here — tex-ridge-ink is a green field, and
+     dropping it on copper would replace the colour rather than texture it. So it
+     goes through soft-light, which transfers only its light and shade.
+     The filter order matters and the values are measured, not guessed: the plate
+     greys out at mean 60 with a standard deviation of just 2.9, so brightness has
+     to come FIRST to lift the mean onto mid-grey (127.5/60 = 2.125) — soft-light
+     against a layer that dark would only ever darken. Contrast then amplifies
+     what is left, ~2.9 → ~18 of deviation, which is enough to read as texture and
+     little enough to leave the copper's hue alone. Contrast first would drive the
+     mean negative (the pivot is 127.5 and the plate sits well below it) and the
+     texture would come out black. */
+  .stat-band::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("/images/tex-ridge-ink.webp");
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(1) brightness(2.125) contrast(3);
+    mix-blend-mode: soft-light;
+    opacity: 0.8;
+  }
+
+  /* Short centred divider between the stat cells.
+     Deliberately not a border: Tailwind's `divide-x` sets border-left on the
+     cell, and a border always spans the cell's full height — there is no way to
+     shorten or centre one. So the rule is drawn as a pseudo-element instead,
+     half height and centred on the cell's midline.
+     Only from `sm` up, where the three stats sit side by side. Below that they
+     stack and the grid's own `divide-y` keeps them apart — a vertical rule has
+     nothing to divide once the cells are in one column. */
+  @media (min-width: 40rem) {
+    .stat-divide > * {
+      position: relative;
+    }
+    .stat-divide > * + *::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 25%;
+      height: 50%;
+      width: 1px;
+      background: var(--border);
+    }
+  }
+
+}

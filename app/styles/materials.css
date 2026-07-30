@@ -1,0 +1,359 @@
+/* Materials — the surfaces, scrims, plates and grades that imagery and dark
+   sections are built from. The measured contrast values live with the class
+   they justify; do not change a veil without re-measuring the copy on it. */
+
+@layer components {
+  @media (min-width: 64rem) {
+    .bleed-right {
+      margin-right: calc(50% - 50vw);
+    }
+  }
+
+  /* Smoked glass — dark translucent for dark sections. Held at 0.34 so the
+     tex-light-aisle plate reads through the cards.
+     The binding case: the third card sits where .scrim-side has bottomed out at
+     ink 0.58, and the weakest text there is Stone at text-sm (the kicker and
+     body), which needs 4.5:1. At a combined 0.723 coverage that lands 5.19:1
+     against the plate's brightest pixel (247,242,233), with Cream at 6.94:1.
+     There is real headroom now: 0.28 would still hold 4.76:1. Stone was
+     lightened to #D8D2C4 with the locked palette, which is where the slack came
+     from — the previous, darker Stone put this same 0.34 fill at only 4.59:1,
+     one hundredth off the floor. Opening the cards up is available but is a
+     visual decision, so the value stands.
+     (Against the plate's p95 patch rather than its single brightest pixel there is
+     far more room, so the binding constraint is one bright bokeh spot landing
+     behind small type, which the 20px blur softens in practice.)
+     The 20px blur averages more of the backdrop, which both helps the worst case
+     and reads as more glass the more transparent the fill gets. The 0.18 edge is
+     the same logic — a lighter fill leans harder on its border to define the
+     card. */
+  .material-smoked {
+    background: linear-gradient(
+      155deg,
+      rgb(var(--ink-rgb) / 0.34),
+      rgb(var(--ink-rgb) / 0.56)
+    );
+    backdrop-filter: blur(20px) saturate(1.05);
+    border: 1px solid rgb(var(--cream-rgb) / 0.18);
+  }
+
+  /* ----------------------------------------------------------
+     Scrims & veils — legibility washes over imagery. Authored
+     from the palette channels, never raw hex.
+     ---------------------------------------------------------- */
+
+  /* Vertical Ink wash — dark statement bands (footer, closing band) */
+  .scrim-deep {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--ink-rgb) / 0.62),
+      rgb(var(--ink-rgb) / 0.82)
+    );
+  }
+
+  /* Bottom-weighted — copy anchored to the foot of a panel */
+  .scrim-panel {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--ink-rgb) / 0.2),
+      rgb(var(--ink-rgb) / 0.42) 55%,
+      rgb(var(--ink-rgb) / 0.78)
+    );
+  }
+
+  /* Horizontal — copy on the left, imagery breathing to the right */
+  .scrim-side {
+    background: linear-gradient(
+      90deg,
+      rgb(var(--ink-rgb) / 0.94) 0%,
+      rgb(var(--ink-rgb) / 0.8) 42%,
+      rgb(var(--ink-rgb) / 0.58) 100%
+    );
+  }
+
+  /* Hero — angled, clears the right side for the artwork.
+     Retuned for the frontline composite. The previous 0.94 → 0.34 wash was
+     built for the prism plate, which was bright enough to read through it;
+     over an already-dark monochrome shot it crushed the left half to flat
+     black, so the picture only surfaced when a resize happened to swing a
+     light frame into the unscrimmed right edge. */
+  .scrim-hero {
+    background: linear-gradient(
+      100deg,
+      rgb(var(--ink-rgb) / 0.8) 0%,
+      rgb(var(--ink-rgb) / 0.56) 32%,
+      rgb(var(--ink-rgb) / 0.22) 58%,
+      rgb(var(--ink-rgb) / 0) 78%
+    );
+  }
+
+  /* Top fade — keeps the glass nav legible over imagery */
+  .scrim-top {
+    background: linear-gradient(180deg, rgb(var(--ink-rgb) / 0.7), transparent);
+  }
+
+  /* Bottom band — the rolling keyword strip */
+  .scrim-band {
+    background: linear-gradient(
+      0deg,
+      rgb(var(--ink-rgb) / 0.94),
+      rgb(var(--ink-rgb) / 0.5)
+    );
+  }
+
+  /* ----------------------------------------------------------
+     Duotone — neutralises an image so it sits in the palette.
+     INTERIM: it exists because part of the photographic set was
+     produced for the retired teal/lime palette, and it strips
+     that hue rather than re-treating the artwork. Delete the
+     class and its one usage (ClosingBand) once the artwork is
+     re-treated.
+     Wrap only the image — never a node with text inside, or the
+     blend picks up the copy.
+     ---------------------------------------------------------- */
+  .duotone {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  /* grayscale() wipes the retired teal and the acid-lime nodes out completely,
+     and nothing re-tints it: the plates stay neutral black-and-white so they
+     match the header photograph, which is a genuinely monochrome shot shown with
+     no
+     filter at all. The old sepia(0.5) saturate(1.5) that used to sit here was
+     what made every plate read brown. Contrast is up a little to compensate —
+     removing the sepia also removed the punch it was adding. */
+  .duotone :where(img) {
+    filter: grayscale(1) contrast(1.12) brightness(0.98);
+  }
+  /* A little depth back into the plate — light at the top, ink at the foot.
+     Neutral white rather than Cream: Cream is a warm off-white, and at
+     soft-light it was reintroducing the warm cast the filter just removed. */
+  .duotone::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.16),
+      rgb(var(--ink-rgb) / 0.24)
+    );
+    mix-blend-mode: soft-light;
+  }
+
+  /* ----------------------------------------------------------
+     Plates — a photographic or textured field behind a section,
+     with a flat ink veil folded in as a gradient layer rather
+     than carried by a second element.
+
+     One mechanic, driven by three custom properties, with the
+     per-plate values in small named classes below — so the
+     measurement stays next to the number it justifies.
+
+       --plate-image  the asset
+       --plate-veil   ink alpha over it, 0 for none
+       --plate-base   fallback colour if the asset fails
+
+     Veil strengths are measured, not chosen. Each class records
+     what its value was measured against; do not change one
+     without re-measuring the copy that sits on it.
+     ---------------------------------------------------------- */
+  .plate {
+    --plate-veil: 0;
+    --plate-base: var(--color-ink);
+    /* Three layers, top to bottom: the ink veil, the asset, then the base colour.
+       The base is a flat gradient rather than `background-color`, which looks
+       redundant but is not: every plate also carries .theme-dark, and .theme-dark
+       sets `background-color: var(--bg)`. It lives OUTSIDE @layer components while
+       this rule is inside it, and unlayered styles beat layered ones — so a
+       `background-color` here silently loses, and .plate-ridge's Green base was
+       resolving to Ink. Only visible if the asset fails to load, which is exactly
+       when a fallback is supposed to work. As a background layer it does not
+       compete for the property at all. */
+    background-image:
+      linear-gradient(
+        rgb(var(--ink-rgb) / var(--plate-veil)),
+        rgb(var(--ink-rgb) / var(--plate-veil))
+      ),
+      var(--plate-image),
+      linear-gradient(var(--plate-base), var(--plate-base));
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Ridge, in Green — the brand's own treated texture as a panel field rather
+     than a photograph. tex-ridge-ink is already supplied in the green, so it
+     needs no veil and no blend mode: it is just the image over its own base,
+     which is the flat fallback if the asset fails. Cream on it is ~9:1. */
+  .plate-ridge {
+    --plate-image: url("/images/tex-ridge-ink.webp");
+    --plate-base: var(--color-green-field);
+  }
+
+  /* Defocused drive-through, on the New-model panel.
+     Veil 0.55 is measured for one thing: the h2, in Cream, at text-4xl. That
+     counts as large text (3:1) and 0.55 gives 4.05:1 against the plate's
+     brightest pixel (241,236,227) — clear with room, without flattening a plate
+     whose mean is only 29 and whose whole character is its bokeh highlights.
+     Body copy needs more than this; .wash-read supplies it over the copy column
+     only, and its table has the numbers. */
+  .plate-drive {
+    --plate-image: url("/images/tex-light-drive.webp");
+    --plate-veil: 0.55;
+    /* 78%, not `center` — the crop is framed on the server rather than the car.
+       The source is 1280×720 and the section runs about 1440×1310, so `cover`
+       fits the height and the plate overflows to ~2333px wide: only 790 of the
+       1280 source pixels are ever on screen. Centred, that window was 245–1035,
+       which put the car (0–650) across half the frame and sliced the server's
+       shoulder off at 1035 — he reads as a smudge at the edge. At 78% the window
+       moves to 382–1172: the whole figure is in frame, from the cup in his hand
+       to his back, and the car drops to the leftmost third.
+       It helps most at narrow widths, where the crop is severe. On a 390px
+       viewport only ~200 source pixels survive; centred those were 539–739, the
+       dead gap between car and server, so the plate read as near-black texture.
+       At 78% it is 842–1042 — the server himself. */
+    background-position: 78% center;
+  }
+
+  /* Reading wash — pairs with .plate-drive on the new-model section, which is a
+     sticky headline on the left and a scrolling column of copy on the right.
+     .plate-drive's 0.55 veil is measured for exactly one thing: the h2, in
+     Cream, at large-text sizes. Small body copy sits on the plate directly, and
+     0.55 does not carry it. Measured against the plate's brightest pixel
+     (241,236,227):
+
+                            Cream    Stone    Copper
+       plate at 0.55        4.05:1   3.03:1   1.39:1
+       plate + this wash    7.30:1   5.46:1   2.51:1
+
+     Deepening .plate-drive itself to ~0.72 would reach the same numbers, but the
+     plate's mean is only 29 — its character is entirely in the bokeh highlights,
+     and a flat 0.72 dims those everywhere, including behind the headline, which is
+     the part worth keeping. So the depth goes only where the reading happens.
+
+     46% is measured, not chosen. .shell caps at 78rem and centres, so the copy
+     column's left edge lands at 48–49% of the viewport at every width from this
+     breakpoint to 1920px — the wash is at full strength before the first character
+     of it at all of them. Below the breakpoint the columns stack and there is no
+     left/right split to feather, so it degrades to the flat value.
+
+     Note for anyone extending this section: Copper is unusable as text here.
+     It is a mid-tone, so deepening the field moves it TOWARD the type rather than
+     away — it fails even the 3:1 large-text bar at 2.51:1. Hence the index
+     numerals in Stone. Copper is still fine as a non-text mark. */
+  .wash-read {
+    background: rgb(var(--ink-rgb) / 0.4);
+  }
+  @media (min-width: 64rem) {
+    .wash-read {
+      background: linear-gradient(
+        90deg,
+        rgb(var(--ink-rgb) / 0) 0%,
+        rgb(var(--ink-rgb) / 0.06) 28%,
+        rgb(var(--ink-rgb) / 0.4) 46%,
+        rgb(var(--ink-rgb) / 0.4) 100%
+      );
+    }
+  }
+
+  /* Defocused aisle, on the Capability-now panel. Veil 0.35 rather than the
+     deeper value the plate would otherwise want, because this panel also carries
+     .scrim-panel, which ramps to ink 0.78 at the foot where the copy sits.
+     That pairing is required, not belt-and-braces. The panel's highlighted line
+     is Copper, and Copper is a MID-TONE: veiling the field darker moves it toward
+     the type rather than away, so Copper cannot reach 3:1 on this plate by
+     veiling alone. What fixes it is depth where the copy actually is — 0.35 veil
+     plus the scrim's 0.78 at the foot combines to 0.857 coverage, which against
+     the plate's brightest pixel (247,242,233) puts Copper at 3.79:1, Cream at
+     11.03:1 and Stone at 8.25:1. Copper clears the 3:1 large-text bar there and
+     nothing more, so the highlighted line has to stay at display size.
+     At the top of the panel the scrim is only 0.2, so the combined 0.48 still
+     lets the bokeh read. */
+  .plate-aisle {
+    --plate-image: url("/images/tex-light-aisle.webp");
+    --plate-veil: 0.35;
+  }
+
+  /* ----------------------------------------------------------
+     Film grade — the supplied recipe, one line at a time:
+       saturation  −100%     ┐
+       gamma       1.12      │ all four in the #film-grade SVG
+       black point #121110   │ filter — see components/brand/FilmGrade.tsx
+       white point #F4EEE4   ┘
+       grain       fine, 8%  → self-contained SVG noise, overlay
+       vignette    −15%      → ink at the edges
+     Wrap the image only — never a node with copy inside, or the
+     overlay layers pick up the text.
+     ---------------------------------------------------------- */
+  .grade-film {
+    position: absolute;
+    inset: 0;
+    /* Contains the grain's blend, so the page behind the hero card and the
+       scrims stacked on top are both left alone. */
+    isolation: isolate;
+    overflow: hidden;
+    /* The black point doubles as the placeholder. Below the fold the image
+       lazy-loads, and until it lands there is nothing in the frame — it read
+       as a flat grey-brown block. Sitting the group on the same black the
+       grade maps 0 to means the empty state reads as the graded shadow
+       instead. Hidden once the image paints over it. */
+    background: var(--grade-black);
+  }
+
+  /* The tone map is a genuine remap, so it belongs in the filter chain rather
+     than in blend layers — a lighten/darken pair only clamps the two ends and
+     leaves the midtones untinted. FilmGrade.tsx has the full reasoning. */
+  .grade-film :where(img) {
+    filter: url(#film-grade);
+  }
+
+  /* Fine grain. feTurbulence rather than the background-cream plate the rest
+     of the site uses: that plate carries large wave forms, and the recipe
+     wants tight film grain. Desaturated in the filter chain so the noise is
+     luminance-only and doesn't speckle colour back into the graded frame. */
+  .grade-film-grain,
+  .grade-film-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .grade-film-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+    mix-blend-mode: overlay;
+    /* 8%, the middle of the recipe's 6–10% band. */
+    opacity: 0.08;
+  }
+
+  /* −15% at the edges, falling off from a clean centre. Ink rather than pure
+     black so the corners sit in the palette. */
+  .grade-film-vignette {
+    background: radial-gradient(
+      115% 115% at 50% 50%,
+      transparent 45%,
+      rgb(var(--ink-rgb) / 0.15) 100%
+    );
+  }
+
+  /* Print grain — tactile texture over light fields (§5.4) */
+  .grain-overlay {
+    position: fixed;
+    inset: -10% 0 0 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("/images/background-cream.webp");
+    background-size: cover;
+    background-position: center top;
+    /* A legacy cream/teal plate, desaturated and only lightly warmed, so the
+       texture reads white rather than cream.
+       0.38 is a deliberate ceiling: the plate carries large wave forms as well as
+       grain, and much above this they start to read as banding across flat
+       fields rather than as texture. */
+    filter: grayscale(1) sepia(0.16) brightness(1.06);
+    opacity: 0.38;
+    will-change: transform;
+  }
+
+}

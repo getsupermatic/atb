@@ -1,0 +1,100 @@
+/* Element defaults and the display-type primitives.
+   In @layer base / @layer components so Tailwind utilities can still
+   override — e.g. a text-[color:…] on a heading in a dark section. */
+
+/* ============================================================
+   Base — in @layer base so Tailwind utilities can override
+   (e.g. text-[color:…] on a heading in a dark section).
+   ============================================================ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-copper);
+    color: var(--color-ink);
+  }
+
+  /* Newsreader is a serif with an optical-size axis — it wants near-neutral
+     tracking, a touch more leading and a lighter weight than a grotesque would,
+     or large sizes read clotted.
+     The weight ladder is deliberate and runs light-to-heavy as size falls:
+     Light on the hero, Regular at h2 and on the pull quotes, Medium from h3 down.
+     Two sections take their h3 back to Regular where it sits beside an h2 — see
+     NewModel and Products. */
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    color: var(--heading);
+    font-weight: 400;
+    font-optical-sizing: auto;
+    letter-spacing: -0.01em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  /* Light on the h1 only — the hero is the only h1 on the site. */
+  h1 {
+    font-weight: 300;
+  }
+
+  h3, h4, h5 {
+    font-weight: 500;
+  }
+
+  :where(a, button, input, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--accent-text);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  /* Section kicker — sentence-case label */
+  .eyebrow {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Large display statement — the pull-quote / manifesto voice. Size is set
+     per usage with a type-scale utility. */
+  .statement {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-optical-sizing: auto;
+    letter-spacing: -0.01em;
+    line-height: 1.14;
+    color: var(--heading);
+    text-wrap: balance;
+  }
+
+  /* Big stat numerals — tabular so the count-up doesn't jitter in width */
+  .stat-figure {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--heading);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+}

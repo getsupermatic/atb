@@ -1,0 +1,116 @@
+/* The page shell, the section rhythm, the full-bleed escape, and the nav. */
+
+@layer components {
+  /* Navigation (§4.1, behaviour target: Valliance) -----------------------
+     At the top of the page there is no container at all — the logo, links and
+     CTA sit bare over the hero. Scrolling back up brings in a full-width
+     smoked-glass bar behind them.
+
+     The bar is Ink, not Cream, so the foreground stays Cream in
+     both states — there is no colour flip to cross-fade, and therefore no
+     window where the labels are the wrong colour for what is behind them.
+
+     Foreground colour lives on the header so the pane, links, logo and burger
+     all resolve from one source of truth (custom properties inherit down the
+     tree, and the pane is a sibling of the content). */
+  .nav-bar {
+    --nav-fg: var(--color-cream);
+    /* On Ink, full Copper clears AA (5.59:1) */
+    --accent-text: var(--color-copper);
+  }
+
+  .nav-fg {
+    color: var(--nav-fg, var(--color-ink));
+  }
+
+  /* Bare over the hero the row sits lower, so the logo isn't crowded against
+     the top edge; docked it tightens up to keep the bar compact.
+     hidden → docked happens off-screen, but docked → top happens in full view
+     at the top of the page, so this has to be transitioned or the row snaps.
+     Matched to the pane's duration so the height and the fade move together. */
+  .nav-row {
+    padding-block: 1.5rem 1.3rem;
+    transition:
+      padding-top var(--dur-base) var(--ease-standard),
+      padding-bottom var(--dur-base) var(--ease-standard);
+  }
+  .nav-scrolled .nav-row {
+    padding-block: 1.15rem;
+  }
+
+  /* The bar itself — edge to edge and square, so it reads as a bar rather than
+     a floating pill. Kept fairly opaque: the page beneath is Ink copy on
+     Cream, and a thinner tint lets that ghost through as legible text. */
+  .nav-pane {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-100%);
+    background: linear-gradient(
+      180deg,
+      rgb(var(--ink-rgb) / 0.88),
+      rgb(var(--ink-rgb) / 0.78)
+    );
+    backdrop-filter: blur(26px);
+    border-bottom: 1px solid rgb(var(--cream-rgb) / 0.12);
+    transition:
+      opacity var(--dur-base) var(--ease-standard),
+      transform var(--dur-base) var(--ease-entrance);
+  }
+  .nav-scrolled .nav-pane {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Mobile dropdown — same smoked material, a touch more solid since it is
+     carrying a full menu rather than a single row. */
+  .nav-panel {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--ink-rgb) / 0.94),
+      rgb(var(--ink-rgb) / 0.86)
+    );
+    backdrop-filter: blur(26px);
+    border: 1px solid rgb(var(--cream-rgb) / 0.14);
+  }
+
+  /* Layout container */
+  .shell {
+    width: 100%;
+    max-width: 78rem; /* ~1248px */
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  /* Runs a direct child of .shell out to the viewport's RIGHT edge, leaving its
+     left edge on the shell's column. Used by the Blueprints spread, where the
+     FrontlineOS plate bleeds off the page while its copy stays aligned.
+
+     The value is derived, not tuned. With the shell at outer width W (capped at
+     78rem, centred) and inline padding P, a child's `50%` resolves against the
+     shell's CONTENT box, so it is (W − 2P)/2. The distance to travel is the auto
+     margin plus the padding: (100vw − W)/2 + P. Negating that target gives
+     W/2 − P − 50vw, and `calc(50% - 50vw)` expands to (W − 2P)/2 − 50vw, i.e.
+     W/2 − P − 50vw. Identical — so it lands exactly on the edge at every width,
+     with no magic number to re-measure if the shell's cap or gutters move.
+
+     Two things to know before reusing it:
+     - It must go on the element whose containing block IS the shell's content
+       box. On a grid ITEM the percentage resolves against the grid area instead
+       and the bleed comes out short — so it belongs on the grid container.
+     - `100vw` includes the classic scrollbar, so on desktop Chrome this overruns
+       the visible viewport by the scrollbar width. Harmless here (the plate is
+       bleeding off the edge by design) and it cannot produce a horizontal
+       scrollbar, because html/body already carry `overflow-x: clip`.
+
+     Gated at the same breakpoint the spread stacks at: below it the columns are
+     single-file and the copy needs its right gutter back. */
+
+  /* Section vertical rhythm */
+  .section {
+    position: relative;
+    z-index: 1;
+    padding-block: clamp(4.5rem, 9vw, 9rem);
+  }
+}

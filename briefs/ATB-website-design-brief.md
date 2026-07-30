@@ -37,7 +37,35 @@ ATB (*at the beyond.*) is an **AI-native product studio**. We build intelligent 
 
 ### 2.2 Colour system
 
-*(Revised 2026-07-25 — supersedes the original teal/cream/lime system.)*
+*(Revised 2026-07-30 for v3 — supersedes the 2026-07-25 revision below, which in
+turn superseded the original teal/cream/lime system.)*
+
+**LOCKED — the palette is six colours.** This is what the build implements; the
+table further down this section is retained for its usage-ratio and contrast
+guidance, but its hex values and names are superseded.
+
+| Token | Hex | Name | Use |
+|---|---|---|---|
+| `--color-ink` | `#0F1613` | Ink | Headings, dark base, scrims. A green-black, the darkest step of the same family as Green |
+| `--color-green` | `#2D523D` | Green | Display accent, primary CTA fill, statement panels |
+| `--color-copper` | `#C97B45` | Copper | Accent: CTAs, the stat band, the logo dot |
+| `--color-cream` | `#F5F1E8` | Cream | Text on dark, veils, glass |
+| `--color-steel` | `#5C665F` | Steel | Muted text on light |
+| `--color-stone` | `#D8D2C4` | Stone | Muted text on dark, soft fills, elevated surfaces on light |
+
+Surfaces and derived shades, which are **not** brand colours: `--color-paper`
+`#FBFAF6` (the page canvas — a near-white, warmer than white, with the grain
+plate supplying the texture), `--color-ink-soft` `#1C2320`, `--color-ink-deep`
+`#070B09`, `--color-copper-deep` `#975C34` (Copper × 0.75), `--color-green-field`
+`#284836`.
+
+**Contrast rules, measured.** Copper is 3.14:1 on the canvas and must never be
+text on a light field — `--accent-text` resolves to Copper on dark (5.59:1) and
+`--color-copper-deep` on light (5.16:1). Steel is 3.08:1 on Ink and must never be
+text on dark; Stone is the muted colour there (12.18:1). Ink on Copper is 5.59:1,
+Cream on Green 7.81:1, Green on the canvas 8.43:1.
+
+*(The 2026-07-25 revision follows, retained for reference.)*
 
 A warm-neutral palette anchored by Deep Ink. Target usage ratio across the site
 is roughly **60% base (Warm Chalk + Deep Ink) / 30% supports / 10% Clay Amber
@@ -86,8 +114,21 @@ Four reusable visual “materials”. Build each as a component/utility so it ca
 
 *(If a typeface is not yet locked, use this as the intent and confirm licences before build.)*
 
-*(Revised 2026-07-25 — typefaces are now locked; supersedes the earlier
-sans-display / serif-body intent.)*
+*(Revised 2026-07-30 for v3. Typefaces locked: **Newsreader** for display and
+pull quotes, **Instrument Sans** for everything functional. Inter is retired.*
+
+*The Newsreader weight ladder runs light-to-heavy as size falls, and is
+deliberate: **Light (300)** on the `h1` — the hero is the only h1 on the site —
+**Regular (400)** at `h2`, on `.statement` pull quotes and on `.stat-figure`, and
+**Medium (500)** from `h3` down. Two sections take their `h3` back to Regular
+where it sits beside an `h2`, because 500 there reads heavier than the heading
+above it. Recorded at this level of detail because "Newsreader Light for display"
+describes the h1 but not the rest of the ladder.*
+
+*Instrument Sans loads as a variable font: the system uses 400 for body, 500 for
+nav and eyebrows, and 600 for buttons.)*
+
+*(The 2026-07-25 revision follows, retained for reference.)*
 
 - **Display / headings — Newsreader.** A serif with an optical-size axis. Set at
   weight 400 (500 for h3–h5), tracking −0.01em, leading 1.08, with

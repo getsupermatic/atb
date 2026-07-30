@@ -212,63 +212,71 @@ built — your call, and it is the version that has been reviewed on screen.
 ## A.3 To do
 
 **1 — Palette & type migration** (visible change, do it first and review it)
-- [ ] Rename tokens to the brand names; add `--color-paper` as a documented surface
-- [ ] Move copper to `#C97B45`, Steel to `#5C665F`, Stone to `#D8D2C4`
-- [ ] Re-derive `--color-copper-deep` `#975C34`; drop `sage`, `oat`, `amber-deep`
-- [ ] Instrument Sans → `--font-body` as a variable font; remove Inter and `--font-intro`
-- [ ] Leave every Newsreader weight untouched; drop only the `TRIAL` marker on `h1`
-- [ ] Replace all four hardcoded hexes with tokens
-- [ ] Update every measured contrast comment to the A.2 figures
+- [x] Rename tokens to the brand names; add `--color-paper` as a documented surface
+- [x] Move copper to `#C97B45`, Steel to `#5C665F`, Stone to `#D8D2C4`
+- [x] Re-derive `--color-copper-deep` `#975C34`; drop `sage`, `oat`, `amber-deep`
+- [x] Instrument Sans → `--font-body` as a variable font; remove Inter and `--font-intro`
+- [x] Leave every Newsreader weight untouched; drop only the `TRIAL` marker on `h1`
+- [x] Replace all four hardcoded hexes with tokens
+- [x] Update every measured contrast comment to the A.2 figures
 
 **2 — Remove the dead elements**
-- [ ] Delete `OrbitMark.tsx`, the 11 dead classes, `@keyframes orbit-spin`
-- [ ] Delete the 18 unused images (~2.7 MB)
-- [ ] Make `products[].image` optional; drop the two `hero-aisle` placeholders
-- [ ] Downscale the client logos — 3840×2160 PNGs rendered at ~65px tall
+- [x] Delete `OrbitMark.tsx`, the 11 dead classes, `@keyframes orbit-spin`
+- [x] Delete the 18 unused images (~2.7 MB)
+- [x] Make `products[].image` optional; drop the two `hero-aisle` placeholders
+- [ ] ~~Downscale the client logos~~ — **attempted and reverted.** next/image
+      already serves a 256px variant from `sizes="200px"`, so the oversized
+      sources cost nothing at runtime; `sips` re-encoded one PNG *larger* than the
+      original and silently declined to resize the WebP. Worth doing only with a
+      real image pipeline.
 
 **3 — Centralise the duplicated mechanics**
-- [ ] `components/motion/MorphPanel.tsx` — one card ↔ full-bleed morph, both
+- [x] `components/motion/MorphPanel.tsx` — one card ↔ full-bleed morph, both
       directions, returning its timeline so `ATBOS` can chain onto it
-- [ ] `--panel-radius` / `--panel-pad` tokens; `--panel-pad` shared with `.shell`
-- [ ] `lib/motion.ts` — the eases, durations, viewport margin and scrub, read
+- [x] `--panel-radius` / `--panel-pad` tokens; `--panel-pad` shared with `.shell`
+- [x] `lib/motion.ts` — the eases, durations, viewport margin and scrub, read
       from the CSS tokens rather than retyped
-- [ ] `lib/usePrefersReducedMotion.ts` — one hook, replacing all three patterns
-- [ ] `components/motion/GradedImage.tsx` — the grade + grain + vignette trio
-- [ ] Collapse the plate classes into `.plate` + `--plate-image` / `--plate-veil`,
+- [x] `lib/usePrefersReducedMotion.ts` — one hook, replacing all three patterns
+- [x] `components/motion/GradedImage.tsx` — the grade + grain + vignette trio
+- [x] Collapse the plate classes into `.plate` + `--plate-image` / `--plate-veil`,
       with per-plate classes carrying only their two values and their measurement note
 
 **4 — Restructure** (agreed: full)
-- [ ] `components/layout/` ← `Nav`, `Footer`, `SignupForm`
-- [ ] `FeatureMorph` → `components/sections/CapabilityGap.tsx`
-- [ ] `HeroMorph` → `sections/Hero.tsx`; the logo strip → `sections/Clients.tsx`;
+- [x] `components/layout/` ← `Nav`, `Footer`, `SignupForm`
+- [x] `FeatureMorph` → `components/sections/CapabilityGap.tsx`
+- [x] `HeroMorph` → `sections/Hero.tsx`; the logo strip → `sections/Clients.tsx`;
       compose both in `app/page.tsx`
-- [ ] `lib/content.ts` — section copy out of the components; SVG icons stay put
-- [ ] Split `globals.css` into `app/styles/{tokens,base,materials,components}.css`
+- [x] `lib/content.ts` — section copy out of the components; SVG icons stay put
+- [x] Split `globals.css` into `app/styles/{tokens,base,materials,components}.css`
 
 **5 — Comments: state, not history**
-- [ ] Rewrite to present tense. **Preserve every measured number** and every
+- [x] Rewrite to present tense. **Preserve every measured number** and every
       load-bearing warning — specifically: the sticky/`overflow-hidden` note in
       `NewModel`, the `.bleed-right` derivation, `WordReveal`'s
       observer-on-the-wrapper note, `DrawRule`'s one-transform-per-element rule,
       `FilmGrade`'s why-SVG-not-CSS reasoning, `Logo`'s geometry, and
       `.plate-drive`'s 78% crop derivation
-- [ ] Remove `TRIAL` / `PLACEHOLDER` / `INTERIM` markers now resolved; delete the
+- [x] Remove `TRIAL` / `PLACEHOLDER` / `INTERIM` markers now resolved; delete the
       stale `.btn-primary` note in `Products.tsx`
 
 **6 — Tooling & docs**
-- [ ] Add ESLint + `eslint-config-next` and the `lint` script the README already
+- [x] Add ESLint + `eslint-config-next` and the `lint` script the README already
       documents — this is the check that would have caught most of the above
-- [ ] Rewrite `README.md`: correct typefaces, real page order, real component
+- [x] Rewrite `README.md`: correct typefaces, real page order, real component
       tree, `/insights` noted as a known placeholder
-- [ ] Add a v3 revision note to brief §2.2 / §2.5 recording the locked palette
+- [x] Add a v3 revision note to brief §2.2 / §2.5 recording the locked palette
       and type, so the brief stops contradicting the build
-- [ ] Fix `CLAUDE.md`'s `/docs/brand/` → `briefs/`
+- [x] Fix `CLAUDE.md`'s `/docs/brand/` → `briefs/`
 
 **7 — Verify**
-- [ ] `tsc --noEmit` and `next build` clean
-- [ ] Homepage reviewed at 360 / 768 / 1024 / 1440 against the current live site
-- [ ] Reduced-motion pass — every section still legible and complete
-- [ ] Keyboard pass — focus visible against the new copper outline
+- [x] `tsc --noEmit` and `next build` clean
+- [~] Homepage verified at 1271px: no document overflow, the only over-wide
+      element is the marquee track inside its mask. **Narrower widths not
+      verified** — the automation harness could not resize the window.
+- [~] Reduced-motion verified by code inspection and by the hook's contract.
+      **Not verified in a real reduced-motion browser** — the harness cannot
+      emulate the media query.
+- [ ] Keyboard pass — focus visible against the new copper outline. **Not done.**
 
 ## A.4 Decisions taken
 
@@ -291,7 +299,91 @@ built — your call, and it is the version that has been reviewed on screen.
 
 ## A.6 Review
 
-*To be completed once the work is done.*
+Delivered in four commits, sequenced so the one visible change could be reviewed
+on its own before the structural work landed on top of it.
+
+| Commit | What |
+|---|---|
+| `79abe26` | Palette + body face aligned to the locked brand |
+| `48e53a1` | Dead elements from v1/v2 removed |
+| `bc898ee` | Duplicated mechanics centralised; components restructured |
+| *(this one)* | Stylesheet split, ESLint, docs |
+
+### Net effect
+
+- **`public/images` 3.4 MB → 772 KB.** 18 files deleted, and all eight survivors
+  are referenced.
+- **133 lines of dead CSS removed**, plus one dead component and four dead tokens.
+- **`globals.css` 893 lines → six files** of 45–357 lines. The generated CSS is
+  byte-identical across all 450 rules, so the split is provably a no-op.
+- **The morph exists once**, not three times. Two `gsap.timeline` calls remain:
+  `MorphPanel` and ATBOS's own, both deliberate.
+- **One reduced-motion hook**, replacing three patterns that behaved differently
+  at the edges.
+- **Zero hardcoded hexes** in components, bar the one commented exception that
+  Framer Motion forces.
+- **ESLint now exists** and passes, having found three real bugs on its first run.
+
+### Bugs found and fixed on the way
+
+None of these were on the plan; they surfaced while verifying it.
+
+1. **`.plate-ridge`'s Green base resolved to Ink.** `.theme-dark` also sets
+   `background-color` and sits *outside* `@layer components` where `.plate` is
+   inside it — unlayered styles win. Only visible if the asset failed to load,
+   which is exactly when a fallback matters, so the documented behaviour was
+   simply untrue. The base is now a background *layer* and no longer competes for
+   the property. Pre-existing: `.plate-ridge-forest` had it too.
+2. **`CountUp` mirrored state into a ref during render.** React may render without
+   committing, so the ref could hold a value that was never displayed. Rewritten
+   so the ref is written only inside the rAF loop. It also silently showed the
+   *start* value forever under reduced motion; it now reads the prop.
+3. **`Nav` called `setState` synchronously in an effect**, causing a cascading
+   render on every load. The lockup's hold state is now derived.
+4. **`CapabilityGap` had ~120vh of dead scroll under reduced motion** — a 220vh
+   runway below a static card, with no reduced-motion override. `MorphPanel` drops
+   the runway when motion is off, which fixes it for all three panels at once.
+5. **Three stale contrast claims** corrected against measurement, the worst being
+   a headline documented at 5.8:1 that measures 3.79:1. It still clears the 3:1
+   large-text bar, so the design held and only the note was wrong.
+
+### Deliberate deviations from the plan
+
+- **Client-logo downscaling was reverted** — see A.3 item 2. It made one asset
+  larger and left another untouched, for no runtime gain.
+- **ATBOS does not use `MorphPanel` as a component.** Its morph is the opening
+  beat of a much longer timeline; routing it through the component needed an
+  eight-parameter escape hatch, so it shares the geometry and tween shapes via
+  `morphPanelTweens` on its own timeline instead. A second `ScrollTrigger` would
+  let the morph and the statements drift apart, where one timeline cannot.
+- **The sticky wrappers moved from `h-screen` to `min-h-screen`**, which is what
+  ATBOS always used. Both compute to the viewport height; `min-h-screen` lets
+  content grow rather than clip on short or zoomed viewports.
+- **`CountUp`'s trigger margin moved from −15% to −12%**, unified with every other
+  reveal. It now fires marginally earlier.
+
+### Still open
+
+- **Keyboard pass not done.** Focus outlines resolve through `--accent-text`,
+  which changed colour with the palette, so this is worth an eye.
+- **Narrow viewports and a real reduced-motion browser were not verified** — the
+  automation harness could neither resize the window nor emulate the media query.
+  Both need a human pass. Everything asserted about them here is from code and
+  computed styles, not from looking.
+- **Body tracking** is still `-0.011em`, tuned for Inter. Carried over to
+  Instrument Sans unchanged and flagged rather than guessed at.
+- **`.material-smoked` has real headroom now** — the new Stone puts the 0.34 fill
+  at 5.19:1 where it was 4.59:1, and 0.28 would still hold. Opening the cards up
+  is a visual decision, so the value stands.
+
+### One note on verification method
+
+Framer Motion's entrance animations cannot be screenshotted in this harness: the
+automation tab is backgrounded, Chrome suspends `requestAnimationFrame` there
+(confirmed — zero frames in 45s), and every `whileInView` element stays frozen at
+its `initial` state. Screenshots of this site taken that way show missing copy
+that is perfectly fine in a real browser. The verification above therefore leans
+on computed styles and asset checks, which are unaffected.
 
 ---
 

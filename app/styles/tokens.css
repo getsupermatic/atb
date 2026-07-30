@@ -1,0 +1,153 @@
+/* ATB. — design tokens, semantic aliases and the dark-section remap.
+   Imported first: everything else resolves through these. */
+
+/* ============================================================
+   ATB. — design tokens
+
+   THE BRAND PALETTE IS SIX COLOURS. Ink, Green, Copper, Cream, Steel, Stone.
+   Anything else below is a surface or a derived shade, labelled as such — do
+   not add a seventh brand colour here without it changing in the brand doc
+   first.
+
+   Copper is accent-only. At 3.14:1 on the paper canvas it must never be text
+   on a light field; use --accent-text, which resolves to Copper on dark and
+   --color-copper-deep on light.
+   ============================================================ */
+@theme {
+  /* ---- The six brand colours ---- */
+  --color-ink: #0f1613; /* Ink    — headings, dark base, scrims. A green-black,
+                            the darkest step of the same family as Green. */
+  --color-green: #2d523d; /* Green  — display accent, primary CTA fill,
+                            statement panels */
+  --color-copper: #c97b45; /* Copper — CTAs, the stat band, the logo dot. Accent
+                            only: never a text colour on a light field. */
+  --color-cream: #f5f1e8; /* Cream  — text on dark, veils, glass */
+  --color-steel: #5c665f; /* Steel  — muted text on light. Only 3.08:1 on Ink,
+                            so never the muted colour on dark — Stone is. */
+  --color-stone: #d8d2c4; /* Stone  — muted text on dark, soft fills, and
+                            elevated surfaces on light */
+
+  /* ---- Surfaces — not brand colours ---- */
+  /* The canvas is a hair lighter than Cream so the page reads as paper with the
+     grain plate supplying the warmth, rather than as a flat cream field. Cream
+     stays the brand colour everywhere else. */
+  --color-paper: #fbfaf6;
+
+  /* ---- Derived shades — tints/shades of the above, not new brand colours ---- */
+  /* The two darks follow Ink's green cast: a neutral black or grey beside this
+     base reads as a colour mismatch where the two meet in a gradient. */
+  --color-ink-soft: #1c2320; /* Ink lifted — elevated dark surfaces */
+  --color-ink-deep: #070b09; /* Ink at its floor — the footer, deepest scrims */
+  /* Copper × 0.75. Copper itself is 3.14:1 on the paper canvas; this lands
+     5.16:1, so accent text on a light field is safe. */
+  --color-copper-deep: #975c34;
+  /* Statement-panel field only, never a fill or a text colour. Sampled as the
+     mean of the tex-ridge-ink texture, so the flat fallback matches the plate
+     it sits under — see .plate-ridge. */
+  --color-green-field: #284836;
+  /* The film grade's black point. Not a palette colour — it is the value the
+     #film-grade filter maps 0 to, and it doubles as .grade-film's placeholder so
+     an unloaded plate reads as the graded shadow. MUST equal `blackPoint` in
+     components/brand/FilmGrade.tsx; the filter and the placeholder are the same
+     black by definition. */
+  --grade-black: #121110;
+
+  /* Typefaces (wired to next/font vars in layout.tsx).
+     Newsreader carries display and pull quotes; Instrument Sans carries
+     everything functional — body copy, buttons, nav, eyebrows, labels. */
+  --font-display: var(--font-newsreader), "Newsreader", Georgia, serif;
+  --font-body: var(--font-instrument-sans), "Instrument Sans", system-ui, sans-serif;
+
+  /* Fluid type scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  /* Display steps — headings, .statement and .stat-figure only; no body copy
+     uses these. Nudged up ~4% at the floor and ~6% at the cap: Newsreader at
+     400 reads optically smaller than the grotesque it replaced, so the whole
+     display end of the scale wanted a lift. The floors are deliberately raised
+     less than the caps — they govern narrow viewports, where the previous
+     round of tuning was what fixed the mobile clipping. */
+  --text-2xl: clamp(1.5625rem, 1.3rem + 1.05vw, 2.125rem);
+  /* Paired leading, so `text-2xl` carries the display line-height instead of
+     Tailwind's default. Without this the utility sets font-size AND a 1.333
+     line-height, and because utilities sit in a later layer than @layer base it
+     beat the 1.08 on the heading rule — the card headings that wrap to two
+     lines ("Customise & Accelerate") were reading loose as a result.
+     Safe to pair at the token level because every `text-2xl` on the site is a
+     heading. The shared steps (xs–xl) are deliberately left unpaired: `text-xl`
+     is used by an h3 *and* by CapabilityGap's body paragraph, and 1.08 leading
+     on a paragraph would be unreadable. */
+  --text-2xl--line-height: 1.08;
+  --text-3xl: clamp(1.975rem, 1.55rem + 1.7vw, 2.9rem);
+  --text-4xl: clamp(2.4rem, 1.75rem + 2.75vw, 4rem);
+  --text-5xl: clamp(2.9rem, 1.95rem + 4.2vw, 5.3rem);
+  --text-6xl: clamp(3.55rem, 2.1rem + 6.3vw, 6.9rem);
+
+  /* ---- Layout ---- */
+  /* The page's inline gutter. Owned by .shell, but the scroll-morph panels
+     animate the SAME value — a contained panel sits on the shell's gutter and
+     opens to zero — so it has to be a token rather than a literal repeated in
+     each of them. Mirrored as PANEL.pad in components/motion/MorphPanel.tsx,
+     which is the one place JS needs it. */
+  --gutter: clamp(1.25rem, 5vw, 3rem);
+  /* Contained-panel corner radius, the other half of the morph geometry. */
+  --panel-radius: 1.75rem;
+
+  /* Motion (§5.6). Mirrored for JS in lib/motion.ts — see the note there. */
+  --dur-fast: 150ms;
+  --dur-base: 300ms;
+  --dur-slow: 600ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ------------------------------------------------------------
+   Semantic aliases — remapped by .theme-dark for dark sections
+   ------------------------------------------------------------ */
+:root {
+  /* Channel triplets so scrims can be authored as rgb(… / alpha)
+     without hardcoding the palette hex in every gradient. */
+  --ink-rgb: 15 22 19;
+  --cream-rgb: 245 241 232;
+  --copper-rgb: 201 123 69;
+
+  --bg: var(--color-paper);
+  /* Stone, which covers both roles the palette gives it: muted text on dark and
+     elevated surfaces on light. Ink text on Stone is 12.18:1. */
+  --bg-elevated: var(--color-stone);
+  --text: var(--color-ink);
+  --text-muted: var(--color-steel);
+  --heading: var(--color-ink);
+  --accent: var(--color-copper);
+  /* Copper is 3.14:1 on the canvas and fails as text — light fields use the
+     darkened shade, at 5.16:1. */
+  --accent-text: var(--color-copper-deep);
+  /* Display accent for highlighted words in headings. Green reads on the paper
+     canvas (8.4:1) but only 2.08:1 on Ink, so the dark highlight is decorative,
+     not legible. Light fields fall back to the heading colour. */
+  --accent-display: var(--heading);
+  --border: rgb(var(--ink-rgb) / 0.14);
+  --field-bg: rgb(var(--cream-rgb) / 0.55);
+}
+
+.theme-dark {
+  --bg: var(--color-ink);
+  --bg-elevated: var(--color-ink-soft);
+  --text: var(--color-cream);
+  --text-muted: var(--color-stone);
+  --heading: var(--color-cream);
+  --accent: var(--color-copper);
+  /* On Ink, Copper clears AA at 5.59:1 — no substitute needed */
+  --accent-text: var(--color-copper);
+  /* Green on Ink is only 2.08:1 — see the note on --accent-display in :root.
+     Kept as the display accent by direction, not by contrast. */
+  --accent-display: var(--color-green);
+  --border: rgb(var(--cream-rgb) / 0.16);
+  --field-bg: rgb(var(--ink-rgb) / 0.5);
+  background-color: var(--bg);
+  color: var(--text);
+}

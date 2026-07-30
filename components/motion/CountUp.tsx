@@ -38,34 +38,45 @@ export default function CountUp({
   const reduce = usePrefersReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, VIEWPORT_REPLAY);
-  const [display, setDisplay] = useState(reduce ? value : from);
-  const displayRef = useRef(display);
-  displayRef.current = display;
+  const [display, setDisplay] = useState(from);
+  /**
+   * The live value, so a re-triggered animation can pick up from wherever the
+   * last one got to rather than jumping back to `from`.
+   *
+   * Written ONLY inside the rAF loop below, never during render. Mirroring state
+   * into a ref on every render (`ref.current = display`) is a real bug and not
+   * just a lint complaint: React may render without committing, so the ref can
+   * end up holding a value that was never shown.
+   */
+  const current = useRef(from);
 
   useEffect(() => {
     if (reduce) return;
     const target = inView ? value : from;
-    const start_value = displayRef.current;
-    if (start_value === target) return;
+    const startValue = current.current;
+    if (startValue === target) return;
     let raf = 0;
     const start = performance.now();
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / duration);
       const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
-      const next = start_value + (target - start_value) * eased;
-      displayRef.current = next;
+      const next = t < 1 ? startValue + (target - startValue) * eased : target;
+      current.current = next;
       setDisplay(next);
       if (t < 1) raf = requestAnimationFrame(tick);
-      else setDisplay((displayRef.current = target));
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [inView, reduce, value, from, duration]);
 
+  // Under reduced motion the figure renders at its final value immediately —
+  // read from the prop rather than from state, which never animates in that case.
+  const shown = reduce ? value : display;
+
   return (
     <span ref={ref} className={className} style={style}>
       {prefix}
-      {display.toLocaleString("en-US", {
+      {shown.toLocaleString("en-US", {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals,
       })}
