@@ -1,15 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/motion/Reveal";
+import { engagementModels } from "@/lib/content";
 
 /**
  * Icons built from the brand's orbit + node motif — one per engagement model.
  * Cream shapes on the dark section, with the Copper node as the accent.
+ *
+ * Presentation, so they live here rather than in lib/content.ts; the copy there
+ * names its icon by key and this map resolves it.
  */
-const stroke = { fill: "none", stroke: "var(--color-cream)", strokeWidth: 4, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+const stroke = {
+  fill: "none",
+  stroke: "var(--color-cream)",
+  strokeWidth: 4,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
 const node = { fill: "var(--color-copper)" };
 
-// Subscribe & Deploy — a node in orbit: plug into the system that's already running.
+/** Subscribe & Deploy — a node in orbit: plug into a system already running. */
 function DeployIcon() {
   return (
     <svg width="44" height="44" viewBox="0 0 48 48" aria-hidden>
@@ -19,7 +29,7 @@ function DeployIcon() {
   );
 }
 
-// Forward Deploy — carried forward to your frontline.
+/** Forward Deploy — carried forward to your frontline. */
 function ForwardIcon() {
   return (
     <svg width="44" height="44" viewBox="0 0 48 48" aria-hidden>
@@ -30,7 +40,7 @@ function ForwardIcon() {
   );
 }
 
-// Frontier Advisory — reaching up to the node at the edge.
+/** Frontier Advisory — reaching up to the node at the edge. */
 function FrontierIcon() {
   return (
     <svg width="44" height="44" viewBox="0 0 48 48" aria-hidden>
@@ -40,26 +50,11 @@ function FrontierIcon() {
   );
 }
 
-const ways = [
-  {
-    Icon: DeployIcon,
-    name: "Subscribe & Deploy",
-    kicker: "AI Blueprints",
-    body: "Immediate access to production-grade frontline AI. We host and run it; you deploy from day one.",
-  },
-  {
-    Icon: ForwardIcon,
-    name: "Customise & Accelerate",
-    kicker: "Forward Deploy",
-    body: "Our Blueprints, shaped to your brand, workflows and systems. Leading practice, live fast.",
-  },
-  {
-    Icon: FrontierIcon,
-    name: "Co-Innovate & Pioneer",
-    kicker: "Frontier Advisory",
-    body: "New capabilities built with your team at the edge of what AI can do.",
-  },
-];
+const ICONS = {
+  deploy: DeployIcon,
+  forward: ForwardIcon,
+  frontier: FrontierIcon,
+} as const;
 
 export default function WaysToWork() {
   return (
@@ -89,14 +84,23 @@ export default function WaysToWork() {
         </Reveal>
 
         <ol className="mt-12 grid gap-4 md:grid-cols-3">
-          {ways.map((way, i) => (
-            <Reveal as="li" key={way.name} delay={i * 0.14} distance={56} className="material-smoked flex flex-col rounded-3xl p-8">
-              <way.Icon />
-              <p className="mt-6 text-sm text-[color:var(--text-muted)]">{way.kicker}</p>
-              <h3 className="mt-1 text-2xl">{way.name}</h3>
-              <p className="mt-3 flex-1 text-[color:var(--text-muted)]">{way.body}</p>
-            </Reveal>
-          ))}
+          {engagementModels.map((way, i) => {
+            const Icon = ICONS[way.icon];
+            return (
+              <Reveal
+                as="li"
+                key={way.name}
+                delay={i * 0.14}
+                distance={56}
+                className="material-smoked flex flex-col rounded-3xl p-8"
+              >
+                <Icon />
+                <p className="mt-6 text-sm text-[color:var(--text-muted)]">{way.kicker}</p>
+                <h3 className="mt-1 text-2xl">{way.name}</h3>
+                <p className="mt-3 flex-1 text-[color:var(--text-muted)]">{way.body}</p>
+              </Reveal>
+            );
+          })}
         </ol>
 
         {/* Copper fill rather than the Green .btn-primary, following the

@@ -24,7 +24,7 @@
  */
 "use client";
 
-import { useReducedMotion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 type Props = {
   /**
@@ -77,7 +77,7 @@ const GLYPHS = [
 ];
 
 export default function Logo({ height = 31, expanded = false, label, hideDot, className, style }: Props) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const dur = reduce ? 0 : 520;
   const ratio = expanded ? RATIO_EXPANDED : RATIO_CLOSED;
   const px = typeof height === "number";

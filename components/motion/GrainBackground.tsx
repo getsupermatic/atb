@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 /**
  * Cream print-grain parallax texture (§5.4). Quiet atmosphere, not decoration:
@@ -8,7 +9,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
  * background-position animation). Hidden under reduced-motion (also via CSS).
  */
 export default function GrainBackground() {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "8%"]);
 

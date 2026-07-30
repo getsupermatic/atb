@@ -1,7 +1,9 @@
 "use client";
 
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useRef, type ReactNode } from "react";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { EASE, VIEWPORT_REPLAY } from "@/lib/motion";
 
 /**
  * Masked top-down word reveal. The word sits in a clipped box and slides down
@@ -50,9 +52,9 @@ export default function WordReveal({
   /** Stagger offset in seconds. */
   delay?: number;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { margin: "0px 0px -12% 0px" });
+  const inView = useInView(ref, VIEWPORT_REPLAY);
 
   if (reduce) return <>{children}</>;
 
@@ -73,8 +75,8 @@ export default function WordReveal({
         animate={{ y: inView ? "0%" : "-105%" }}
         transition={
           inView
-            ? { duration: 1.05, ease: [0.33, 1, 0.68, 1], delay }
-            : { duration: 0.4, ease: [0.4, 0, 1, 1], delay: 0 }
+            ? { duration: 1.05, ease: EASE.out, delay }
+            : { duration: 0.4, ease: EASE.exit, delay: 0 }
         }
       >
         {children}

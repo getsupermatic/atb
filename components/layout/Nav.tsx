@@ -2,15 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-} from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { primaryNav } from "@/lib/site";
-import Logo from "./brand/Logo";
+import { EASE } from "@/lib/motion";
+import Logo from "@/components/brand/Logo";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 /**
  * Scroll-aware navigation (§4.1, behaviour target: Valliance). Three states:
@@ -46,7 +42,7 @@ type Mode = "top" | "hidden" | "docked";
 const HOLD_MS = 2000;
 
 export default function Nav() {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const { scrollY } = useScroll();
   const [mode, setMode] = useState<Mode>("top");
   const [open, setOpen] = useState(false);
@@ -87,7 +83,7 @@ export default function Nav() {
     <motion.header
       className={`nav-bar fixed inset-x-0 top-0 z-50 ${docked ? "nav-scrolled" : ""}`}
       animate={{ y: mode === "hidden" ? "-100%" : "0%" }}
-      transition={{ duration: 0.45, ease: [0.65, 0, 0.35, 1] }}
+      transition={{ duration: 0.45, ease: EASE.nav }}
     >
       {/* Full-width glass bar — absent at the top of the page, slides in when docked */}
       <div aria-hidden className="nav-pane" />
@@ -169,7 +165,7 @@ export default function Nav() {
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.28, ease: EASE.entrance }}
             className="nav-panel fixed inset-x-3 top-[5.25rem] rounded-[1.75rem] p-6 lg:hidden"
           >
             <ul className="flex flex-col gap-1">

@@ -4,7 +4,10 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { EASE, MORPH_SCRUB, VIEWPORT_ONCE } from "@/lib/motion";
+import GradedImage from "@/components/motion/GradedImage";
 
 /**
  * A graded photographic plate that wipes in when it arrives and drifts slower
@@ -22,7 +25,7 @@ import { motion, useReducedMotion } from "framer-motion";
  *            would drag its own soft edges through the frame. (The same
  *            reasoning the retired hover-scale on the product cards carried.)
  *
- * The drift is scrubbed but NOT pinned. FeatureMorph and ATBOS both own the
+ * The drift is scrubbed but NOT pinned. CapabilityGap and ATBOS both own the
  * pinned card→full-bleed morph, and a third pin on one page reads as a tic; an
  * unpinned trigger also needs no scroll runway, so it cannot collide with either
  * of their sticky sections.
@@ -52,12 +55,11 @@ export default function PlateReveal({
 }) {
   const frame = useRef<HTMLDivElement>(null);
   const pan = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   useEffect(() => {
-    // One source of truth for both motion sets: framer-motion's hook governs the
-    // wipe below, so the GSAP drift reads the same value rather than querying
-    // matchMedia separately the way the older sections do.
+    // One source of truth for both motion sets — the same value governs the GSAP
+    // drift here and the Framer wipe below.
     if (reduce) return;
     gsap.registerPlugin(ScrollTrigger);
 
@@ -74,7 +76,7 @@ export default function PlateReveal({
             // pass rather than a movement that starts once you are level with it.
             start: "top bottom",
             end: "bottom top",
-            scrub: 0.6,
+            scrub: MORPH_SCRUB,
           },
         },
       );
@@ -92,19 +94,21 @@ export default function PlateReveal({
     : {
         initial: { clipPath: "inset(0 100% 0 0)" },
         whileInView: { clipPath: "inset(0 0% 0 0)" },
-        viewport: { once: true, margin: "0px 0px -12% 0px" },
-        transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] as const },
+        viewport: VIEWPORT_ONCE,
+        transition: { duration: 0.9, ease: EASE.entrance },
       };
 
   return (
     <motion.div ref={frame} className={`relative overflow-hidden ${className}`} {...wipe}>
-      <div className="grade-film">
+      {/* The image goes in as a child rather than via GradedImage's own `src`,
+          because it needs the over-sized panning box between the grade and
+          itself. The grain and vignette stay siblings of `pan` and therefore
+          still, which is the point — see the note above. */}
+      <GradedImage>
         <div ref={pan} className="absolute inset-x-0 -inset-y-[12%]">
           <Image src={src} alt={alt} fill sizes={sizes} className="object-cover" />
         </div>
-        <div aria-hidden className="grade-film-grain" />
-        <div aria-hidden className="grade-film-vignette" />
-      </div>
+      </GradedImage>
     </motion.div>
   );
 }

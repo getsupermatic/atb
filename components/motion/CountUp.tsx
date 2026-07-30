@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useInView, useReducedMotion } from "framer-motion";
+import { useInView } from "framer-motion";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { VIEWPORT_REPLAY } from "@/lib/motion";
 
 /**
  * Counts a figure between two values when it scrolls into view — 0 → 100 for
@@ -33,9 +35,9 @@ export default function CountUp({
   className,
   style,
 }: Props) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { margin: "0px 0px -15% 0px" });
+  const inView = useInView(ref, VIEWPORT_REPLAY);
   const [display, setDisplay] = useState(reduce ? value : from);
   const displayRef = useRef(display);
   displayRef.current = display;

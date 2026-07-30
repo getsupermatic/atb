@@ -1,32 +1,6 @@
 import Reveal from "@/components/motion/Reveal";
 import CountUp from "@/components/motion/CountUp";
-
-const stats = [
-  {
-    value: 100,
-    suffix: "M+",
-    label:
-      "frontline workers in the US alone — the largest, most underserved workforce for AI-driven productivity.",
-  },
-  {
-    value: 1,
-    // Counts DOWN from 100 rather than up from 0 — the figure is about how little
-    // of the spend reached the floor, so the fall is the point.
-    from: 100,
-    prefix: "~",
-    suffix: "%",
-    label:
-      "of enterprise software investment has reached the store floor. Without purpose-built products, AI repeats the mistake.",
-  },
-  {
-    value: 4.4,
-    decimals: 1,
-    prefix: "$",
-    suffix: "T",
-    label:
-      "long-term AI productivity opportunity (McKinsey) — yet 60%+ of companies see no significant impact today.",
-  },
-];
+import { stats } from "@/lib/content";
 
 export default function Problem() {
   return (

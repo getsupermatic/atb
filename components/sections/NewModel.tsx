@@ -1,35 +1,15 @@
 import Reveal from "@/components/motion/Reveal";
 import DrawRule from "@/components/motion/DrawRule";
-
-const pillars = [
-  {
-    title: "Products, not seats.",
-    body: "Rebuild the SaaS you rent as a product that's truly yours — just the features you need, customised to how you work, without the per-seat bill.",
-  },
-  {
-    title: "Shaped to your reality.",
-    body: "We start from our IP and customise to how your business actually runs — accelerating delivery, not starting from scratch.",
-  },
-  {
-    title: "Frontier, in weeks.",
-    body: "We co-create new capabilities at the edge of what's possible — without the quarter-long discovery phase.",
-  },
-  {
-    title: "Outcomes, not hours.",
-    body: "Commercial models tied to the value we create, not people multiplied by rates. We succeed when you do.",
-  },
-];
+import { pillars } from "@/lib/content";
 
 /**
- * A new model — an editorial ledger, in place of the 2×2 panel grid this used to
- * be. Two things drove the change: Products and Ways-to-Work both follow with
- * grids of their own, so this was the third in a row; and the four opaque cards
- * covered most of .plate-drive, which is the strongest field on the page.
+ * A new model — an editorial ledger. The headline goes sticky and holds against
+ * the plate for the whole section while the four pillars scroll past it as a
+ * single column of ruled beats, each written along its own drawn hairline.
  *
- * So the headline goes sticky and holds against the plate for the whole section,
- * and the pillars become a single column of ruled beats scrolling past it. The
- * copy is unchanged — the titles simply move from card-heading scale to display
- * scale, which is most of why it reads differently.
+ * Deliberately not a grid: Products and WaysToWork both follow with grids of
+ * their own, and opaque cards here would cover most of .plate-drive, which is the
+ * strongest field on the page.
  */
 export default function NewModel() {
   return (
@@ -44,7 +24,7 @@ export default function NewModel() {
        right are contained by the `overflow-x: clip` already on html/body, and
        `clip` (unlike `hidden`) does not create a scrollport, so sticky still
        resolves against the viewport. */
-    <section className="theme-dark plate-drive section" aria-label="A new model">
+    <section className="theme-dark plate plate-drive section" aria-label="A new model">
       {/* Deepens the plate under the copy column only, leaving it at full strength
           behind the sticky headline. The veil .plate-drive carries was measured for
           the h2 alone; body copy needs more. Numbers and the reason it is a

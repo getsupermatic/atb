@@ -1,8 +1,10 @@
 "use client";
 
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useLayoutEffect, useRef, useState } from "react";
 import Logo from "./Logo";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { EASE } from "@/lib/motion";
 
 /**
  * Footer logo with a live full stop. Each time the footer scrolls into view the
@@ -25,7 +27,7 @@ const COPPER = "201, 123, 69";
 const GLOW_OFF = `0 0 0px 0px rgba(${COPPER}, 0)`;
 
 export default function FooterLogo({ height = 26 }: { height?: number }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const wrapRef = useRef<HTMLSpanElement>(null);
   const inView = useInView(wrapRef, { margin: "0px 0px -8% 0px" });
   const [travel, setTravel] = useState(0);
@@ -82,8 +84,8 @@ export default function FooterLogo({ height = 26 }: { height?: number }) {
             : GLOW_OFF,
         }}
         transition={{
-          x: { duration: 1.5, ease: [0.16, 1, 0.3, 1] },
-          boxShadow: { duration: 1.5, ease: [0.16, 1, 0.3, 1] },
+          x: { duration: 1.5, ease: EASE.entrance },
+          boxShadow: { duration: 1.5, ease: EASE.entrance },
         }}
       >
         {/* Comet trail — points back the way it came, fades on arrival */}
@@ -100,7 +102,7 @@ export default function FooterLogo({ height = 26 }: { height?: number }) {
               "linear-gradient(90deg, rgb(var(--copper-rgb) / 0.55), rgb(var(--copper-rgb) / 0))",
           }}
           animate={{ opacity: inView ? [0, 0.9, 0] : 0, scaleX: inView ? [0.2, 1, 0.2] : 0.2 }}
-          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 1.5, ease: EASE.entrance }}
         />
       </motion.span>
     </span>

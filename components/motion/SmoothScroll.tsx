@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 /**
  * Single scroll source (§5.5): Lenis drives smooth/inertia scrolling and feeds
@@ -11,9 +12,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  * Disabled under reduced-motion — native scrolling, full functionality.
  */
 export default function SmoothScroll() {
+  const reduce = usePrefersReducedMotion();
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reduce) return;
 
     gsap.registerPlugin(ScrollTrigger);
 
@@ -33,7 +35,9 @@ export default function SmoothScroll() {
       gsap.ticker.remove(raf);
       lenis.destroy();
     };
-  }, []);
+    // Re-runs if the visitor changes the setting mid-session, tearing Lenis down
+    // or standing it back up — the old matchMedia read could not see that.
+  }, [reduce]);
 
   return null;
 }

@@ -1,9 +1,10 @@
 import Hero from "@/components/sections/Hero";
-import FeatureMorph from "@/components/motion/FeatureMorph";
+import Clients from "@/components/sections/Clients";
+import CapabilityGap from "@/components/sections/CapabilityGap";
 import Problem from "@/components/sections/Problem";
 import NewModel from "@/components/sections/NewModel";
-import WaysToWork from "@/components/sections/WaysToWork";
 import Products from "@/components/sections/Products";
+import WaysToWork from "@/components/sections/WaysToWork";
 import ATBOS from "@/components/sections/ATBOS";
 import { products, site } from "@/lib/site";
 
@@ -32,7 +33,8 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productsJsonLd) }}
       />
       <Hero />
-      <FeatureMorph />
+      <Clients />
+      <CapabilityGap />
       <Problem />
       <NewModel />
       <Products />

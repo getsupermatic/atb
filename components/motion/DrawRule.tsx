@@ -1,6 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { DUR, EASE, VIEWPORT_ONCE } from "@/lib/motion";
 
 /**
  * A hairline that draws itself across its container, left to right, when it comes
@@ -28,7 +30,7 @@ export default function DrawRule({
   className?: string;
   delay?: number;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const base = `h-px origin-left bg-[color:var(--border)] ${className}`;
 
   if (reduce) return <div aria-hidden className={base} />;
@@ -39,8 +41,8 @@ export default function DrawRule({
       className={base}
       initial={{ scaleX: 0 }}
       whileInView={{ scaleX: 1 }}
-      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay }}
+      viewport={VIEWPORT_ONCE}
+      transition={{ duration: DUR.reveal, ease: EASE.entrance, delay }}
     />
   );
 }

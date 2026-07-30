@@ -4,30 +4,33 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Logo from "@/components/brand/Logo";
+import { MORPH_TRIGGER } from "@/lib/motion";
+import { PANEL, morphPanelTweens } from "@/components/motion/MorphPanel";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { atbosStatements as headlines } from "@/lib/content";
 
 /**
  * ATBOS — introduces ATB's internal operating system. The panel pins while you
  * scroll through it: on arrival it is just the ATBOS logo, and each scroll
  * brings the next statement in from the right, one at a time (the previous one
  * sliding off to the left). Scroll-linked (scrubbed) and reversible. Under
- * reduced motion the logo is static and all three statements render stacked, so
+ * reduced motion the logo is static and every statement renders stacked, so
  * nothing is hidden behind motion.
+ *
+ * Unlike the Hero and Capability-gap panels this does NOT use MorphPanel as a
+ * component, because the panel morph is only the opening beat of a much longer
+ * timeline that also drives the statements, the logo's rise and the progress
+ * dots. It shares the geometry and the tween shapes via morphPanelTweens, on its
+ * own timeline — a second ScrollTrigger for the morph would let the two drift
+ * apart from each other, where one timeline cannot.
  */
-const headlines = [
-  "The AI-native operating system we've built the whole company on, and the reason we deliver faster, at lower cost, and smarter.",
-  "One intelligent system runs the entire business — every pipeline, project, decision and delivery, in a single always-current view.",
-  "An agentic engine sits at its core — scoping, building, shipping and improving every product we make.",
-  "We build smarter, sharper and more consistently than ever — more creative, more innovative, and more informed with every decision.",
-];
-
 // Shared by the live copy and the hidden measuring stack, so both wrap
 // identically. Presentation lives in `.statement` / `text-3xl`.
 const headlineClass = "statement text-3xl";
 
-// Panel morph geometry, shared by the inline styles (which carry the arrival
-// state, and the whole state under reduced motion) and the GSAP tweens.
-const PAD = "clamp(1.25rem, 5vw, 3rem)";
-const RADIUS = "1.75rem";
+// The panel's arrival height. The gutter and radius come from PANEL, shared with
+// MorphPanel; this one is ATBOS's own, because its panel arrives shorter than the
+// viewport and grows to fill it.
 const MIN_H = "82vh";
 
 export default function ATBOS() {
@@ -37,11 +40,7 @@ export default function ATBOS() {
   const logo = useRef<HTMLDivElement>(null);
   const lines = useRef<(HTMLParagraphElement | null)[]>([]);
   const [index, setIndex] = useState(-1);
-  const [reduce, setReduce] = useState(false);
-
-  useEffect(() => {
-    setReduce(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }, []);
+  const reduce = usePrefersReducedMotion();
 
   // Reserve the height of the tallest statement so the copy never shifts the
   // layout as lines swap — re-measured on width changes for responsive safety.
@@ -77,15 +76,13 @@ export default function ATBOS() {
     const ctx = gsap.context(() => {
       gsap.set(els, { opacity: 0, x: 120 });
       gsap.set(logo.current, { y: logoOffset });
-      gsap.set(pad.current, { paddingInline: PAD });
-      gsap.set(card.current, { borderRadius: RADIUS, minHeight: MIN_H });
+      gsap.set(pad.current, { paddingInline: PANEL.pad });
+      gsap.set(card.current, { borderRadius: PANEL.radius, minHeight: MIN_H });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.6,
+          ...MORPH_TRIGGER,
           onUpdate: (self) => {
             const p = self.progress;
             // Timeline: a 0.5 beat of logo alone, then each line spans 3 units
@@ -100,18 +97,18 @@ export default function ATBOS() {
       });
 
       // The panel builds in first — contained and rounded on arrival, opening to
-      // full-bleed as you scroll through, the same gesture as FeatureMorph. It is
+      // full-bleed as you scroll through, the same gesture as CapabilityGap. It is
       // on the section's existing scrubbed timeline rather than a second
       // ScrollTrigger, so the morph and the statements can't drift apart.
       // 1.5 units against a 12.5-unit runway, so it resolves in the first ~12%
       // and overlaps the first statement's entrance rather than queueing.
-      tl.fromTo(pad.current, { paddingInline: PAD }, { paddingInline: 0, ease: "none", duration: 1.5 }, 0)
-        .fromTo(
-          card.current,
-          { borderRadius: RADIUS, minHeight: MIN_H },
-          { borderRadius: "0rem", minHeight: "100vh", ease: "none", duration: 1.5 },
-          0,
-        );
+      morphPanelTweens(tl, {
+        pad: pad.current,
+        card: card.current,
+        open: true,
+        duration: 1.5,
+        minHeight: { from: MIN_H, to: "100vh" },
+      });
 
       tl.to({}, { duration: 0.5 }); // a beat of logo alone on arrival
       els.forEach((el, i) => {
@@ -133,7 +130,7 @@ export default function ATBOS() {
       aria-label="ATBOS — our operating system"
     >
       <div className="sticky top-0 flex min-h-screen items-center overflow-hidden">
-       <div ref={pad} className="w-full" style={{ paddingInline: PAD }}>
+       <div ref={pad} className="w-full" style={{ paddingInline: PANEL.pad }}>
         {/* .plate-ridge-forest — the same Green ridge field as the
             Capability-now panel, so the two statement panels read as one device.
             It replaces the atbos-bg photograph, and both of that photograph's
@@ -144,8 +141,8 @@ export default function ATBOS() {
             resolve through — so none of them hardcode a colour. */}
         <div
           ref={card}
-          className="theme-dark plate-ridge-forest relative flex w-full items-center overflow-hidden"
-          style={{ borderRadius: RADIUS, minHeight: MIN_H }}
+          className="theme-dark plate plate-ridge relative flex w-full items-center overflow-hidden"
+          style={{ borderRadius: PANEL.radius, minHeight: MIN_H }}
         >
         {/* items-center on the card above centres this block vertically in the
             panel, so the wordmark, the statements and the progress slider stay as

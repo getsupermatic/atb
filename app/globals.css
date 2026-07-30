@@ -42,7 +42,7 @@
   --color-copper-deep: #975c34;
   /* Statement-panel field only, never a fill or a text colour. Sampled as the
      mean of the tex-ridge-ink texture, so the flat fallback matches the plate
-     it sits under — see .plate-ridge-forest. */
+     it sits under — see .plate-ridge. */
   --color-green-field: #284836;
   /* The film grade's black point. Not a palette colour — it is the value the
      #film-grade filter maps 0 to, and it doubles as .grade-film's placeholder so
@@ -77,7 +77,7 @@
      lines ("Customise & Accelerate") were reading loose as a result.
      Safe to pair at the token level because every `text-2xl` on the site is a
      heading. The shared steps (xs–xl) are deliberately left unpaired: `text-xl`
-     is used by an h3 *and* by FeatureMorph's body paragraph, and 1.08 leading
+     is used by an h3 *and* by CapabilityGap's body paragraph, and 1.08 leading
      on a paragraph would be unreadable. */
   --text-2xl--line-height: 1.08;
   --text-3xl: clamp(1.975rem, 1.55rem + 1.7vw, 2.9rem);
@@ -85,7 +85,17 @@
   --text-5xl: clamp(2.9rem, 1.95rem + 4.2vw, 5.3rem);
   --text-6xl: clamp(3.55rem, 2.1rem + 6.3vw, 6.9rem);
 
-  /* Motion (§5.6) */
+  /* ---- Layout ---- */
+  /* The page's inline gutter. Owned by .shell, but the scroll-morph panels
+     animate the SAME value — a contained panel sits on the shell's gutter and
+     opens to zero — so it has to be a token rather than a literal repeated in
+     each of them. Mirrored as PANEL.pad in components/motion/MorphPanel.tsx,
+     which is the one place JS needs it. */
+  --gutter: clamp(1.25rem, 5vw, 3rem);
+  /* Contained-panel corner radius, the other half of the morph geometry. */
+  --panel-radius: 1.75rem;
+
+  /* Motion (§5.6). Mirrored for JS in lib/motion.ts — see the note there. */
   --dur-fast: 150ms;
   --dur-base: 300ms;
   --dur-slow: 600ms;
@@ -319,7 +329,7 @@
     width: 100%;
     max-width: 78rem; /* ~1248px */
     margin-inline: auto;
-    padding-inline: clamp(1.25rem, 5vw, 3rem);
+    padding-inline: var(--gutter);
   }
 
   /* Runs a direct child of .shell out to the viewport's RIGHT edge, leaving its
@@ -482,41 +492,65 @@
     mix-blend-mode: soft-light;
   }
 
-  /* Ridge plate, Green — the brand's own treated ridge texture as a panel
-     field, in place of a photograph.
-     This used to reconstruct the field from background-cream.webp: a pale cream
-     scan, desaturated and darkened onto a green base through soft-light, with a
-     measured brightness value to stop it washing the whole panel out.
-     tex-ridge-ink is supplied already in the green, so none of that is needed —
-     it is just the image. No filter, no blend mode, no base-colour interaction.
-     --color-green-field stays underneath as the fallback if the asset fails. */
-  .plate-ridge-forest {
-    background-color: var(--color-green-field);
-    background-image: url("/images/tex-ridge-ink.webp");
+  /* ----------------------------------------------------------
+     Plates — a photographic or textured field behind a section,
+     with a flat ink veil folded in as a gradient layer rather
+     than carried by a second element.
+
+     One mechanic, driven by three custom properties, with the
+     per-plate values in small named classes below — so the
+     measurement stays next to the number it justifies.
+
+       --plate-image  the asset
+       --plate-veil   ink alpha over it, 0 for none
+       --plate-base   fallback colour if the asset fails
+
+     Veil strengths are measured, not chosen. Each class records
+     what its value was measured against; do not change one
+     without re-measuring the copy that sits on it.
+     ---------------------------------------------------------- */
+  .plate {
+    --plate-veil: 0;
+    --plate-base: var(--color-ink);
+    /* Three layers, top to bottom: the ink veil, the asset, then the base colour.
+       The base is a flat gradient rather than `background-color`, which looks
+       redundant but is not: every plate also carries .theme-dark, and .theme-dark
+       sets `background-color: var(--bg)`. It lives OUTSIDE @layer components while
+       this rule is inside it, and unlayered styles beat layered ones — so a
+       `background-color` here silently loses, and .plate-ridge's Green base was
+       resolving to Ink. Only visible if the asset fails to load, which is exactly
+       when a fallback is supposed to work. As a background layer it does not
+       compete for the property at all. */
+    background-image:
+      linear-gradient(
+        rgb(var(--ink-rgb) / var(--plate-veil)),
+        rgb(var(--ink-rgb) / var(--plate-veil))
+      ),
+      var(--plate-image),
+      linear-gradient(var(--plate-base), var(--plate-base));
     background-size: cover;
     background-position: center;
   }
 
-  /* Drive plate — the supplied defocused drive-through, on the New-model panel.
-     Veil 0.55: the only thing sitting directly on this plate is the h2 in Cream, and the four cards are opaque --bg-elevated so they ask nothing of it.
-     text-4xl counts as large text (3:1), and 0.55 gives 4.05:1 against the
-     plate's brightest pixel (241,236,227) — clear of the large-text minimum with
-     room, without flattening a plate whose mean is only 29.
-     Side effect worth knowing: this plate is much darker than the tex-lightfield
-     it replaces, which resolves the note that the cards were reading as recessed.
-     Against a field this dark, --bg-elevated now sits above it rather than below.
+  /* Ridge, in Green — the brand's own treated texture as a panel field rather
+     than a photograph. tex-ridge-ink is already supplied in the green, so it
+     needs no veil and no blend mode: it is just the image over its own base,
+     which is the flat fallback if the asset fails. Cream on it is ~9:1. */
+  .plate-ridge {
+    --plate-image: url("/images/tex-ridge-ink.webp");
+    --plate-base: var(--color-green-field);
+  }
 
-     (Three of these veiled-plate classes now exist — .plate-aisle, .plate-drive,
-     .plate-lightfield — differing only in URL and veil. If a fourth arrives,
-     factor the mechanics into one class driven by two custom properties and keep
-     the per-plate values in small named classes, so the reasoning stays with the
-     number rather than moving into the markup.) */
+  /* Defocused drive-through, on the New-model panel.
+     Veil 0.55 is measured for one thing: the h2, in Cream, at text-4xl. That
+     counts as large text (3:1) and 0.55 gives 4.05:1 against the plate's
+     brightest pixel (241,236,227) — clear with room, without flattening a plate
+     whose mean is only 29 and whose whole character is its bokeh highlights.
+     Body copy needs more than this; .wash-read supplies it over the copy column
+     only, and its table has the numbers. */
   .plate-drive {
-    background-color: var(--color-ink);
-    background-image:
-      linear-gradient(rgb(var(--ink-rgb) / 0.55), rgb(var(--ink-rgb) / 0.55)),
-      url("/images/tex-light-drive.webp");
-    background-size: cover;
+    --plate-image: url("/images/tex-light-drive.webp");
+    --plate-veil: 0.55;
     /* 78%, not `center` — the crop is framed on the server rather than the car.
        The source is 1280×720 and the section runs about 1440×1310, so `cover`
        fits the height and the plate overflows to ~2333px wide: only 790 of the
@@ -573,14 +607,13 @@
     }
   }
 
-  /* Aisle plate — the defocused aisle, on the Capability-now panel. The veil is
-     folded in as a gradient layer rather than a second element, at 0.35 rather
-     than 0.50 because this panel also carries .scrim-panel, which ramps to ink
-     0.78 at the foot where the copy sits.
+  /* Defocused aisle, on the Capability-now panel. Veil 0.35 rather than the
+     deeper value the plate would otherwise want, because this panel also carries
+     .scrim-panel, which ramps to ink 0.78 at the foot where the copy sits.
      That pairing is required, not belt-and-braces. The panel's highlighted line
-     is Copper, and Copper is a MID-TONE: veiling the field darker moves it
-     toward the type rather than away, so Copper cannot reach 3:1 on this plate by
-     veiling alone. What fixes it is depth where the copy actually is: 0.35 veil
+     is Copper, and Copper is a MID-TONE: veiling the field darker moves it toward
+     the type rather than away, so Copper cannot reach 3:1 on this plate by
+     veiling alone. What fixes it is depth where the copy actually is — 0.35 veil
      plus the scrim's 0.78 at the foot combines to 0.857 coverage, which against
      the plate's brightest pixel (247,242,233) puts Copper at 3.79:1, Cream at
      11.03:1 and Stone at 8.25:1. Copper clears the 3:1 large-text bar there and
@@ -588,12 +621,8 @@
      At the top of the panel the scrim is only 0.2, so the combined 0.48 still
      lets the bokeh read. */
   .plate-aisle {
-    background-color: var(--color-ink);
-    background-image:
-      linear-gradient(rgb(var(--ink-rgb) / 0.35), rgb(var(--ink-rgb) / 0.35)),
-      url("/images/tex-light-aisle.webp");
-    background-size: cover;
-    background-position: center;
+    --plate-image: url("/images/tex-light-aisle.webp");
+    --plate-veil: 0.35;
   }
 
   /* ----------------------------------------------------------
@@ -820,11 +849,6 @@
     z-index: 1;
     padding-block: clamp(4.5rem, 9vw, 9rem);
   }
-
-  /* Hero morph scroll runway (full-screen → contained panel) */
-  .hero-morph-section {
-    height: 175vh;
-  }
 }
 
 /* ============================================================
@@ -865,9 +889,5 @@
   }
   .marquee-track {
     animation: none !important;
-  }
-  /* No scroll morph — render the hero as a single full-screen panel */
-  .hero-morph-section {
-    height: 100vh;
   }
 }

@@ -1,7 +1,7 @@
 import Link from "next/link";
-import FooterLogo from "./brand/FooterLogo";
-import WordReveal from "./motion/WordReveal";
-import SignupForm from "./SignupForm";
+import FooterLogo from "@/components/brand/FooterLogo";
+import WordReveal from "@/components/motion/WordReveal";
+import SignupForm from "@/components/layout/SignupForm";
 import { footerNav, site } from "@/lib/site";
 
 function LinkedInIcon() {

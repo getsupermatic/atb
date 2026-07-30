@@ -1,7 +1,9 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { DUR, EASE, VIEWPORT_ONCE } from "@/lib/motion";
 
 /**
  * Section reveal (§5.5): gentle fade + slide-up on enter, staggerable for
@@ -26,7 +28,7 @@ export default function Reveal({
   distance,
   as = "div",
 }: Props) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const MotionTag = motion[as];
 
   if (reduce) {
@@ -47,8 +49,8 @@ export default function Reveal({
       className={className}
       initial={{ opacity: 0, ...offset }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay }}
+      viewport={VIEWPORT_ONCE}
+      transition={{ duration: DUR.reveal, ease: EASE.entrance, delay }}
     >
       {children}
     </MotionTag>
