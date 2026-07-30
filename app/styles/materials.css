@@ -101,46 +101,13 @@
     );
   }
 
-  /* ----------------------------------------------------------
-     Duotone — neutralises an image so it sits in the palette.
-     INTERIM: it exists because part of the photographic set was
-     produced for the retired teal/lime palette, and it strips
-     that hue rather than re-treating the artwork. Delete the
-     class and its one usage (ClosingBand) once the artwork is
-     re-treated.
-     Wrap only the image — never a node with text inside, or the
-     blend picks up the copy.
-     ---------------------------------------------------------- */
-  .duotone {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-  }
-  /* grayscale() wipes the retired teal and the acid-lime nodes out completely,
-     and nothing re-tints it: the plates stay neutral black-and-white so they
-     match the header photograph, which is a genuinely monochrome shot shown with
-     no
-     filter at all. The old sepia(0.5) saturate(1.5) that used to sit here was
-     what made every plate read brown. Contrast is up a little to compensate —
-     removing the sepia also removed the punch it was adding. */
-  .duotone :where(img) {
-    filter: grayscale(1) contrast(1.12) brightness(0.98);
-  }
-  /* A little depth back into the plate — light at the top, ink at the foot.
-     Neutral white rather than Cream: Cream is a warm off-white, and at
-     soft-light it was reintroducing the warm cast the filter just removed. */
-  .duotone::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(
-      180deg,
-      rgb(255 255 255 / 0.16),
-      rgb(var(--ink-rgb) / 0.24)
-    );
-    mix-blend-mode: soft-light;
-  }
+  /* `.duotone` was here. It existed for one reason — stripping the retired
+     teal/lime palette out of artwork produced for it — and it had one usage, the
+     glass-planes photograph behind the closing bands. That photograph has been
+     removed from the site and both bands now take `.plate-aisle`, so the class had
+     nothing left to treat and went with it. Anything needing this again should
+     re-treat the artwork instead: the note it carried recorded that the class was
+     always interim. */
 
   /* ----------------------------------------------------------
      Plates — a photographic or textured field behind a section,

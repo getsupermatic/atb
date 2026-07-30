@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { primaryNav } from "@/lib/site";
 import { EASE } from "@/lib/motion";
@@ -39,9 +40,49 @@ type Mode = "top" | "hidden" | "docked";
  */
 const HOLD_MS = 2000;
 
+/**
+ * The current-page marker: a hairline under the label in the nav's own foreground
+ * colour, plus `aria-current="page"`.
+ *
+ * Deliberately NOT a colour change to Copper, which is what hover uses. The bar is
+ * transparent at the top of a page and the careers hero it sits over is a Green
+ * field, where Copper is 2.73:1 — the one label that must be legible would be the
+ * least legible thing in the row. An underline in `currentColor` inherits whatever
+ * the bar has resolved its foreground to, so it cannot be wrong on any field.
+ */
+const ACTIVE_LINK = "underline decoration-1 underline-offset-[6px]";
+
 export default function Nav() {
   const reduce = usePrefersReducedMotion();
+  const pathname = usePathname();
   const { scrollY } = useScroll();
+
+  /**
+   * Prefix match, not equality, so a nested route marks its section — /insights/an
+   * -article lights "Insights". The trailing slash is what stops /careers-of-old
+   * matching /careers. Product pages live at /products/… rather than under
+   * /what-we-do, so they mark nothing; give them a `section` on the nav data if
+   * they should ever light it.
+   *
+   * Anchor items never light. Most of the nav points into the homepage while the
+   * dedicated pages are unbuilt, and marking all three "current" the moment you are
+   * on the homepage would say nothing. Tracking which section is in view would mean
+   * a scroll-spy, which is a real feature rather than a fallback — and it should
+   * arrive with those pages, not before them.
+   */
+  const isActive = (href: string) =>
+    !href.includes("#") && (pathname === href || pathname.startsWith(`${href}/`));
+
+  /**
+   * On the homepage, a `/#section` item is rewritten to a bare `#section` so Lenis's
+   * `anchors` handling takes the click (see SmoothScroll). Left as `/#section` it is
+   * a Next.js navigation to the route you are already on, which sets the scroll
+   * position itself — and that fights Lenis's own animation, the exact problem the
+   * `anchors` option exists to solve. Off the homepage it stays a real href, so it
+   * navigates home and lands on the section.
+   */
+  const resolveHref = (href: string) =>
+    pathname === "/" && href.startsWith("/#") ? href.slice(1) : href;
   const [mode, setMode] = useState<Mode>("top");
   const [open, setOpen] = useState(false);
   /** True while the opening hold is still running — see HOLD_MS. */
@@ -62,25 +103,56 @@ export default function Nav() {
     return () => clearTimeout(t);
   }, [reduce]);
 
-  // A reload can restore a mid-page scroll position, where the bare Cream
-  // treatment would be invisible over light content. Dock immediately in that
-  // case rather than waiting for the first scroll event.
+  // Landing mid-page has to dock the bar. Bare, the treatment is Cream with no pane
+  // behind it, which is invisible over the light sections — and there are two ways
+  // to arrive mid-page: a reload restoring a scroll position, and a cross-page
+  // anchor like /#what-we-think from the careers page.
+  //
+  // This covers the case where the position is already set by the time React
+  // hydrates. The case where it lands AFTER hydration is handled in the scroll
+  // handler below, which cannot tell a positional jump from a gesture on its own.
   //
   // This genuinely has to be an effect: window.scrollY does not exist during SSR,
-  // so it cannot seed useState, and nothing else fires until the visitor scrolls.
-  // It runs once on mount and is exactly the "synchronise with an external system"
-  // case the rule exists to allow — but the rule cannot tell that apart, so it is
-  // suppressed here rather than worked around.
+  // so it cannot seed useState. It runs once on mount and is exactly the
+  // "synchronise with an external system" case the rule exists to allow — but the
+  // rule cannot tell that apart, so it is suppressed here rather than worked around.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (window.scrollY > 8) setMode("docked");
   }, []);
 
+  /**
+   * Whether a scroll position has been OBSERVED yet. Not the same as "has scrolled":
+   * see the first-event guard in the handler below.
+   */
+  const observed = useRef(false);
+
   useMotionValueEvent(scrollY, "change", (y) => {
     if (open) return; // don't move the bar out from under an open menu
-    if (y <= 8) return setMode("top"); // back at the top → bare again
+    if (y <= 8) {
+      observed.current = true;
+      return setMode("top"); // back at the top → bare again
+    }
     // Under reduced motion, skip the slide-away entirely and just stay docked.
     if (reduce) return setMode("docked");
+
+    // The FIRST observed event on a page that is already scrolled well down did not
+    // get there by scrolling: it is a reload restoring a position, or a /#section
+    // arrival whose fragment scroll landed after hydration. `getPrevious()` is 0
+    // simply because nothing has been observed yet, so the delta below would read as
+    // one enormous downward scroll and hide the bar on arrival. Dock instead.
+    //
+    // Both conditions are needed. A real scroll from the top also has no previous
+    // value, but its first event is a few pixels in, not a full viewport — so the
+    // height test is what tells a jump from a gesture, and scrolling down from the
+    // top still hides the bar as it should.
+    if (!observed.current) {
+      observed.current = true;
+      if ((scrollY.getPrevious() ?? 0) === 0 && y > window.innerHeight) {
+        return setMode("docked");
+      }
+    }
+
     const dy = y - (scrollY.getPrevious() ?? 0);
     if (Math.abs(dy) < 4) return; // ignore jitter, or the bar flickers
     setMode(dy < 0 ? "docked" : "hidden"); // reveal only on scrolling up
@@ -130,8 +202,11 @@ export default function Nav() {
             {primaryNav.map((item) => (
               <li key={item.href}>
                 <Link
-                  href={item.href}
-                  className="nav-fg text-[0.9rem] font-medium transition-colors hover:text-[color:var(--accent-text)]"
+                  href={resolveHref(item.href)}
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                  className={`nav-fg text-[0.9rem] font-medium transition-colors hover:text-[color:var(--accent-text)] ${
+                    isActive(item.href) ? ACTIVE_LINK : ""
+                  }`}
                 >
                   {item.label}
                 </Link>
@@ -179,9 +254,12 @@ export default function Nav() {
               {primaryNav.map((item) => (
                 <li key={item.href}>
                   <Link
-                    href={item.href}
+                    href={resolveHref(item.href)}
                     onClick={() => setOpen(false)}
-                    className="nav-fg flex min-h-[44px] items-center text-lg font-medium"
+                    aria-current={isActive(item.href) ? "page" : undefined}
+                    className={`nav-fg flex min-h-[44px] items-center text-lg font-medium ${
+                      isActive(item.href) ? ACTIVE_LINK : ""
+                    }`}
                   >
                     {item.label}
                   </Link>

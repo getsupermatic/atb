@@ -21,7 +21,10 @@ export default function Products() {
   const [frontline, ...rest] = products;
 
   return (
-    <section className="section" aria-label="Products">
+    /* #what-we-do is the primary nav's target — see `primaryNav` in lib/site.ts.
+       scroll-mt-6 for the same reason as NewModel: `.section`'s own top padding is
+       the nav clearance, and this is just the safety margin at the narrow end. */
+    <section id="what-we-do" className="section scroll-mt-6" aria-label="Products">
       <div className="shell">
         {/* The heading stands alone — there is no intro sentence. If one is ever
             added it should go BESIDE the heading, in a

@@ -23,6 +23,18 @@ export default function SmoothScroll() {
       duration: 1.1,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      // In-page anchors have to be handed to Lenis. A native anchor jump moves the
+      // real scroll position while Lenis is still animating its own, and the two
+      // fight — the page lands on the target and is then dragged back. This routes
+      // any href="#id" through lenis.scrollTo instead.
+      //
+      // No `offset` here, deliberately. Lenis reads the target's own
+      // `scroll-margin-top` (lenis.mjs, in its scrollTo element branch), which is
+      // also what the native path uses when a /#section URL is loaded directly. So
+      // each target's `scroll-mt-*` governs both paths and there is one source of
+      // truth. An offset here would be ADDED to that margin, not replace it —
+      // double-counting the nav clearance on every click.
+      anchors: true,
     });
 
     lenis.on("scroll", ScrollTrigger.update);

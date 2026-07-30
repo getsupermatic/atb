@@ -59,10 +59,7 @@ const ICONS = {
 export default function WaysToWork() {
   return (
     <section className="theme-dark section relative overflow-hidden" aria-label="Three ways to work with us">
-      {/* No .duotone on this plate — the asset is already a clean monochrome, so
-          there is no legacy hue to strip and the wrapper's soft-light layer would
-          only muddy it.
-          No extra veil either, which is worth recording because this is a BRIGHT
+      {/* No veil on this plate, which is worth recording because this is a BRIGHT
           plate: its brightest pixel is (247,242,233), where Cream alone would be
           1.01:1. .scrim-side is what covers it — unlike the other scrims it never
           fades out, bottoming at ink 0.58 on the right — and the cards add their

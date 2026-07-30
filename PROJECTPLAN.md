@@ -3234,3 +3234,78 @@ but the banner is still outstanding — brief §7.9). The Terms still describe u
 "an AI-native agency and technology partner", which is the old positioning rather
 than the copy deck's "AI-native product and consulting company"; changing it is a
 legal-review call, so it was left.
+
+## Round: primary nav anchored into the homepage (2026-07-30)
+
+The nav is now **What we think · How we work · What we do · Careers**. The first
+three are anchors into the homepage — the dedicated pages are not built yet —
+and Careers is the one real route.
+
+### The mapping
+
+| Nav item | Target | Section it lands on |
+|---|---|---|
+| What we think | `#what-we-think` | CapabilityGap — "Capability now advances by the month. Most frontline tools still change by the year." |
+| How we work | `#how-we-work` | NewModel — "A new model for a changed world." |
+| What we do | `#what-we-do` | Products — "Production-ready AI blueprints." |
+| Careers | `/careers` | the dedicated page |
+
+Nav order follows page order. It lives in `primaryNav` (lib/site.ts) with the
+mapping recorded there, so when a dedicated page ships only its href changes — the
+section ids can stay.
+
+`MorphPanel` gained an optional `id` prop so CapabilityGap could take one; it goes on
+the section, which is the runway, so arriving lands at the START of the morph with
+the panel in its contained rounded state.
+
+### Anchors: one source of truth, and a double-count removed
+
+**Lenis reads a target's `scroll-margin-top`** — `lenis.mjs` does exactly that in its
+scrollTo-element branch. So the `anchors: { offset: -112 }` added earlier was being
+ADDED to the CSS margin, not replacing it: 224px of clearance on every Lenis-driven
+click. It is now `anchors: true`, and each target's `scroll-mt-*` governs both the
+smooth path and the native path (a `/#section` URL loaded directly). Change the CSS,
+both paths follow.
+
+The margins are then per-target, and deliberately small:
+
+- **`#what-we-think`: none.** Any clearance here shows the tail of the Trusted-by
+  band above the panel, which is the thing this anchor is meant to land past. It
+  needs none — the card is centred in a min-h-screen sticky box, so its top edge
+  already sits ~103px down, clear of the docked bar.
+- **`#how-we-work`, `#what-we-do`, `#open-roles`: `scroll-mt-6` (24px).** `.section`
+  opens with 72–144px of its own top padding, so the bar has empty space to sit
+  over; 24px is just the safety margin at the narrow end of that clamp. Measured
+  landings: headings at 133–161px on desktop and 96–124px at 390px, against an
+  89px nav row — all clear. The 24px of previous section that shows is empty
+  padding, and the docked bar covers it entirely.
+
+### A latent nav bug this surfaced
+
+Arriving mid-page could hide the bar instead of docking it. On a mid-page load
+framer's first `change` event compares against a previous value of 0, so it reads as
+one enormous downward scroll — and the existing mount-time dock (added for reloads
+that restore a scroll position) was immediately undone by it.
+
+`Nav.tsx` now guards the first observed event: if nothing has been observed yet, the
+previous value is 0 and the position is already more than a viewport down, that is a
+positional jump rather than a gesture, so it docks. Both conditions are needed —
+a real scroll from the top also has no previous value, but its first event is a few
+pixels in, not a full viewport, so scrolling down from the top still hides the bar.
+
+**Not verified in-browser.** framer-motion's scroll pipeline is rAF-driven and the
+automation tab is `visibilityState: hidden`, so no scroll event ever reaches it.
+The reasoning and the measurements around it hold, but the docking behaviour on
+arrival wants a click-through in a real browser.
+
+### Still pointing at unbuilt routes
+
+Not touched, because the ask was the primary nav, but worth deciding on together:
+
+- `footerNav.Company` still lists **Who we are · What we do · How we work** as
+  `/who-we-are`, `/what-we-do`, `/how-we-work` — all 404 today. The footer is now
+  the only place linking to them. "Who we are" has no homepage section mapped, which
+  is why this was not swapped wholesale.
+- The homepage hero's second CTA, **"See how we work"**, points at `/how-we-work`.
+  `/#how-we-work` would work today.
+- Every **"/contact"** CTA (hero, nav, closing bands, footer) 404s. Pre-existing.

@@ -24,7 +24,18 @@ export default function NewModel() {
        right are contained by the `overflow-x: clip` already on html/body, and
        `clip` (unlike `hidden`) does not create a scrollport, so sticky still
        resolves against the viewport. */
-    <section className="theme-dark plate plate-drive section" aria-label="A new model">
+    /* #how-we-work is the primary nav's target — see `primaryNav` in lib/site.ts.
+       scroll-mt-6 rather than the nav's full height: `.section` already opens with
+       72–144px of its own top padding, so the bar has empty space to sit over, and
+       this is only the safety margin for the narrow end of that clamp. Anything
+       larger would land far enough back to show the tail of the previous section,
+       which is the fault this anchor set was corrected for. It is a scroll margin,
+       so it has no layout effect and cannot disturb the sticky headline below. */
+    <section
+      id="how-we-work"
+      className="theme-dark plate plate-drive section scroll-mt-6"
+      aria-label="A new model"
+    >
       {/* Deepens the plate under the copy column only, leaving it at full strength
           behind the sticky headline. The veil .plate-drive carries was measured for
           the h2 alone; body copy needs more. Numbers and the reason it is a

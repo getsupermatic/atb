@@ -18,11 +18,33 @@ export const site = {
   },
 } as const;
 
+/**
+ * The primary nav row.
+ *
+ * Three of the four are ANCHORS into the homepage rather than routes: the dedicated
+ * What-we-think / How-we-work / What-we-do pages are not built yet, so each points
+ * at the homepage section that carries its argument today. Careers is the one real
+ * route. When a dedicated page ships, change its href here and nothing else needs
+ * to move — the section ids can stay where they are.
+ *
+ * The mapping, and the sections that own these ids:
+ *
+ *   What we think → CapabilityGap  "Capability now advances by the month. Most
+ *                                  frontline tools still change by the year."
+ *   How we work   → NewModel    "A new model for a changed world." — products not
+ *                                seats, outcomes not hours
+ *   What we do    → Products    "Production-ready AI blueprints."
+ *
+ * Nav order follows page order, which is why How-we-work sits before What-we-do.
+ *
+ * Insights is deliberately absent — the page is still a stub carrying the closing
+ * band alone. The route and the footer link both stand, and it comes back here when
+ * the editorial index is built.
+ */
 export const primaryNav = [
-  { label: "Who we are", href: "/who-we-are" },
-  { label: "What we do", href: "/what-we-do" },
-  { label: "How we work", href: "/how-we-work" },
-  { label: "Insights", href: "/insights" },
+  { label: "What we think", href: "/#what-we-think" },
+  { label: "How we work", href: "/#how-we-work" },
+  { label: "What we do", href: "/#what-we-do" },
   { label: "Careers", href: "/careers" },
 ] as const;
 

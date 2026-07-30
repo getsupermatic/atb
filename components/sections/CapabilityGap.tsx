@@ -20,6 +20,16 @@ export default function CapabilityGap() {
       open
       runway="220vh"
       ariaLabel="Why now"
+      /* #what-we-think is the primary nav's target — see the mapping on
+         `primaryNav` in lib/site.ts. The id goes on the section, which is the
+         runway, so arriving here lands at the START of the morph: the panel is in
+         its contained, rounded resting state and opens as you scroll on.
+         NO scroll margin, unlike the other two anchor targets. Any clearance here
+         would show the tail of the Clients band above the panel, which is exactly
+         what this anchor is meant to land past. It needs none: the card is centred
+         in a min-h-screen sticky box, so its top edge already sits ~140px below the
+         section top — well clear of the docked nav. */
+      id="what-we-think"
       /* A constant floor, not an animated value: the card is 62vh at rest and the
          morph only grows its `height` to fill the viewport. */
       cardClassName="min-h-[62vh]"

@@ -93,6 +93,8 @@ type Props = {
    */
   runway: string;
   ariaLabel: string;
+  /** Anchor target, set on the section — the runway, not the panel inside it. */
+  id?: string;
   className?: string;
   cardClassName?: string;
   cardStyle?: React.CSSProperties;
@@ -128,6 +130,7 @@ export default function MorphPanel({
   open,
   runway,
   ariaLabel,
+  id,
   className = "",
   cardClassName = "",
   cardStyle,
@@ -172,6 +175,7 @@ export default function MorphPanel({
   return (
     <section
       ref={section}
+      id={id}
       className={`relative ${className}`}
       style={reduce ? undefined : { height: runway }}
       aria-label={ariaLabel}

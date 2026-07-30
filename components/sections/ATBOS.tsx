@@ -134,9 +134,9 @@ export default function ATBOS() {
         {/* .plate-ridge-forest — the same Green ridge field as the
             Capability-now panel, so the two statement panels read as one device.
             It replaces the atbos-bg photograph, and both of that photograph's
-            wrappers went with it: .duotone (nothing left to desaturate) and
-            .veil-chalk-radial (it existed to lift copy off imagery; the flat
-            field needs no help, and Cream on it is ~9:1).
+            wrappers went with it: the duotone treatment (nothing left to
+            desaturate) and .veil-chalk-radial (it existed to lift copy off
+            imagery; the flat field needs no help, and Cream on it is ~9:1).
             theme-dark comes with the green: it flips --heading and --text to Cream, which is what the wordmark, the statements and the dots all
             resolve through — so none of them hardcode a colour. */}
         <div
