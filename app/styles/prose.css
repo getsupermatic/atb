@@ -1,0 +1,140 @@
+/* Long-form document type — the legal & policy pages.
+   Rendered markdown, so the rules are element selectors rather than classes:
+   nothing in content/legal/ can carry a className. Every value resolves through
+   the tokens, and the only colours used are the semantic aliases, so a .prose
+   block inside .theme-dark would invert correctly if one ever needs to. */
+
+@layer components {
+  .prose {
+    color: var(--text);
+    /* Legal copy is read in long sittings, not scanned — a little more leading
+       than the body default. */
+    line-height: 1.7;
+  }
+
+  /* One rhythm for everything, with the headings overriding it below to open up
+     the space above a new section. */
+  .prose > * + * {
+    margin-top: 1.15rem;
+  }
+  .prose > :first-child {
+    margin-top: 0;
+  }
+
+  /* The document's own h1 is not rendered here — the page heading carries it —
+     so `##` is the top level and the outline stays correct. */
+  .prose h2 {
+    font-size: var(--text-2xl);
+    margin-top: 3.5rem;
+    /* The contents rail anchors to these. 7rem clears the fixed nav, and it
+       MIRRORS `anchors.offset` in SmoothScroll.tsx (-112px), which is what makes
+       the same jump land in the same place while Lenis is running. Change one,
+       change both. */
+    scroll-margin-top: 7rem;
+  }
+  .prose h3 {
+    font-size: var(--text-xl);
+    margin-top: 2.5rem;
+  }
+  .prose h4 {
+    font-size: var(--text-lg);
+    margin-top: 2rem;
+  }
+  .prose h2 + *,
+  .prose h3 + *,
+  .prose h4 + * {
+    margin-top: 0.85rem;
+  }
+  /* A subhead straight after its section heading is the one case that wants more
+     than the tight follow-on gap — at 0.85rem the two collide as one block.
+     Several sections open this way ("6. How to manage…" → "6.1 On our website"). */
+  .prose h2 + h3,
+  .prose h3 + h4 {
+    margin-top: 1.75rem;
+  }
+
+  /* Tailwind's preflight strips list styling, so it is restored rather than
+     inherited. */
+  .prose ul,
+  .prose ol {
+    padding-left: 1.35rem;
+  }
+  .prose ul {
+    list-style: disc;
+  }
+  .prose ol {
+    list-style: decimal;
+  }
+  .prose li + li {
+    margin-top: 0.5rem;
+  }
+  .prose li::marker {
+    color: var(--text-muted);
+  }
+
+  .prose strong {
+    font-weight: 600;
+    color: var(--heading);
+  }
+
+  /* The pull lines under each Responsible AI principle are the only italics in
+     the set, and they are asides — muted, like a caption. */
+  .prose em {
+    color: var(--text-muted);
+  }
+
+  .prose a {
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: color var(--dur-base) var(--ease-standard);
+  }
+  .prose a:hover {
+    color: var(--heading);
+  }
+
+  .prose hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin-block: 2.5rem;
+  }
+
+  /* Cookie names and tokens (`_ga`, `__vercel_*`). No syntax highlighting to
+     inherit, so this is only a tint and a monospace face. */
+  .prose code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.875em;
+    background: rgb(var(--ink-rgb) / 0.06);
+    border-radius: 4px;
+    padding: 0.15em 0.4em;
+  }
+
+  /* The cookie tables run wider than the reading column at narrow widths, so
+     each one scrolls inside its own box rather than pushing the page sideways.
+     The wrapper is added by the renderer — see app/legal/[slug]/page.tsx. */
+  .prose-scroll {
+    overflow-x: auto;
+    /* A scroll container is a focus scope; without this it is unreachable by
+       keyboard when it overflows. */
+    scrollbar-width: thin;
+  }
+  .prose table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    text-align: left;
+  }
+  .prose th,
+  .prose td {
+    border-bottom: 1px solid var(--border);
+    padding: 0.7rem 1rem 0.7rem 0;
+    vertical-align: top;
+  }
+  .prose th {
+    color: var(--heading);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+}

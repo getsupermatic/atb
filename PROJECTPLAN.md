@@ -2781,3 +2781,456 @@ corrected `.ico` delivers.
   is a palette token (Deep Pine is `#0f1613`, Warm Chalk `#f5f1e8`), so the icon
   sits just outside the palette. Not changed — it is the mark as adopted — but
   noted for whenever the icon is next revisited.
+
+---
+
+# Plan: the Careers page (`/careers`) — 2026-07-30
+
+**Copy source:** `briefs/documents/legal/ATB-v1-careers-copy.md` (the v1 careers
+deck), used verbatim. It supersedes the Master Copy Deck §2.6 careers block, which
+is the earlier, shorter version ("Come build on the far side of what's possible") —
+§2.6's *rule* still holds and the new copy already obeys it: principles only, no
+16:24 windows, no Life Days, no expense mechanics, no Impact Score. The publication
+notes at the foot of the copy file list what must not appear; none of it does.
+
+**Style source:** the homepage. No new visual devices, no new materials, no new
+tokens. Every section below is assembled from what already exists.
+
+## Section plan
+
+Dark / light / dark / light / dark, so the page alternates the way the homepage
+does, and so the top of the page is dark — the nav sits bare in Cream over the
+hero and needs a dark field under it.
+
+| # | Section | Field | Devices reused |
+|---|---------|-------|----------------|
+| 1 | Hero | `theme-dark` + `.plate-ridge` (the Green ridge texture) | `.scrim-top`, staggered `motion` entrance copied from `Hero.tsx`, the hero's bottom strip pattern for the three why-join lines |
+| 2 | The company we are building | paper canvas | `Reveal`, `DrawRule` ruled pair (as `Products.tsx`), `.statement` in Green for the mission (as `Problem.tsx`'s pull quote) |
+| 3 | Principles for how we work | `theme-dark` + `tex-light-aisle` + `.scrim-side` | `.material-smoked` card grid, exactly as `WaysToWork.tsx` |
+| 4 | Open role | paper canvas | `Reveal`, `DrawRule`, hairlines only — the `Products.tsx` editorial register |
+| 5 | General interest | `theme-dark` + `glass-planes` `.duotone` + `.scrim-deep` | the `ClosingBand.tsx` material |
+
+**Why `.plate-ridge` for the hero and not a photograph.** There is no new artwork,
+and the only unused-on-this-page photographs are the homepage's own signatures —
+`hero-panels` is the homepage h1's field and reusing it would read as the same page
+twice. The Green ridge plate is a brand-owned texture, is already the field for
+both statement panels (Capability-now, ATBOS), needs no veil, and puts Cream at
+~9:1. A typographic hero is also the right register for a careers page.
+
+**Why no `MorphPanel` on this page.** The card→full-bleed morph is the homepage's
+opening gesture and it costs a scroll runway (175vh–220vh) plus a pin. Careers is
+a reading page with a long role spec; two pinned panels on the way to the job
+description would fight the content. The hero is a plain full-bleed dark section.
+
+## Copy mapping
+
+- **Hero** — eyebrow "Careers"; h1 "Help build a different kind of AI company.";
+  intro paragraphs 1–2 (the belief about the shape of teams); the three why-join
+  lines as a ruled strip at the foot of the panel; two CTAs.
+- **Section 2** — intro paragraphs 3–4 lead it (they are about ATB specifically,
+  so they belong with "the company we are building" rather than in the hero), then
+  the four beats (Small teams amplified · One team from problem to outcome · A
+  system for consistently great work · Build the model with us) as a ruled 2×2,
+  then the mission as the Green `.statement` pull quote.
+- **Section 3** — the framing paragraph ("We are at the beginning of building this
+  model…"), the six principles as smoked-glass cards, and the closing line ("The
+  model will evolve. The underlying idea will not…") as a statement below them.
+- **Section 4** — eyebrow "Open role"; h2 "Applied AI solution engineer"; the
+  meta row (London · Hybrid · Client-facing); About the role; What you'll do;
+  What good looks like (Hands-on / Front of house); the "we do not expect one
+  person to match every line" note; Package; Location; Application; Apply CTA.
+- **Section 5** — General interest, both paragraphs, one CTA.
+
+## Structure
+
+Per brief §7.7, "structure roles as data so they're easy to add/remove":
+
+- **`lib/careers.ts`** (new) — the page's copy as data, following `lib/content.ts`'s
+  conventions: the why-join lines, the four company beats, the six principles, and
+  `roles` as an array. The page renders `roles.map(…)`, so adding or removing a
+  role is a data edit. An empty `roles` array falls through to the General-interest
+  band on its own, which is the copy deck's documented empty state.
+- **`app/careers/page.tsx`** (new) — metadata (title, description, canonical),
+  `JobPosting` JSON-LD per open role, and the five sections. Server component;
+  only the hero's staggered entrance needs `"use client"`, so the hero is its own
+  component in `components/sections/careers/` alongside the others.
+- **`app/sitemap.ts`** — register `/careers`. It currently carries home only, with
+  a comment saying future routes register as they ship.
+
+No changes to `lib/site.ts` (the nav already links `/careers`, so that link simply
+starts working), and no changes to any stylesheet — if a section needs something
+the materials layer does not already have, that is a signal the section is wrong,
+not that the stylesheet is missing a class.
+
+## Open decision (flagged in the copy itself)
+
+The copy carries two "Decision required" notes: the destination behind **Apply
+now**, and whether **Introduce yourself** uses the same route. Asked separately;
+both CTAs will be built as a single `applyHref` value on the role data plus one
+for general interest, so changing them later is a one-line edit.
+
+## To do
+
+- [ ] `lib/careers.ts` — why-join lines, company beats, principles, roles data
+- [ ] `components/sections/careers/CareersHero.tsx` — dark ridge panel, h1, intro, why-join strip, CTAs
+- [ ] `components/sections/careers/TheCompany.tsx` — intro, ruled 2×2 beats, mission statement
+- [ ] `components/sections/careers/Principles.tsx` — framing line, six smoked cards, closing statement
+- [ ] `components/sections/careers/OpenRoles.tsx` — role spec, rendered from data
+- [ ] `components/sections/careers/GeneralInterest.tsx` — closing band
+- [ ] `app/careers/page.tsx` — metadata, JobPosting JSON-LD, assembly
+- [ ] `app/sitemap.ts` — add `/careers`
+- [ ] Verify: `npm run lint`, `npx tsc --noEmit`, `npm run build`, and read the page at desktop and mobile widths
+- [ ] Contrast check every new text-on-field pairing against the measured values recorded in `materials.css`
+- [ ] Review section appended below
+
+---
+
+# Plan: the legal pages (`/legal/*`) — 2026-07-30
+
+Five policy pages, linked from the footer's Legal column (the links already exist
+in `lib/site.ts` and currently 404):
+
+| Route | Document |
+|---|---|
+| `/legal/responsible-ai` | Responsible AI Policy |
+| `/legal/ai-transparency` | AI Transparency Policy |
+| `/legal/privacy` | Privacy Policy |
+| `/legal/terms` | Website Terms and Conditions |
+| `/legal/cookies` | Cookie Policy |
+
+Careers is explicitly out of scope this round.
+
+## Where the copy comes from
+
+`briefs/documents/legal/` holds five drafted markdown documents, branded
+"Beyond". They stay untouched as the archive. The site's live copy is a rebranded
+copy of them in `content/legal/*.md`.
+
+**Rebrand rules applied to the copy:**
+
+- "trading as Beyond" → "trading as At The Beyond"; every standalone use of
+  "Beyond" as our name → "At The Beyond" (or "ATB." where the brand mark reads
+  better than the formal name). Per the copy deck, "Beyond" is never used solo as
+  our name (§1.1).
+- The legal entity stays **At Beyond Limited** (Company No. 17146628, 71-75
+  Shelton Street), unchanged. So do all `@atbeyond.com` addresses and the domain.
+- "beyond" used as an ordinary preposition ("risks that go beyond traditional
+  software") is left alone.
+- Retired names brought in line with the rest of the site, since the pages ship
+  beside a site that uses the new ones: Frontline OS → **FrontlineOS**, Generative
+  Commerce → **CommerceOS**, Marketing OS → **MarketingOS**, Infinity Engine →
+  **ATBOS**, and the engagement models to Subscribe & Deploy / Customise &
+  Accelerate / Co-Innovate & Pioneer.
+- Cross-references between the policies become real links (`/legal/…`), and the
+  Privacy Policy's "always available at atbeyond.com/privacy" becomes
+  `/legal/privacy`.
+- The rebrand materially changes the trading name in each document, so every one
+  is bumped to **Effective: 30 July 2026 · Version: 1.1** (confirmed).
+
+## Rendering
+
+The documents are long, table-bearing prose. Hand-converting ~1,900 lines of
+markdown into JSX would be the largest and most error-prone part of the job, and
+would put the copy where copy changes mean editing components — the opposite of
+how the rest of the site is built.
+
+So: **`react-markdown` + `remark-gfm`**, rendered in a server component. Both run
+at build time only and ship no client JavaScript, and the copy stays as markdown
+that anyone can edit.
+
+## Structure
+
+- **`content/legal/*.md`** (new) — the five rebranded documents.
+- **`lib/legal.ts`** (new) — the policies as data: slug, title, file, meta
+  description, and the one-line summary used under the page heading. One array;
+  adding a policy is a data edit, and the footer nav can later read from it.
+- **`app/legal/[slug]/page.tsx`** (new) — one route for all five.
+  `generateStaticParams` from the data, `generateMetadata` per policy, and the
+  document read with `fs` at build. Server component.
+- **`components/sections/LegalHeader.tsx`** (new) — the dark header band: eyebrow
+  "Legal", the h1, the effective/version line, and links to the sibling policies.
+  It is **required, not decorative** — at the top of the page the nav has no
+  container and sits bare in Cream, so a legal page opening on the paper canvas
+  would render the logo and links invisible. Ink field, same as the footer's.
+- **`app/styles/prose.css`** (new) + one import line in `globals.css` — a `.prose`
+  block styling the rendered markdown from the existing tokens (no new colours,
+  no new type steps). Headings, lists, tables, rules, links, `code`.
+- **`app/sitemap.ts`** — register the five routes.
+
+No change to `lib/site.ts` (the footer already links all five), no change to any
+existing component.
+
+## To do
+
+- [x] `content/legal/*.md` — five rebranded documents
+- [x] `lib/legal.ts` — the policy register
+- [x] `app/styles/prose.css` + `globals.css` import
+- [x] `components/sections/LegalHeader.tsx`
+- [x] `app/legal/[slug]/page.tsx`
+- [x] `app/sitemap.ts` — add the five routes
+- [x] Verify: `npm run lint`, `npx tsc --noEmit`, `npm run build`, read every page
+      at desktop and mobile widths, and check the footer links all resolve
+- [x] Confirm no stray "Beyond" remains as our name (`grep`), and that
+      "At Beyond Limited" survives everywhere it should
+- [x] Review section appended below
+
+## Review — the Careers page as built (2026-07-30)
+
+All to-do items complete. `npx tsc --noEmit`, `npm run lint` and `npm run build`
+all clean; `/careers` prerenders as static.
+
+### Files
+
+| File | What it is |
+|---|---|
+| `lib/careers.ts` | new — page copy as data: why-join lines, company beats, principles, `roles` |
+| `components/sections/careers/CareersHero.tsx` | new — dark ridge panel, the only client component on the page |
+| `components/sections/careers/TheCompany.tsx` | new |
+| `components/sections/careers/Principles.tsx` | new |
+| `components/sections/careers/OpenRoles.tsx` | new |
+| `components/sections/careers/GeneralInterest.tsx` | new |
+| `app/careers/page.tsx` | new — metadata, JobPosting JSON-LD, assembly |
+| `app/sitemap.ts` | `/careers` registered |
+| `components/motion/SmoothScroll.tsx` | Lenis `anchors` enabled — see below |
+
+No stylesheet changes and no new tokens: every section is assembled from the
+existing materials layer. `lib/site.ts` untouched — the nav already linked
+`/careers`, so that link simply starts working.
+
+### Two changes beyond the plan
+
+**Lenis `anchors: { offset: -112 }`.** The hero's "See the open role" link is the
+page's only in-page anchor, and it did not work: a native anchor jump moves the
+real scroll position while Lenis is still animating its own, and the two fight —
+the page lands on the target and is dragged back off it. Lenis 1.3.25 takes an
+`anchors` option that routes `href="#id"` through `lenis.scrollTo`. The offset
+clears the fixed nav and **mirrors `scroll-mt-28` on the target section** (7rem =
+112px), which is what covers the same jump under reduced motion, where Lenis is
+not running. Change one, change both. This is a site-wide improvement — any future
+in-page anchor now behaves.
+
+**The hero CTA is Copper, not `.btn-primary`'s Green.** `.btn-primary` is a Green
+fill that reads by its Cream label rather than by fill contrast, which holds on
+Ink. This hero's field IS green (`--color-green-field`, one step off the fill), so
+the pill dissolved into the plate and the page's main action stopped looking like a
+button — visible in the first screenshot of the build. Copper is the palette's CTA
+colour and separates cleanly; the label goes to Ink, because Cream on Copper is
+2.18:1 and fails where Ink is 5.59:1. Same pairing as WaysToWork's CTA and the
+footer's Subscribe.
+
+### Measurements taken, not assumed
+
+The ridge plate was measured before any copy was put on it: `max` channel 80/255 at
+a standard deviation of 2.8, so it is all but a flat field. Against its brightest
+plausible pixel Cream is 7.95:1, Stone 5.95:1 — both clear AA, which is why
+`.plate-ridge` still carries no veil. **Copper is unusable as text there at 2.73:1**,
+failing even the large-text bar, so the eyebrow is Stone rather than the accent.
+Copper as the CTA *fill* is unaffected — the contrast that matters is its Ink label
+against the fill, not the fill against the field.
+
+The principles section reuses `WaysToWork`'s plate/scrim/card stack unchanged, so
+its recorded measurement carries: Stone at text-sm in a card over the plate's
+brightest pixel, 5.19:1. This section's card copy is at body size, so it has more
+headroom than the number it inherits. The framing paragraph sits in the left half
+where `.scrim-side` is 0.94–0.8: Stone is 6.79:1 there.
+
+### One copy decision to sign off
+
+Every word on the page is the v1 careers deck's, with one exception, commented in
+`GeneralInterest.tsx`: the deck gives "General interest" as the section label,
+which is too flat to carry a closing band at display size. The headline is the
+deck's own first sentence re-punctuated — "Not always hiring. Always interested in
+exceptional people who want to build for the real world." — and that sentence is
+therefore not repeated as body copy beneath it. Revert to the literal label if you
+would rather stay verbatim.
+
+Section headings gained full stops ("The company we are building.", "Open role.")
+to match the house style every homepage h2 already follows.
+
+### Worth knowing
+
+- **Both CTAs point at `mailto:careers@atbeyond.com`** with distinct subject lines
+  ("Application — Applied AI solution engineer" / "Introduction — general
+  interest"). That mailbox needs to exist before this goes live. The destination is
+  one constant, `APPLY_INBOX` in `lib/careers.ts` — swapping to an ATS is a
+  one-line change.
+- **`datePosted` is data, not the build clock.** A `new Date()` there would
+  silently re-date the posting on every deployment and tell search engines the role
+  is permanently new. Set it when a role goes up: currently `2026-07-30`.
+- **The JobPosting schema is deliberately incomplete.** No `employmentType` (the
+  copy does not say full-time), no `baseSalary` (no range published), no
+  `validThrough` (no closing date). Inventing any of them would put an unverified
+  claim into machine-readable form — the same rule the copy's publication notes
+  apply to prose.
+- **An empty `roles` array is a valid state.** `OpenRoles` returns null, the hero
+  drops its "See the open role" button, and the general-interest band becomes the
+  only route in — which is the copy deck's documented empty state (§2.6).
+- **`/insights` is still absent from the sitemap** on purpose: it is a stub
+  carrying the closing band alone. It should be added when it is built.
+- **Reviewing this locally in an automated browser is misleading.** A tab that is
+  not the visible tab reports `document.visibilityState: "hidden"`, so
+  `requestAnimationFrame` never ticks and every framer-motion entrance sits frozen
+  at the `initial` styles it was server-rendered with — the copy appears to be
+  missing entirely. This affects the homepage identically and is not a site bug.
+  Force the end state to review layout:
+  `main * { opacity:1 !important; transform:none !important; clip-path:none !important }`
+- **Narrow-viewport checks were run in a same-origin 390px iframe**, because a
+  hidden tab does not relayout when its window is resized — media queries do
+  respond to an iframe's width. No horizontal overflow at 390px; the hero h1 sets
+  in three lines and both CTAs sit on one row.
+
+## Round: nav current-page state, CTA labels, glass-planes retired (2026-07-30)
+
+Four asks off the back of the careers build. All verified in the browser;
+`npx tsc --noEmit`, `npm run lint` and `npm run build` clean.
+
+### 1. Primary navigation now shows where you are
+
+`components/layout/Nav.tsx` reads `usePathname()` and marks the matching link with
+`aria-current="page"` plus a hairline underline (`ACTIVE_LINK`). Applied to both the
+desktop row and the mobile dropdown.
+
+**The marker is an underline in `currentColor`, deliberately not Copper.** Copper is
+what hover uses and it would have been the obvious choice, but the bar is
+transparent at the top of a page and the careers hero it sits over is a Green field,
+where Copper is 2.73:1 — the one label that must be legible would have become the
+least legible thing in the row. An underline inherits whatever `--nav-fg` has
+resolved to, so it cannot be wrong on any field, present or future.
+
+Matching is a prefix, not equality (`/insights/an-article` lights "Insights"), with a
+trailing slash so `/careers-of-old` cannot match `/careers`. Product pages live at
+`/products/…` rather than under `/what-we-do`, so they currently light nothing — add a
+`section` key to the nav data if they should.
+
+The homepage marks nothing, because `primaryNav` has no "/" entry — home is the logo.
+
+### 2 & 3. Labels
+
+- Hero CTA: "See the open role" → **"See open roles"**.
+- Open-roles heading: the count-dependent "Open role." / "Open roles." ternary is
+  gone, and it is **always "Open roles."** — it names the section rather than
+  counting its contents, and it now agrees with the hero CTA.
+
+### 4. glass-planes removed from the site
+
+Both closing bands — `ClosingBand` (currently on /insights) and the careers page's
+`GeneralInterest` — now take **`.plate-aisle` under `.scrim-deep`**: the defocused
+aisle from the homepage's Capability-now panel, as asked.
+
+Three things went with the photograph:
+
+- `public/images/glass-planes.webp`, deleted.
+- **`.duotone` in materials.css.** Its own note recorded that it was interim and
+  existed for exactly one thing — stripping the retired teal/lime palette out of
+  artwork produced for it — with one usage, this photograph. With the artwork gone
+  the class had nothing to treat. A comment stands in its place so the next person
+  does not re-add it instead of re-treating artwork.
+- The `next/image` wrappers in both bands. `.plate` carries its asset AND its veil
+  as background layers, so the field is now one empty div per band, the same
+  construction `CapabilityGap` uses.
+
+**Measured, because this is a bright plate under a new scrim.** `.plate-aisle`'s veil
+is 0.35 and `.scrim-deep` runs 0.62 → 0.82, so the weakest point is the TOP of the
+band at a combined 0.753 coverage. Against the plate's brightest pixel
+(247,242,233): **Cream 7.71:1, Stone 5.76:1** — both clear AA for body text, and the
+foot of the band is deeper still. Copper is 2.65:1 there and unusable as text, which
+is why neither band sets anything in it.
+
+### Worth knowing
+
+- **`tex-light-aisle` now appears twice on the careers page** — the principles
+  section (with `.scrim-side` and smoked cards) and the closing band (with
+  `.scrim-deep`). The two treatments are different enough to read as different
+  fields, and the homepage already uses this plate twice, but if the repetition
+  grates the principles section is the one to move: it is the section whose field
+  was a free choice.
+- The site is now down to **six images plus the client logos**. Every remaining
+  photographic plate is a genuine monochrome shown with no hue correction, so
+  nothing is left that a duotone treatment would apply to.
+
+### 5. Insights out of the primary nav
+
+`primaryNav` in `lib/site.ts` is down to four: Who we are · What we do · How we work
+· Careers. The `/insights` route and the footer link both stand — only the top-level
+slot is gone while the page is still a stub carrying the closing band alone. A
+comment on the array records why, so it goes back when the editorial index is built.
+
+Verified against the prerendered `/careers` HTML: one `href="/insights"` left on the
+page (the footer's), and `aria-current="page"` with the underline on `/careers`.
+
+## Review — the legal pages (2026-07-30)
+
+All five policies are live at `/legal/…`, and the footer's Legal column — which
+already pointed at those routes — now resolves instead of 404ing.
+
+**Copy.** `content/legal/*.md` holds the site's version of each document; the
+drafts in `briefs/documents/legal/` are untouched as the archive. Applied across
+all five: every use of "Beyond" as our name became **At The Beyond** (the legal
+entity **At Beyond Limited**, the `@atbeyond.com` addresses and the domain are
+unchanged, and "beyond" as an ordinary preposition was left alone); the retired
+product names became FrontlineOS, CommerceOS, MarketingOS and ATBOS, and the
+engagement models Subscribe & Deploy / Customise & Accelerate / Co-Innovate &
+Pioneer; cross-references between the policies became real links; the Privacy
+Policy's canonical address became `atbeyond.com/legal/privacy`; and every document
+is now Effective 30 July 2026 · Version 1.1.
+
+Three sentences needed rewriting rather than replacing, because the substitution
+left them ungrammatical — the Responsible AI opener ("At At Beyond Limited…"),
+ATBOS's description in the AI Transparency Policy (it referred back to "The
+Engine"), and its entry in the Terms' IP list.
+
+**Build.** One route, `app/legal/[slug]/page.tsx`, renders all five: the register
+in `lib/legal.ts` drives `generateStaticParams`, the sibling links and the
+sitemap, so a sixth policy is a markdown file plus one entry. The documents are
+read at build time and rendered with react-markdown — chosen over hand-authored
+JSX so copy changes never mean editing components. It runs server-side only, so
+the pages ship no more client JavaScript than before; all five prerender static.
+
+Title and effective date are lifted out of the markdown rather than duplicated in
+TypeScript — the page cannot claim a version the document it renders does not
+carry.
+
+**Design.** `LegalHeader` puts each document on the same Ink field as the footer,
+so the page is bracketed by the two. That band is structural, not decorative: at
+the top of the page the nav has no container and sits bare in Cream, so a document
+opening on the paper canvas would render the logo and links invisible.
+`app/styles/prose.css` styles the rendered markdown by element (nothing in
+content/ can carry a className), entirely from existing tokens — no new colours,
+no new type steps. The cookie tables each scroll inside their own box; measured at
+390px, the page itself does not scroll sideways.
+
+`LegalContents` is the rail beside the document — its own sections, sticky, with
+the one you are reading marked as you scroll. It went through two rounds:
+
+- It started as a policy switcher sitting under the page title, where it read as
+  the first item of the document rather than as a way around it. Moving between
+  policies is the footer's job; the rail is now a table of contents.
+- The rail follows the document's own depth. Four of the five number their
+  sections at `##`, so those are what it lists — carrying `###` too would give the
+  Privacy Policy a thirty-six-entry rail. The Responsible AI Policy is built the
+  other way (four `##` sections, with the seven principles beneath one of them), so
+  below six top-level sections the rail drops a level and maps those instead.
+- Which section is current is measured on scroll rather than observed with an
+  IntersectionObserver: a section taller than the viewport leaves nothing
+  intersecting, and the rail would go blank mid-section. The 240px threshold is
+  measured too — an anchored heading lands at 224px (Lenis's -112 offset plus the
+  matching `scroll-margin-top`), and the section you just clicked has to read as
+  current when it gets there.
+- Below `lg` there is no second column, and eighteen sections above the opening
+  paragraph would bury it, so the rail collapses to an "On this page" toggle.
+
+The reading measure is 54ch, not the 65–75 the unit's name suggests: `ch` is the
+width of a zero and Instrument Sans's is wide (11.3px at the body size), so 68ch
+was running ~95 characters a line. 54 measures out at ~75.
+
+**Verified.** `npm run lint`, `npx tsc --noEmit` and `npm run build` all clean;
+all five routes prerendered and in the sitemap; an unknown slug 404s; read at
+desktop and at 390px, with the rail's anchors and active marking checked on the
+longest document (Privacy, eighteen sections) and the shallowest (Responsible AI).
+
+**Not done / worth a look:** the pages describe a cookie consent banner that does
+not exist yet (each document is careful to say "when live", so this is accurate,
+but the banner is still outstanding — brief §7.9). The Terms still describe us as
+"an AI-native agency and technology partner", which is the old positioning rather
+than the copy deck's "AI-native product and consulting company"; changing it is a
+legal-review call, so it was left.

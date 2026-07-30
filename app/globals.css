@@ -9,6 +9,7 @@
  *   layout      shell, section rhythm, full-bleed escape, nav
  *   materials   surfaces, scrims, plates, film grade, grain
  *   ui          buttons, fields, the copper stat band
+ *   prose       long-form document type — the legal & policy pages
  *   motion      keyframes, and the reduced-motion contract that overrides
  *               classes defined above it — hence last
  */
@@ -19,4 +20,5 @@
 @import "./styles/layout.css";
 @import "./styles/materials.css";
 @import "./styles/ui.css";
+@import "./styles/prose.css";
 @import "./styles/motion.css";
