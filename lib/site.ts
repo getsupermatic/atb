@@ -38,8 +38,10 @@ export const site = {
  * Nav order follows page order, which is why How-we-work sits before What-we-do.
  *
  * Insights is deliberately absent — the page is still a stub carrying the closing
- * band alone. The route and the footer link both stand, and it comes back here when
- * the editorial index is built.
+ * band alone. The route stands but nothing links to it, in nav or footer, and it
+ * comes back here when the editorial index is built.
+ *
+ * footerNav.Company mirrors this row exactly; change one, change the other.
  */
 export const primaryNav = [
   { label: "What we think", href: "/#what-we-think" },
@@ -97,10 +99,11 @@ export const products: readonly Product[] = [
 ] as const;
 
 export const footerNav = {
+  // Mirrors primaryNav — same labels, same homepage anchors, same order.
   Company: [
-    { label: "Who we are", href: "/who-we-are" },
-    { label: "What we do", href: "/what-we-do" },
-    { label: "How we work", href: "/how-we-work" },
+    { label: "What we think", href: "/#what-we-think" },
+    { label: "How we work", href: "/#how-we-work" },
+    { label: "What we do", href: "/#what-we-do" },
     { label: "Careers", href: "/careers" },
   ],
   Products: [
@@ -109,7 +112,6 @@ export const footerNav = {
     { label: "MarketingOS", href: "/products/marketing-os" },
   ],
   More: [
-    { label: "Insights", href: "/insights" },
     { label: "Contact", href: "/contact" },
     { label: "info@atbeyond.com", href: "mailto:info@atbeyond.com" },
   ],

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import FooterLogo from "@/components/brand/FooterLogo";
 import WordReveal from "@/components/motion/WordReveal";
-import SignupForm from "@/components/layout/SignupForm";
 import { footerNav, site } from "@/lib/site";
 
 function LinkedInIcon() {
@@ -12,18 +11,9 @@ function LinkedInIcon() {
   );
 }
 
-function XIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.65l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.82l4.71 6.23 5.46-6.23zm-1.16 17.52h1.83L7.02 4.13H5.05l12.03 15.64z" />
-    </svg>
-  );
-}
-
 /**
- * Deep super-footer (§7.10): a closing statement paired with the Insights
- * sign-up, grouped navigation, and a base row carrying the logo, social links
- * and copyright — on a solid black ground.
+ * Deep super-footer (§7.10): a closing statement, grouped navigation, and a base
+ * row carrying the logo, social links and copyright — on a solid black ground.
  */
 export default function Footer() {
   return (
@@ -32,33 +22,21 @@ export default function Footer() {
       style={{ backgroundColor: "var(--color-ink-deep)" }}
     >
       <div className="shell relative z-10 py-20 lg:py-28">
-        {/* Statement + supporting paragraph */}
-        <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch lg:gap-20">
-          <div>
-            {/* The three disciplines build in one at a time as the footer
-                arrives, each sliding down into its own clipped box — see
-                WordReveal. The lead sentence is static: it is the statement, and
-                animating all of it would bury the effect. */}
-            <p className="statement max-w-[15ch] text-5xl">
-              AI-native products for the customer frontline.{" "}
-              <WordReveal delay={0.1}>Operations.</WordReveal>{" "}
-              <WordReveal delay={0.42}>Commerce.</WordReveal>{" "}
-              <WordReveal delay={0.74}>Marketing.</WordReveal>
-            </p>
-            <Link href="/contact" className="btn btn-primary mt-8">
-              Start a conversation
-            </Link>
-          </div>
-
-          <div className="flex flex-col">
-            <div className="mt-8 lg:mt-auto lg:pt-8">
-              <h2 className="text-2xl">Insights</h2>
-              <p className="mb-5 mt-2 max-w-[52ch] text-[color:var(--text-muted)]">
-                No noise, just the thinking on frontier AI.
-              </p>
-              <SignupForm />
-            </div>
-          </div>
+        {/* Statement */}
+        <div>
+          {/* The three disciplines build in one at a time as the footer
+              arrives, each sliding down into its own clipped box — see
+              WordReveal. The lead sentence is static: it is the statement, and
+              animating all of it would bury the effect. */}
+          <p className="statement max-w-[15ch] text-5xl">
+            AI-native products for the customer frontline.{" "}
+            <WordReveal delay={0.1}>Operations.</WordReveal>{" "}
+            <WordReveal delay={0.42}>Commerce.</WordReveal>{" "}
+            <WordReveal delay={0.74}>Marketing.</WordReveal>
+          </p>
+          <Link href="/contact" className="btn btn-primary mt-8">
+            Start a conversation
+          </Link>
         </div>
 
         {/* Navigation columns */}
@@ -91,14 +69,6 @@ export default function Footer() {
                     className="transition-colors hover:text-[color:var(--color-copper)]"
                   >
                     <LinkedInIcon />
-                  </a>
-                  <a
-                    href={site.social.x}
-                    aria-label="ATB. on X"
-                    rel="me noopener"
-                    className="transition-colors hover:text-[color:var(--color-copper)]"
-                  >
-                    <XIcon />
                   </a>
                 </div>
               )}

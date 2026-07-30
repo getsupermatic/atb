@@ -3309,3 +3309,31 @@ Not touched, because the ask was the primary nav, but worth deciding on together
 - The homepage hero's second CTA, **"See how we work"**, points at `/how-we-work`.
   `/#how-we-work` would work today.
 - Every **"/contact"** CTA (hero, nav, closing bands, footer) 404s. Pre-existing.
+
+## Review — footer: Insights and X removed
+
+- `components/layout/Footer.tsx`: dropped the Insights sign-up block (heading,
+  strapline, `SignupForm`) and the X icon/link. With the right-hand column gone the
+  two-column grid had nothing to balance, so the statement + CTA now sit in a plain
+  block. `XIcon` and the `SignupForm` import were removed with it.
+- `lib/site.ts`: removed the **Insights** entry from `footerNav.More`, so the footer
+  no longer links to the stub page.
+
+Left in place deliberately, say the word if either should go too:
+
+- `components/layout/SignupForm.tsx` is now unused — the footer was its only caller.
+- `site.social.x` still feeds the `sameAs` array in `app/layout.tsx` (JSON-LD), and
+  `/insights` itself still exists as a stub, unlinked from nav and footer.
+
+### Footer Company column now mirrors the primary nav
+
+`footerNav.Company` was still pointing at **Who we are / What we do / How we work** as
+routes (`/who-we-are`, `/what-we-do`, `/how-we-work`) — all 404s, and the footer was
+the only place linking to them. It now carries the same three labels, hrefs and order
+as `primaryNav`: **What we think** `/#what-we-think`, **How we work** `/#how-we-work`,
+**What we do** `/#what-we-do`, then Careers. All three ids exist on the homepage
+(`CapabilityGap`, `NewModel`, `Products`), and `Nav.tsx` already handles arriving at a
+homepage anchor from another route, so the footer links work from any page.
+
+Still outstanding from the earlier list: the hero's second CTA (`Hero.tsx:84`) points
+at `/how-we-work`, which 404s — `/#how-we-work` would work today.
