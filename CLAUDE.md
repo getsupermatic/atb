@@ -2,7 +2,7 @@
 
 **Never push to remote without explicit approval.** All changes must be reviewed and tested locally by the user before pushing. Commit changes locally, then wait for confirmation before running `git push`.
 
-## Standard Workflow
+## Robs Standard Workflow
 
 1. First, think through the problem, read the codebase for relevant files and review the brief and copy deck in /briefs/ for brand alignment, then write a plan to PROJECTPLAN.md.
 2. The plan should also have a list of to-do items that you can check off as you complete them.
