@@ -22,10 +22,24 @@ Frontier AI advances every month, but almost none of it reaches the store floor,
 
 ## Key pages
 
+Only what exists is listed. Dedicated What-we-think / How-we-work / What-we-do
+pages are not built yet, so each is given as the homepage section that carries its
+argument today — the same mapping the site's own navigation uses.
+
 - Home: https://atbeyond.com/
-- Who we are: https://atbeyond.com/who-we-are
-- What we do: https://atbeyond.com/what-we-do
-- How we work: https://atbeyond.com/how-we-work
-- Insights: https://atbeyond.com/insights
 - Careers: https://atbeyond.com/careers
-- Contact: https://atbeyond.com/contact
+- What we think (homepage section): https://atbeyond.com/#what-we-think
+- How we work (homepage section): https://atbeyond.com/#how-we-work
+- What we do (homepage section): https://atbeyond.com/#what-we-do
+
+## Policies
+
+- Responsible AI: https://atbeyond.com/legal/responsible-ai
+- AI transparency: https://atbeyond.com/legal/ai-transparency
+- Privacy: https://atbeyond.com/legal/privacy
+- Terms: https://atbeyond.com/legal/terms
+- Cookies: https://atbeyond.com/legal/cookies
+
+## Contact
+
+info@atbeyond.com — there is no contact form or /contact page at present.

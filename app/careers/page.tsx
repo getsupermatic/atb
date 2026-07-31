@@ -41,6 +41,11 @@ const jobsJsonLd = roles.map((role) => ({
     alternateName: site.name,
     url: site.domain,
   },
+  // The physical location alone, which is what a hybrid role is. `jobLocationType:
+  // TELECOMMUTE` and `applicantLocationRequirements` are the fully-remote pair —
+  // setting either alongside a real `jobLocation` is contradictory and is a known
+  // source of Search Console warnings. The copy says "Hybrid", so the place is the
+  // claim and the remote fields stay off.
   jobLocation: {
     "@type": "Place",
     address: {
@@ -49,9 +54,6 @@ const jobsJsonLd = roles.map((role) => ({
       addressCountry: "GB",
     },
   },
-  // The copy's "Hybrid" working pattern: on site in London, with some remote work.
-  jobLocationType: "TELECOMMUTE",
-  applicantLocationRequirements: { "@type": "Country", name: "United Kingdom" },
   url: `${site.domain}/careers#open-roles`,
 }));
 
