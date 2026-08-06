@@ -3550,3 +3550,265 @@ at `/how-we-work`, which 404s — `/#how-we-work` would work today.
 `Hero.tsx` — "See how we work" pointed at `/how-we-work`, a 404. Now `/#how-we-work`,
 the same target the primary nav and the footer use. That closes the last link to an
 unbuilt route.
+
+---
+
+# Round: the product design system — extending ATB. to FrontlineOS (2026-08-06)
+
+The marketing site has a design system. The SaaS product does not — it has defaults.
+This round builds the bridge: a product layer that inherits the marketing tokens, a
+shared product-mark rule, light and dark modes, and one fully-built example screen
+(FrontlineOS Today) that proves the language works at operational density.
+
+Reviewed at `localhost:3000/design/product`. Not indexed, not in the nav, not in the
+sitemap. This repo is where the system is *authored*; the product team ports the CSS
+layer and the components across.
+
+## What is actually wrong with the current app UI
+
+From the five screenshots. The complaint — "feels very AI" — is real, and it decomposes
+into eight specific things, all fixable:
+
+1. **Pure-neutral greys.** The canvas is a dead `#f5f5f5`, the cards pure white. The
+   brand's whole light end is warm — Paper `#fbfaf6` over a grain plate, Ink as a
+   *green*-black. Neutral grey beside Ink reads as a colour mismatch; `tokens.css`
+   already records this for the dark shades, and it is just as true on light.
+2. **The orange is not Copper.** The `OS` and the alert dots sit at a saturated amber,
+   roughly `#f5a623`. Copper is `#c97b45` — browner, quieter, and the only accent the
+   brand has.
+3. **Accent used as text on light.** "View all" is set in the amber. `tokens.css` names
+   this as the one thing Copper must never do: 3.14:1 on the paper canvas. There is
+   already a token for the correct behaviour — `--accent-text`, which resolves to
+   `--color-copper-deep` (5.16:1) on light and to full Copper on dark.
+4. **Everything is a card.** Three identical white rounded boxes for three messages,
+   another for training, another for tasks. Uniform elevation means no hierarchy, so
+   the eye has nothing to land on. The marketing site structures with hairlines,
+   surface steps and plates, and reserves the panel for a statement.
+5. **Colour is doing hierarchy's job.** Pastel lilac and amber task blocks, a red
+   badge, seven avatar circles in seven unrelated hues. This is the strongest
+   "generated" tell — a designed system uses one accent and earns the rest.
+6. **One typeface, one voice.** Newsreader appears once (the greeting, in `image (2)`)
+   and relates to nothing else on the page. The rest is a single grotesque at two
+   weights. The marketing site's whole character is the *pairing*.
+7. **Generic section labels.** `MESSAGES`, `TRAINING`, `MY TASKS — 0/10` in tiny grey
+   caps. The site has `.eyebrow`: sentence-case, body face, `--text-muted`.
+8. **Empty states with no voice.** "Nothing in the next 90 minutes." in a flat grey
+   box. This is a shift tool — the empty state is the *good* state and should read
+   like it.
+
+## The adaptation principle
+
+The marketing system is the base. It is not the product, and three things have to
+change on the way across:
+
+- **Density up, motion down.** Marketing runs `clamp(4.5rem, 9vw, 9rem)` section
+  padding and scroll-morph panels. A colleague reads this on a handset, standing up,
+  mid-task. The product runs a 4px grid, an 8/12/16/24 spacing ladder, and motion only
+  where it carries meaning — state change, arrival, acknowledgement. No scroll-linked
+  anything.
+- **The display face is rationed.** Newsreader carries the screen title and the
+  greeting. Nothing else — not a card heading, not a stat, not a label. Rationing it is
+  what makes it read as brand rather than as decoration, and it keeps scan speed where
+  it needs to be. Instrument Sans does all functional work.
+- **Six colours is not enough, and that is fine.** A retail operations tool needs
+  urgent / high / due / done / info, and the brand palette cannot supply five
+  distinguishable states. So the product layer adds a **status ramp** — declared as
+  such, kept out of `tokens.css`, and hue-matched to the brand family (warm, low
+  chroma, Ink-cast) rather than taken off the shelf. Red is spent on genuine urgency
+  and nothing else; the current UI spends it on unread counts.
+
+## The layers
+
+```
+app/styles/tokens.css          unchanged — the six colours, the type scale, motion
+  └── app/styles/product.css   NEW: the product layer
+        · mode contract (data-theme, light + dark, root-level)
+        · density scale, radius ladder, elevation steps
+        · the status ramp, with measured contrast
+        · product primitives: .p-bar .p-row .p-tile .p-chip .p-tab …
+```
+
+`product.css` imports nothing and is imported by nothing on the marketing side — it is
+a self-contained sheet that resolves against `tokens.css` variables. That is what makes
+it portable: the product team takes `tokens.css` + `product.css` and has the whole
+system, with no Next.js, no Tailwind config and no marketing components in the way.
+
+### Modes
+
+Marketing's `.theme-dark` is a *section* remap — a green panel inside a light page. The
+product needs a real mode, so the product layer re-expresses the same variable set
+against `:root[data-theme="dark"]`, with `prefers-color-scheme` as the default signal.
+The variable *names* are identical to marketing's, so any component written against
+`--bg` / `--text` / `--border` works in both.
+
+Light: Paper canvas, Cream-tinted elevated surfaces, Ink text, hairlines at ink/0.10.
+Dark: Ink canvas, `--color-ink-soft` elevated, Cream text, hairlines at cream/0.12.
+No grain plate — it is a per-frame cost on a device that is on all shift.
+
+### The status ramp (new, deliberate)
+
+Five states, each declared with its measured contrast on both canvases. Built by
+shifting the brand hues rather than importing stock semantics:
+
+| State  | Light                 | Dark              | Where it comes from                 |
+| ------ | --------------------- | ----------------- | ----------------------------------- |
+| urgent | deep brick            | lifted brick      | Copper rotated to red, desaturated  |
+| high   | `--color-copper-deep` | `--color-copper`  | the existing accent pair            |
+| due    | Steel                 | Stone             | already in the palette              |
+| done   | `--color-green`       | a lifted Green    | already in the palette              |
+| info   | Steel                 | Stone             | shares `due`; distinguished by icon |
+
+Every status is carried by **label + rule + icon**, never by colour alone — which is
+both the accessibility requirement and, incidentally, the fix for tell #5.
+
+## The product mark
+
+One rule, so every product inherits it and the "an At The Beyond product" line
+disappears (the mark says it):
+
+```
+[atb mark]  Frontline OS
+             ^display face   ^lifted, 0.59em, cap-aligned
+```
+
+This is the ATBOS lockup generalised. `ATBOS.tsx` already solved the hard part — the
+`marginRight: -0.278em` that cancels the closed mark's trailing padding, the `0.59em`
+that puts the OS cap at exactly half the mark's, the `marginTop: 0.078em` that levels
+the two cap tops. Those numbers are measured off the render and they carry over intact.
+
+`components/product/ProductMark.tsx`, taking `name` — so `EngageOS`, `CommerceOS` and
+`MarketingOS` are one prop each, not one design each.
+
+Two sizes, because the full lockup is too wide for a handset app bar:
+
+- **full** — mark + name + OS. Sign-in, splash, about.
+- **compact** — mark + `OS` only, with the product name as an adjacent `.eyebrow` where
+  context needs it. This is what sits in the app bar.
+
+The waveform icon retires. It is not in the brand's vocabulary, it duplicates the
+mark's job, and it is the amber's last hiding place.
+
+## The example screen — FrontlineOS Today
+
+Rebuilt in full, light and dark, at handset and desktop width.
+
+| Region        | Now                                    | Becomes                                                                  |
+| ------------- | -------------------------------------- | ------------------------------------------------------------------------ |
+| App bar       | waveform + amber OS + endorsement line | compact product mark, store chip, headset + account. Hairline, no shadow  |
+| Greeting      | `GROCERY CO` / serif greeting          | `.eyebrow` context line + Newsreader Light h1 — the one display moment    |
+| Now strip     | *absent*                               | what is actually next, above everything else. The reason to open the app  |
+| Messages      | 3 identical white cards + amber dot     | hairline-divided rows, priority as a left rule + label, 56px tap target   |
+| Training      | tinted box, one line                    | real empty state with voice                                              |
+| My Tasks      | grey box, one line                      | same, plus the count as a `.p-chip` rather than in the label             |
+| Team on shift | 7 random-hue circles                    | Stone-filled initials chips, one accent for "you"                        |
+| Ask bar       | grey pill, blue mic                     | pinned pill on the surface step, Copper mic                              |
+| Tab bar       | 4 tabs, red count dots                  | hairline top, Copper active indicator, counts as neutral pills           |
+
+Alongside the screen, a short **system sheet** on the same route: the colour ramp with
+its contrast numbers, the type ladder, the radius ladder, the status set and the
+primitives. So the thing is reviewable as a system and not only as a picture.
+
+## To do
+
+- [ ] `app/styles/product.css` — mode contract, density, radius, elevation
+- [ ] Status ramp with measured contrast on both canvases, documented in place
+- [ ] Product primitives (`.p-bar`, `.p-row`, `.p-tile`, `.p-chip`, `.p-tab`, `.p-field`)
+- [ ] `components/product/ProductMark.tsx` — full + compact, from the ATBOS geometry
+- [ ] `components/product/` — AppBar, Greeting, NowStrip, MessageRow, EmptyState,
+      TeamStrip, AskBar, TabBar
+- [ ] `app/design/product/page.tsx` — the Today screen, both modes, both widths
+- [ ] Mode toggle on the route, honouring `prefers-color-scheme` by default
+- [ ] The system sheet — colour, type, radius, status, primitives
+- [ ] `robots.ts` — disallow `/design`; route metadata `index: false`
+- [ ] `npm run lint` and `npm run build` clean
+
+## Deliberately not doing
+
+- **The other four screens.** Tasks timeline, the notifications modal and the EngageOS
+  queue board are out of scope this round by decision. Today is the densest screen and
+  sets the whole language; the rest follow it cheaply once it is agreed.
+- **Touching the live product.** Nothing here reaches `staging-frontline.atbeyond.com`.
+- **A component library package.** The route is the reference. If it survives review,
+  packaging is a separate, easy round.
+- **Marketing-side changes.** `tokens.css` is not edited. If the product needs something
+  the tokens do not have, it goes in `product.css` labelled as an extension — not
+  smuggled into the brand palette.
+
+## Review — what shipped (2026-08-06)
+
+All ten to-do items are done. `npm run lint` and `npm run build` are clean, and every
+control on the route was exercised in the browser rather than assumed.
+
+### Files
+
+| New | |
+| --- | --- |
+| `app/styles/product.css` | The product layer — modes, density, radius, status ramp, primitives |
+| `app/design/product/layout.tsx` | Imports the layer; sets `robots: { index: false }` |
+| `app/design/product/page.tsx` | Four rendered frames + the system sheet |
+| `components/product/ProductMark.tsx` | The generalised ATBOS lockup |
+| `components/product/AppBar.tsx` | The toolbar |
+| `components/product/TodayScreen.tsx` | The reference screen |
+| `components/product/Menu.tsx` | The popover primitive behind every toolbar control |
+| `components/product/theme.tsx` | `ThemeScope` — a mode scope, not a provider |
+| `components/product/Icons.tsx` | 22 glyphs, one stroke weight, drawn not imported |
+| `components/product/data.ts` | Demo content |
+| `components/layout/SiteChrome.tsx` | Keeps the marketing furniture off `/design` |
+
+| Edited | |
+| --- | --- |
+| `app/layout.tsx` | Three `SiteChrome` wraps |
+| `app/robots.ts` | `disallow: "/design/"` |
+
+### The toolbar, as built
+
+Added after the plan was agreed. Product mark · store switcher · ⌘K command trigger ·
+environment badge · three-state headset · notification queue · appearance · account.
+Every one works: the switcher changes the store, the headset cycles live → muted →
+offline with the state on the control, acknowledging a notification removes it, the
+appearance control drives that frame's own `ThemeScope`, and the account menu carries
+identity, shift window, settings, language, help and sign-out — with the atb mark at
+its foot, which is what lets the compact lockup drop the endorsement.
+
+`Menu` is one primitive rather than four copies: Escape closes and returns focus to the
+trigger, an outside `pointerdown` dismisses before the press lands underneath, and
+opening one menu broadcasts so the others stand down.
+
+### Decisions taken during the build
+
+- **No uppercase anywhere.** Flagged in review: the letterspaced caps I had used for
+  `.p-context`, the chips, the tabs, the menu labels and the environment badge were the
+  same tell the round exists to remove. All sentence case now; hierarchy comes from
+  size, weight and colour. This is a rule of the layer, recorded in `product.css`.
+- **Desktop is a two-column composition, not a stretched handset.** A main column
+  (Now, Messages, Tasks) and a 21rem rail (Training, Team). The first build ran the
+  rows the full 1040px and put the chevron a hand's width from its subject.
+- **The handset toolbar shows the store NUMBER.** At 400px the bar leaves ~100px for
+  the switcher and "Cambridge Central" truncated to "Cambri…" — actively misleading
+  when two stores in the org start with "Cambridge". Appearance also moves into the
+  account menu at that width, and the divider and the switcher's store icon are
+  dropped: 33px of decoration the store number needed.
+- **The alert cards in the notification panel gained the leading status rule**, so the
+  queue can be scanned down its left edge like a message list.
+
+### Two bugs found by looking rather than by reasoning
+
+- The Now strip's `<h2>` came out Ink on the Green field. `.p-now` sets Cream on the
+  parent, but `base.css` sets a colour on every heading ELEMENT, and a rule that matches
+  an element always beats one that only reaches it by inheritance — layers do not enter
+  into it. Any heading inside a coloured surface needs an explicit `color: inherit`.
+- The toolbar overflowed its frame at handset width. `Menu` wraps its trigger in a
+  positioning div, so that div — not the button — is the flex item, and it was refusing
+  to shrink. The wrapper now carries the shrink behaviour via a prop, and the store
+  switcher is the one item in the bar that gives way.
+
+### Still open
+
+- The ⌘K trigger is present but not wired to a palette. The palette is a screen of its
+  own and was out of scope; the trigger is there because its absence is what makes an
+  operations tool feel like a website.
+- The other four screens — Tasks timeline, the notifications modal, the EngageOS queue
+  board — remain out of scope by decision. They follow cheaply now the language is set.
+- `ProductMark`'s `CAP = 0.7` is Newsreader's cap height taken as a nominal figure and
+  confirmed by eye at 19px and 40px. If the display face ever changes, that constant is
+  the one number to re-measure.

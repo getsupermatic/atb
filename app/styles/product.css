@@ -1,0 +1,1003 @@
+/* ============================================================
+   ATB. — the product layer.
+
+   Everything the SaaS products need that the marketing site does not. It
+   resolves against app/styles/tokens.css and adds nothing to the brand palette:
+   the six colours stay the six colours. What it DOES add is labelled as an
+   extension, with the reason next to it.
+
+   Three deliberate departures from the marketing system:
+
+     1. Density up, motion down. Marketing runs a 9rem section rhythm and
+        scroll-linked panels. A colleague reads this on a handset, standing up,
+        mid-task, so the product runs a 4px grid and moves only on state change.
+     2. The display face is rationed to the screen title. Newsreader anywhere
+        else — a card heading, a stat, a label — costs scan speed and stops the
+        face reading as brand.
+     3. A status ramp, because six colours cannot express five operational
+        states. See "The status ramp" below.
+
+   NOT in @layer, deliberately. This sheet is imported by the product route
+   alone, not through globals.css, so it can be lifted into a codebase with no
+   Tailwind in it. Unlayered rules also beat Tailwind's utilities, so the
+   product components style themselves with .p-* classes rather than mixing the
+   two and losing the coin toss.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   The mode contract.
+
+   Marketing's .theme-dark is a SECTION remap — a green panel inside a light
+   page. A product needs a real mode, and it needs one that works on a subtree
+   as well as on :root, because the reference route shows light and dark side
+   by side. Hence attribute selectors, which apply wherever they are put, with
+   prefers-color-scheme as the default for an unmarked root.
+
+   The variable NAMES are marketing's — --bg, --text, --border and the rest —
+   so anything written against the marketing system already works here.
+   ------------------------------------------------------------ */
+
+/* Light. The canvas is Cream and the surface is Paper: both brand colours, and
+   the step between them (L* 95.0 → 97.6) is small on purpose. A card lifts off
+   this canvas by about 2.6 points of lightness plus its hairline, which is
+   enough to read as a surface and little enough that a screen of twelve cards
+   does not turn into twelve competing rectangles — the failure mode in the app
+   as it stands. Pure white is held back for the one raised layer (menus,
+   sheets, dialogs) so that "floating above everything" means something. */
+[data-theme="light"],
+:root:not([data-theme]) {
+  color-scheme: light;
+
+  --bg: var(--color-cream);
+  --p-surface: var(--color-paper);
+  --p-raised: #ffffff;
+  /* A recessed step for wells and inset fields — Cream taken down ~3%. Derived,
+     not a new colour. */
+  --p-sunken: #ece7db;
+
+  --text: var(--color-ink);
+  --text-muted: var(--color-steel); /* 5.25:1 on the canvas */
+  --heading: var(--color-ink);
+
+  --accent: var(--color-copper);
+  /* Copper is 3.14:1 on a light field and fails as text — the current app sets
+     "View all" in it. The darkened shade is 4.82:1 on this canvas. */
+  --accent-text: var(--color-copper-deep);
+
+  --border: rgb(var(--ink-rgb) / 0.1);
+  --p-line-strong: rgb(var(--ink-rgb) / 0.18);
+  --p-field: rgb(var(--ink-rgb) / 0.035);
+
+  /* Two-part ambient shadow: a 1px contact edge, then a wide soft drop. Ink
+     rather than black, so the shadow sits in the palette's green cast. */
+  --p-shadow-1: 0 1px 2px rgb(var(--ink-rgb) / 0.06);
+  --p-shadow-2:
+    0 1px 2px rgb(var(--ink-rgb) / 0.05), 0 10px 30px -14px rgb(var(--ink-rgb) / 0.28);
+}
+
+/* Dark. Ink and Ink-soft are already in the tokens; only the raised step is new,
+   and it is Ink-soft lifted by the same ~3% the light mode recesses by.
+   No grain plate — it is a per-frame cost on a device that is on all shift. */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: var(--color-ink);
+  --p-surface: var(--color-ink-soft);
+  --p-raised: #262e2a;
+  --p-sunken: var(--color-ink-deep);
+
+  --text: var(--color-cream);
+  --text-muted: var(--color-stone); /* 12.2:1 on Ink — Steel would be 3.08:1 */
+  --heading: var(--color-cream);
+
+  --accent: var(--color-copper);
+  --accent-text: var(--color-copper); /* 5.50:1 on Ink — no substitute needed */
+
+  --border: rgb(var(--cream-rgb) / 0.12);
+  --p-line-strong: rgb(var(--cream-rgb) / 0.22);
+  --p-field: rgb(var(--cream-rgb) / 0.06);
+
+  /* Depth on dark comes from the surface steps and the hairline, not from a
+     drop shadow — a shadow on a near-black canvas is invisible at the contact
+     edge and muddy at the spread. Only the raised layer casts one, and only
+     enough to separate it from what it covers. */
+  --p-shadow-1: none;
+  --p-shadow-2: 0 16px 40px -12px rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: var(--color-ink);
+    --p-surface: var(--color-ink-soft);
+    --p-raised: #262e2a;
+    --p-sunken: var(--color-ink-deep);
+    --text: var(--color-cream);
+    --text-muted: var(--color-stone);
+    --heading: var(--color-cream);
+    --accent-text: var(--color-copper);
+    --border: rgb(var(--cream-rgb) / 0.12);
+    --p-line-strong: rgb(var(--cream-rgb) / 0.22);
+    --p-field: rgb(var(--cream-rgb) / 0.06);
+    --p-shadow-1: none;
+    --p-shadow-2: 0 16px 40px -12px rgb(0 0 0 / 0.6);
+  }
+}
+
+/* ------------------------------------------------------------
+   The status ramp — an EXTENSION, not a palette addition.
+
+   A retail operations tool has to say urgent / high / due / done / info, and
+   six brand colours cannot carry five distinguishable states. So the ramp is
+   declared here rather than smuggled into tokens.css, and it is built by moving
+   the brand hues rather than by importing stock semantics: every value is warm
+   and low-chroma, and sits in the same family as Ink.
+
+   Measured, against the canvas each pair is used on:
+
+                    light            on Cream    dark             on Ink
+     urgent         #9c3a2c          6.15:1      #e0705a          5.70:1
+     high           #975c34          4.82:1      #c97b45          5.50:1
+     due / info     #5c665f          5.25:1      #d8d2c4         12.20:1
+     done           #2d523d          7.87:1      #7fae8e          7.17:1
+
+   `urgent` is Copper rotated from ~26° to ~9° and deepened; `done` on dark is a
+   lifted Green, because Green itself is 2.08:1 on Ink and unusable as text
+   there (tokens.css records the same limit for --accent-display).
+
+   Colour is never the only carrier. Every status renders as a label AND a rule
+   AND, where it is an alert, an icon — which is the accessibility requirement
+   and also the fix for the seven-random-hues problem in the app today. */
+[data-theme="light"],
+:root:not([data-theme]) {
+  --st-urgent: #9c3a2c;
+  --st-high: var(--color-copper-deep);
+  --st-due: var(--color-steel);
+  --st-done: var(--color-green);
+  --st-info: var(--color-steel);
+}
+[data-theme="dark"] {
+  --st-urgent: #e0705a;
+  --st-high: var(--color-copper);
+  --st-due: var(--color-stone);
+  --st-done: #7fae8e;
+  --st-info: var(--color-stone);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --st-urgent: #e0705a;
+    --st-high: var(--color-copper);
+    --st-due: var(--color-stone);
+    --st-done: #7fae8e;
+    --st-info: var(--color-stone);
+  }
+}
+
+/* ------------------------------------------------------------
+   Density, radius and elevation
+   ------------------------------------------------------------ */
+[data-theme],
+:root {
+  /* A 4px grid. Named by role rather than by size so a screen reads as
+     structure — the tightest gap inside a control, the gap between rows, the
+     gap between groups, the gap between sections. */
+  --p-1: 0.25rem;
+  --p-2: 0.5rem;
+  --p-3: 0.75rem;
+  --p-4: 1rem;
+  --p-5: 1.5rem;
+  --p-6: 2rem;
+
+  /* The radius ladder. Marketing has two curves — the 1.75rem panel and the
+     999px pill. The product needs the steps between them, and it needs them
+     tighter: a 1.75rem corner on a 56px row eats the row.
+     The pill survives unchanged, because every CTA on the site is one. */
+  --p-r-xs: 0.375rem; /* chips, badges, the small square icon plate */
+  --p-r-sm: 0.625rem; /* rows, inputs */
+  --p-r-md: 0.875rem; /* cards, tiles */
+  --p-r-lg: 1.25rem; /* sheets, menus, the app frame */
+  --p-r-pill: 999px;
+
+  /* The one touch-target floor. 44px is the platform minimum; list rows that
+     carry two lines of copy get 56, which is what the message rows use. */
+  --p-tap: 44px;
+}
+
+/* ------------------------------------------------------------
+   Frame and canvas
+   ------------------------------------------------------------ */
+.p-app {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* The scrolling body of the screen, between the bar and the docked footer. */
+.p-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.p-pad {
+  padding-inline: var(--p-4);
+}
+
+/* ------------------------------------------------------------
+   Type
+
+   .p-title is the ONLY display-face element on a product screen. Everything
+   else is Instrument Sans, and the hierarchy comes from weight and colour
+   rather than from a second face.
+   ------------------------------------------------------------ */
+.p-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-optical-sizing: auto;
+  font-size: clamp(1.75rem, 1.35rem + 1.7vw, 2.375rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--heading);
+}
+
+/* Section label. Sentence-case, body face, muted — the marketing site's
+   .eyebrow at product scale. Replaces the tiny grey caps the app uses now,
+   which say "generated" more loudly than anything else on the screen. */
+.p-eyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  color: var(--text-muted);
+}
+
+/* The context line above the title — org and shift.
+   Sentence case, like everything else. There is NO uppercase in this system:
+   letterspaced caps are the house style of every generated admin panel, they
+   read ~15% wider for the same information, and they defeat the shape
+   recognition that makes a small label scannable in the first place. The
+   marketing site's .eyebrow is sentence case for the same reason. Hierarchy
+   here comes from size, weight and colour — which is all it ever needed. */
+.p-context {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: var(--text-muted);
+}
+
+.p-strong {
+  font-weight: 600;
+  color: var(--heading);
+}
+.p-muted {
+  color: var(--text-muted);
+}
+
+/* A section header row: label on the left, action on the right. */
+.p-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--p-3);
+  padding-block: var(--p-2);
+}
+
+/* The inline text action ("View all"). --accent-text, never --accent: on light
+   that resolves to Copper-deep at 4.82:1 where raw Copper is 3.14:1 and fails.
+   No underline at rest — the row it sits in has no other link, so there is
+   nothing to disambiguate from, and a rule here competes with the hairlines
+   doing structural work. */
+.p-link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent-text);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease-standard);
+}
+.p-link:hover {
+  opacity: 0.72;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ------------------------------------------------------------
+   Surfaces
+   ------------------------------------------------------------ */
+.p-card {
+  background: var(--p-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--p-r-md);
+  box-shadow: var(--p-shadow-1);
+}
+
+/* A list of rows sharing one card, divided by hairlines rather than split into
+   separate floating boxes. This is the main structural fix: three messages are
+   one object with three parts, not three objects. */
+.p-list {
+  background: var(--p-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--p-r-md);
+  box-shadow: var(--p-shadow-1);
+  overflow: hidden;
+}
+.p-list > * + * {
+  border-top: 1px solid var(--border);
+}
+
+.p-row {
+  display: flex;
+  align-items: center;
+  gap: var(--p-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--p-3) var(--p-4);
+  text-align: left;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  position: relative;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.p-row:hover {
+  background: var(--p-field);
+}
+
+/* The priority rule — a 3px bar on the leading edge of a row, in the status
+   colour. This is what replaces the floating amber circle: it is at the START
+   of the row, where a scan begins, rather than at the end where it is found
+   last, and it costs no horizontal space in the content column. */
+.p-row-rule::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  background: var(--row-status, transparent);
+}
+
+/* Row content column — the title and its meta line. min-width:0 so long
+   subjects ellipsis rather than pushing the trailing content off the row. */
+.p-row-body {
+  flex: 1;
+  min-width: 0;
+}
+.p-row-title {
+  font-weight: 600;
+  color: var(--heading);
+  line-height: 1.35;
+}
+.p-row-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--p-2);
+  margin-top: 0.125rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* The small square plate that carries a row's leading icon. Tinted from the
+   row's status where it has one, and neutral where it does not. */
+.p-plate {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--p-r-xs);
+  background: color-mix(in oklab, var(--row-status, var(--text-muted)) 12%, var(--p-surface));
+  color: var(--row-status, var(--text-muted));
+}
+
+/* ------------------------------------------------------------
+   Chips, badges and status
+   ------------------------------------------------------------ */
+.p-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1875rem 0.5rem;
+  border-radius: var(--p-r-xs);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  color: var(--text-muted);
+  background: var(--p-field);
+}
+
+/* A status chip takes its colour from --row-status, so a row sets the status
+   once and the rule, the plate and the chip all follow. 14% of the status
+   colour mixed into the surface keeps the fill quiet enough that the LABEL is
+   what reads — the point of the ramp is that colour is never load-bearing. */
+.p-chip-status {
+  color: var(--row-status);
+  background: color-mix(in oklab, var(--row-status) 14%, var(--p-surface));
+}
+
+/* A count. Neutral by default: an unread total is information, not an
+   emergency, and spending red on it is why red says nothing in the app today.
+   .p-count-alert exists for the case that genuinely warrants it. */
+.p-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding-inline: 0.3rem;
+  border-radius: var(--p-r-pill);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: color-mix(in oklab, var(--text) 14%, var(--p-surface));
+}
+.p-count-alert {
+  color: var(--p-surface);
+  background: var(--st-urgent);
+}
+
+/* Live state dot — the headset's connection, the demo badge. */
+.p-dot {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+/* ------------------------------------------------------------
+   Controls
+   ------------------------------------------------------------ */
+.p-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  padding: 0 0.875rem;
+  border-radius: var(--p-r-pill);
+  border: 1px solid transparent;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
+}
+/* Green fill, Cream label — the marketing .btn-primary, without the -2px hover
+   lift. A button that moves under a thumb on a shop floor is a mis-tap. */
+.p-btn-primary {
+  background: var(--color-green);
+  color: var(--color-cream);
+}
+.p-btn-primary:hover {
+  background: color-mix(in oklab, var(--color-green) 88%, #ffffff);
+}
+.p-btn-quiet {
+  border-color: var(--border);
+  color: var(--text);
+  background: var(--p-surface);
+}
+.p-btn-quiet:hover {
+  border-color: var(--p-line-strong);
+  background: var(--p-field);
+}
+
+/* Icon button — the toolbar's unit. Square tap target, round hover field. */
+.p-icon-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--p-tap);
+  height: var(--p-tap);
+  border-radius: var(--p-r-pill);
+  border: 0;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  position: relative;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.p-icon-btn:hover {
+  background: var(--p-field);
+}
+.p-icon-btn[aria-expanded="true"] {
+  background: var(--p-field);
+}
+
+/* The count that sits on a toolbar icon. Offset onto the glyph's top-right
+   rather than centred over it, and ringed in the bar's own background so it
+   reads as a separate object at 11px. */
+.p-icon-btn > .p-count {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.25rem;
+  box-shadow: 0 0 0 2px var(--p-bar-bg, var(--bg));
+}
+
+.p-field-input {
+  width: 100%;
+  min-height: var(--p-tap);
+  padding-inline: var(--p-4);
+  border-radius: var(--p-r-pill);
+  border: 1px solid var(--border);
+  background: var(--p-surface);
+  color: var(--text);
+  font: inherit;
+}
+.p-field-input::placeholder {
+  color: var(--text-muted);
+}
+
+:where(.p-app) :where(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+  border-radius: var(--p-r-xs);
+}
+
+/* ------------------------------------------------------------
+   The toolbar
+   ------------------------------------------------------------ */
+.p-bar {
+  --p-bar-bg: var(--p-surface);
+  display: flex;
+  align-items: center;
+  gap: var(--p-2);
+  flex: none;
+  padding: var(--p-2) var(--p-3);
+  background: var(--p-bar-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+/* The context switcher — org and store, as a control rather than a caption. A
+   frontline colleague covers more than one store; the app currently states the
+   org in dead text and gives no way to change it. */
+.p-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--p-2);
+  min-height: 2.25rem;
+  /* The one flexible item in the bar. Flex items default to `min-width: auto`,
+     which refuses to shrink below their content — so at handset width the
+     switcher held its full "Cambridge Central" and pushed the account avatar
+     off the end of the bar. Zero here lets it give way, and the truncation
+     below decides how. */
+  min-width: 0;
+  padding: 0 0.5rem 0 0.625rem;
+  border-radius: var(--p-r-sm);
+  border: 1px solid transparent;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard);
+}
+.p-switcher:hover,
+.p-switcher[aria-expanded="true"] {
+  background: var(--p-field);
+  border-color: var(--border);
+}
+.p-switcher-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--heading);
+}
+.p-switcher-sub {
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: var(--text-muted);
+}
+/* The store name is the only thing in the bar allowed to truncate. Everything
+   else is either fixed (the icons) or must not be abbreviated (the mark). */
+.p-switcher .p-switcher-name,
+.p-switcher .p-switcher-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Environment badge. Deliberately quiet: the current app runs a saturated red
+   pill across the top of every demo screen, which trains people to ignore red.
+   A hairline outline and a dot say the same thing without spending the alert
+   colour. */
+.p-env {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 0.4rem;
+  flex: none;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--p-r-pill);
+  border: 1px dashed var(--p-line-strong);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  color: var(--text-muted);
+}
+
+/* Command trigger — ⌘K. The single most reliable signal that a tool is a tool.
+   Collapses to an icon button below the toolbar's breakpoint. */
+.p-command {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: var(--p-2);
+  flex: none;
+  min-width: 12rem;
+  min-height: 2.25rem;
+  padding: 0 0.5rem 0 0.75rem;
+  border-radius: var(--p-r-pill);
+  border: 1px solid var(--border);
+  background: var(--p-field);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+.p-command:hover {
+  border-color: var(--p-line-strong);
+}
+.p-kbd {
+  margin-left: auto;
+  padding: 0.125rem 0.3125rem;
+  border-radius: var(--p-r-xs);
+  border: 1px solid var(--border);
+  background: var(--p-surface);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+/* Headset — a toggle with state, not a dead button. The dot carries the
+   connection and the label repeats it, so the state survives both a greyscale
+   screen and a glance. */
+.p-headset {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 0.5rem;
+  flex: none;
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  border-radius: var(--p-r-pill);
+  border: 1px solid var(--border);
+  background: var(--p-surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard);
+}
+.p-headset:hover {
+  border-color: var(--p-line-strong);
+}
+.p-headset[data-state="live"] {
+  color: var(--st-done);
+  border-color: color-mix(in oklab, var(--st-done) 45%, var(--border));
+  background: color-mix(in oklab, var(--st-done) 10%, var(--p-surface));
+}
+.p-headset[data-state="muted"] {
+  color: var(--st-high);
+  border-color: color-mix(in oklab, var(--st-high) 45%, var(--border));
+  background: color-mix(in oklab, var(--st-high) 10%, var(--p-surface));
+}
+
+/* Avatar. Stone-filled with Ink initials in light, and the same relationship
+   inverted in dark — one treatment for everyone, with the accent reserved for
+   "you". Seven unrelated hues is the app's loudest generated tell. */
+.p-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--color-stone);
+  color: var(--color-ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  user-select: none;
+}
+.p-avatar-self {
+  background: var(--color-copper);
+  color: var(--color-ink);
+}
+.p-avatar-lg {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 0.875rem;
+}
+/* Overlapping strip — the team on shift. Ringed in the surface behind them so
+   the overlap reads as depth rather than as a smear. */
+.p-avatar-stack > * + * {
+  margin-inline-start: -0.5rem;
+}
+.p-avatar-stack .p-avatar {
+  box-shadow: 0 0 0 2px var(--p-surface);
+}
+
+/* ------------------------------------------------------------
+   Menus — the account menu, the switcher, the notification panel
+   ------------------------------------------------------------ */
+.p-menu {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 0.375rem);
+  min-width: 15rem;
+  padding: var(--p-1);
+  border-radius: var(--p-r-lg);
+  border: 1px solid var(--border);
+  background: var(--p-raised);
+  box-shadow: var(--p-shadow-2);
+  animation: p-menu-in 140ms var(--ease-entrance);
+}
+.p-menu-end {
+  inset-inline-end: 0;
+}
+.p-menu-start {
+  inset-inline-start: 0;
+}
+@keyframes p-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .p-menu {
+    animation: none;
+  }
+}
+
+.p-menu-head {
+  display: flex;
+  align-items: center;
+  gap: var(--p-3);
+  padding: var(--p-3);
+}
+.p-menu-sep {
+  height: 1px;
+  margin: var(--p-1) 0;
+  background: var(--border);
+}
+.p-menu-label {
+  padding: var(--p-2) var(--p-3) var(--p-1);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  color: var(--text-muted);
+}
+.p-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--p-3);
+  width: 100%;
+  min-height: 2.375rem;
+  padding: 0 var(--p-3);
+  border-radius: var(--p-r-sm);
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.p-menu-item:hover {
+  background: var(--p-field);
+}
+.p-menu-item[aria-checked="true"] {
+  color: var(--accent-text);
+  font-weight: 600;
+}
+.p-menu-item-danger {
+  color: var(--st-urgent);
+}
+.p-menu-item svg {
+  flex: none;
+  opacity: 0.75;
+}
+.p-menu-trail {
+  margin-inline-start: auto;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* An alert inside the notifications panel. Carries the same leading rule as a
+   list row, for the same reason: the chip names the status and the rule locates
+   it, so the panel can be scanned down its left edge without reading. Divided
+   by a hairline rather than by gaps — the panel is one queue, not a stack of
+   cards, which is the distinction the current app's modal misses. */
+.p-alert {
+  position: relative;
+  padding: var(--p-3);
+  padding-inline-start: calc(var(--p-3) + 0.375rem);
+}
+.p-alert::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--p-2);
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--row-status, transparent);
+}
+.p-alert + .p-alert {
+  border-top: 1px solid var(--border);
+}
+
+/* ------------------------------------------------------------
+   Screen furniture
+   ------------------------------------------------------------ */
+
+/* The Now strip. The app has no equivalent — the first thing on the screen is
+   three message cards, so "what am I meant to be doing" is below the fold.
+   Green field, Cream copy: the marketing statement panel at product scale, and
+   the only saturated surface on the screen, which is what makes it the thing
+   the eye lands on. Cream on Green is 7.81:1. */
+.p-now {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--p-r-md);
+  background: var(--color-green-field);
+  background-image: url("/images/tex-ridge-ink.webp");
+  background-size: cover;
+  background-position: center;
+  color: var(--color-cream);
+  padding: var(--p-4);
+}
+.p-now-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  color: rgb(var(--cream-rgb) / 0.78);
+}
+.p-now-title {
+  margin-top: 0.375rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  /* Explicit, and required. This is an <h2>, and base.css sets a colour on
+     every heading element — inheriting Cream from .p-now would lose to that,
+     because a rule that MATCHES the element always beats one that only reaches
+     it by inheritance, whatever the layers say. The heading came out Ink on the
+     Green field. Any heading dropped inside a coloured surface needs the same
+     line. */
+  color: inherit;
+  font-family: var(--font-body);
+}
+.p-now-meta {
+  margin-top: 0.125rem;
+  font-size: 0.8125rem;
+  color: rgb(var(--cream-rgb) / 0.78);
+}
+
+/* Empty state. Not a grey box with a sentence in it — a hairline well, a mark,
+   and copy with a voice. On a shift tool the empty state is the GOOD state and
+   should read like one. */
+.p-empty {
+  display: flex;
+  align-items: center;
+  gap: var(--p-3);
+  padding: var(--p-4);
+  border-radius: var(--p-r-md);
+  border: 1px dashed var(--border);
+  background: var(--p-field);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+.p-empty svg {
+  flex: none;
+  color: var(--st-done);
+}
+
+/* The Ask bar, docked above the tabs. */
+.p-ask {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--p-2);
+  padding: var(--p-3) var(--p-4);
+  background: var(--p-surface);
+  border-top: 1px solid var(--border);
+}
+.p-mic {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--p-tap);
+  height: var(--p-tap);
+  border-radius: 50%;
+  border: 0;
+  background: var(--color-copper);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: filter var(--dur-fast) var(--ease-standard);
+}
+.p-mic:hover {
+  filter: brightness(1.06);
+}
+
+/* The tab bar. Copper marks the active tab as a 2px rule on the TOP edge —
+   the accent as a mark, which is the one thing Copper is allowed to be on a
+   light field. The label goes to full --text weight rather than to Copper,
+   because Copper as small text on light is the 3.14:1 failure. */
+.p-tabs {
+  flex: none;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  background: var(--p-surface);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.p-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-height: 3.5rem;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-standard);
+}
+.p-tab:hover {
+  color: var(--text);
+}
+.p-tab[aria-current="page"] {
+  color: var(--text);
+}
+.p-tab[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2.25rem;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--accent);
+}
+/* The count rides the tab's icon rather than the tab, so it stays pinned to the
+   glyph whatever the label's length. Ringed in the bar's own surface for the
+   same reason the toolbar counts are. */
+.p-tab .p-count {
+  position: absolute;
+  top: -0.375rem;
+  inset-inline-start: 0.75rem;
+  box-shadow: 0 0 0 2px var(--p-surface);
+}

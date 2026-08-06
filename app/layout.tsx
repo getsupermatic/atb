@@ -10,6 +10,7 @@ import { site } from "@/lib/site";
 import ogCard from "@/public/images/og-card.png";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
+import SiteChrome from "@/components/layout/SiteChrome";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 import GrainBackground from "@/components/motion/GrainBackground";
 import FilmGrade from "@/components/brand/FilmGrade";
@@ -130,8 +131,13 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
-        <SmoothScroll />
-        <GrainBackground />
+        {/* SiteChrome keeps the marketing furniture off /design — see the note
+            in the component. The film-grade defs stay unconditional: they are
+            filter definitions with no visual output of their own. */}
+        <SiteChrome>
+          <SmoothScroll />
+          <GrainBackground />
+        </SiteChrome>
         {/* Filter defs only — no visual output. Must be in the document for
             `.grade-film`'s `filter: url(#film-grade)` to resolve. */}
         <FilmGrade />
@@ -141,11 +147,15 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <Nav />
+        <SiteChrome>
+          <Nav />
+        </SiteChrome>
         <main id="main" className="relative">
           {children}
         </main>
-        <Footer />
+        <SiteChrome>
+          <Footer />
+        </SiteChrome>
       </body>
     </html>
   );
